@@ -1,0 +1,8 @@
+not_have_permission: "&cBạn không có quyền để thực hiện hành động."
+must_be_player: "&cBạn cần ở trong trò chơi để có thể thực hiện hành động."
+enchantment_not_found: "&cKhông thể tìm thấy phù phép! Xin hãy kiểm tra lại."
+must_hold_item: "&cBạn cần cầm vật phẩm trước."
+invalid_enchantment_level: "&cCấp độ phù phép phải bắt đầu từ 1."
+over_limited_enchantment_level: "&cCấp độ phù phép đã vượt giới hạn."
+unsuitable_item: "&cVật phẩm không phù hợp để sử dụng phù phép."
+plugin_reloaded: "&aPlugin đã được nạp lại thành công."

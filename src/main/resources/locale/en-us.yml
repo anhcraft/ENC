@@ -1,0 +1,8 @@
+not_have_permission: "&cYou do not have permission to perform the action."
+must_be_player: "&cYou must be an in-game player in order to perform the action."
+enchantment_not_found: "&cCould not find the enchantment! Please recheck."
+must_hold_item: "&cYou must hold an item first."
+invalid_enchantment_level: "&cEnchantment level must be started from 1."
+over_limited_enchantment_level: "&cEnchantment level was over the limit."
+invalid_item: "&cUnsuitable item for using the enchantment."
+plugin_reloaded: "&aThe plugin was reload successfully."
