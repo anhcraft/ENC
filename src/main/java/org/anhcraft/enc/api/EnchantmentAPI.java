@@ -2,7 +2,6 @@ package org.anhcraft.enc.api;
 
 import org.anhcraft.enc.utils.DelayedRunnable;
 import org.anhcraft.enc.utils.RomanNumber;
-import org.anhcraft.spaciouslib.builders.ArrayBuilder;
 import org.anhcraft.spaciouslib.utils.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -13,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class EnchantmentAPI {
     private static final List<String> DEFAULT_WORLDS_LIST = CommonUtils.toList(new String[]{"world"});
@@ -119,36 +119,24 @@ public class EnchantmentAPI {
      * Gets all registered enchantments.
      * @return an array of enchantments
      */
-    public Enchantment[] getRegisteredEnchantments() {
-        ArrayBuilder builder = new ArrayBuilder(Enchantment.class);
-        for(Enchantment enchant : ENCHANT_MAP.values()){
-            builder.append(enchant);
-        }
-        return (Enchantment[]) builder.build();
+    public List<Enchantment> getRegisteredEnchantments() {
+        return new ArrayList<>(ENCHANT_MAP.values());
     }
 
     /**
      * Gets coloured names of all registered enchantments.
      * @return an array of enchantment's coloured name
      */
-    public String[] getRegisteredEnchantmentNames() {
-        ArrayBuilder builder = new ArrayBuilder(String.class);
-        for(Enchantment enchant : ENCHANT_MAP.values()){
-            builder.append(enchant.getName());
-        }
-        return (String[]) builder.build();
+    public List<String> getRegisteredEnchantmentNames() {
+        return ENCHANT_MAP.values().stream().map(Enchantment::getName).collect(Collectors.toList());
     }
 
     /**
      * Gets ids of all registered enchantments.
      * @return an array of enchantment's id
      */
-    public String[] getRegisteredEnchantmentIds() {
-        ArrayBuilder builder = new ArrayBuilder(String.class);
-        for(Enchantment enchant : ENCHANT_MAP.values()){
-            builder.append(enchant.getId());
-        }
-        return (String[]) builder.build();
+    public List<String> getRegisteredEnchantmentIds() {
+        return ENCHANT_MAP.values().stream().map(Enchantment::getId).collect(Collectors.toList());
     }
 
     /**
