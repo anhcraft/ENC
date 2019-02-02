@@ -1,6 +1,8 @@
 package org.anhcraft.enc.api;
 
 import org.anhcraft.algorithmlib.array.searching.ArrayBinarySearch;
+import org.anhcraft.spaciouslib.builders.EqualsBuilder;
+import org.anhcraft.spaciouslib.builders.HashCodeBuilder;
 import org.anhcraft.spaciouslib.utils.Chat;
 import org.anhcraft.spaciouslib.utils.ExceptionThrower;
 import org.bukkit.configuration.ConfigurationSection;
@@ -152,4 +154,28 @@ public abstract class Enchantment {
      * @return true if yes
      */
     public abstract boolean canEnchantItem(ItemStack itemStack);
+
+    @Override
+    public boolean equals(Object object){
+        if(object != null && object.getClass() == this.getClass()){
+            Enchantment e = (Enchantment) object;
+            return new EqualsBuilder()
+                    .append(e.id, this.id)
+                    .append(e.configuration.getString("name"), this.configuration.getString("name"))
+                    .build();
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode(){
+        return new HashCodeBuilder(17, 21)
+                .append(this.id)
+                .append(this.configuration.getString("name"))
+                .append(this.author)
+                .append(this.itemTarget)
+                .append(this.proposer)
+                .append(this.maxLevel)
+                .append(this.description).build();
+    }
 }
