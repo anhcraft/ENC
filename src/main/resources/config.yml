@@ -25,6 +25,7 @@ general:
 enchant_config_saver:
   # should we use another thread for saving?
   use_async: true
+
   # the delay duration for each file-saving time
   delay_duration: 100
 

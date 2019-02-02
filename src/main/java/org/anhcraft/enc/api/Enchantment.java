@@ -1,6 +1,7 @@
 package org.anhcraft.enc.api;
 
 import org.anhcraft.algorithmlib.array.searching.ArrayBinarySearch;
+import org.anhcraft.enc.utils.ChatUtils;
 import org.anhcraft.spaciouslib.builders.EqualsBuilder;
 import org.anhcraft.spaciouslib.builders.HashCodeBuilder;
 import org.anhcraft.spaciouslib.utils.Chat;
@@ -26,7 +27,7 @@ public abstract class Enchantment {
 
     /**
      * Creates an instance of enchantment.
-     * @param id the enchantment id (A-Z, 0-9 and underscore only)
+     * @param id the enchantment id (A-Z, 0-9 and underscore only, ignored case sensitive)
      * @param description the description
      * @param author the author
      * @param proposer the proposer (can be null)
@@ -34,7 +35,7 @@ public abstract class Enchantment {
      * @param targets item types that may fit the enchantment
      */
     public Enchantment(String id, String[] description, String author, String proposer, int maxLevel, EnchantmentTarget... targets) {
-        ExceptionThrower.ifFalse(id.matches("^[\\w]+$"), new Exception("the enchantment id must only contain A-Z, 0-9 and underscore"));
+        ExceptionThrower.ifFalse(id.matches("^[\\w]+$"), new Exception("enchantment id must only contain A-Z, 0-9 and underscore"));
         this.id = id;
         this.description = Arrays.copyOf(description, description.length);
         this.author = author;
@@ -52,6 +53,7 @@ public abstract class Enchantment {
     void initConfig(ConfigurationSection config){
         configuration = config;
         chat = new Chat(replaceStr(config.getString("chat_prefix")));
+        ExceptionThrower.ifFalse(getName().indexOf(ChatUtils.SECTION_SIGN) == -1, new Exception("enchantment name can not contain section signs due to unexpected bugs, please use ampersands instead"));
     }
 
     /**
@@ -88,11 +90,11 @@ public abstract class Enchantment {
     }
 
     /**
-     * Gets the coloured name of this enchantment.
+     * Gets the name of this enchantment.
      * @return enchantment's name
      */
     public String getName() {
-        return Chat.color(configuration.getString("name"));
+        return configuration.getString("name");
     }
 
     /**

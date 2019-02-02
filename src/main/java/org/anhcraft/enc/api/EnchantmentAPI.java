@@ -1,5 +1,6 @@
 package org.anhcraft.enc.api;
 
+import org.anhcraft.enc.utils.ChatUtils;
 import org.anhcraft.enc.utils.DelayedRunnable;
 import org.anhcraft.enc.utils.RomanNumber;
 import org.anhcraft.spaciouslib.utils.*;
@@ -110,9 +111,8 @@ public class EnchantmentAPI {
      * @return the enchantment (may be null if it is not found)
      */
     public Enchantment getEnchantmentByName(String enchantName) {
-        String x = Chat.color(enchantName);
         return ENCHANT_MAP.values().stream().filter(enchantment ->
-                enchantment.getName().equals(x)).findFirst().orElse(null);
+                enchantment.getName().equals(enchantName)).findFirst().orElse(null);
     }
 
     /**
@@ -151,7 +151,7 @@ public class EnchantmentAPI {
             ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
                 for(String l : m.getLore()) {
-                    if(l.startsWith(LORE_PREFIX + enchant.getName() + " ")) {
+                    if(l.startsWith(LORE_PREFIX + Chat.color(enchant.getName()) + " ")) {
                         return true;
                     }
                 }
@@ -175,7 +175,7 @@ public class EnchantmentAPI {
                         String[] x = l.substring(LORE_PREFIX.length()).split(" ");
                         String name = String.join(" ", Arrays.copyOfRange(x, 0, x.length-1));
                         int lv = RomanNumber.toDecimal(x[x.length-1]);
-                        map.put(getEnchantmentByName(name), lv);
+                        map.put(getEnchantmentByName(ChatUtils.reverseColorCode(name)), lv);
                     }
                 }
                 return map;
@@ -192,10 +192,11 @@ public class EnchantmentAPI {
      */
     public int getEnchantmentLevel(ItemStack itemStack, Enchantment enchant) {
         if(!InventoryUtils.isNull(itemStack)) {
+            String colouredName = Chat.color(enchant.getName());
             ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
                 for(String l : m.getLore()) {
-                    if(l.startsWith(LORE_PREFIX + enchant.getName() + " ")) {
+                    if(l.startsWith(LORE_PREFIX + colouredName + " ")) {
                         String[] x = l.substring(LORE_PREFIX.length()).split(" ");
                         return RomanNumber.toDecimal(x[x.length-1]);
                     }
@@ -213,12 +214,13 @@ public class EnchantmentAPI {
      */
     public void addEnchantment(ItemStack itemStack, Enchantment enchant, int level) {
         if(!InventoryUtils.isNull(itemStack)) {
+            String colouredName = Chat.color(enchant.getName());
             ItemMeta m = itemStack.getItemMeta();
             List<String> lore = new ArrayList<>();
-            lore.add(LORE_PREFIX + enchant.getName() + " " + RomanNumber.toRoman(level));
+            lore.add(LORE_PREFIX + colouredName + " " + RomanNumber.toRoman(level));
             if(m.hasLore()) {
                 for(String l : m.getLore()) {
-                    if(!l.startsWith(LORE_PREFIX + enchant.getName() + " ")) {
+                    if(!l.startsWith(LORE_PREFIX + colouredName + " ")) {
                         lore.add(l);
                     }
                 }
@@ -235,11 +237,12 @@ public class EnchantmentAPI {
      */
     public void removeEnchantment(ItemStack itemStack, Enchantment enchant) {
         if(!InventoryUtils.isNull(itemStack)) {
+            String colouredName = Chat.color(enchant.getName());
             ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
                 List<String> lore = new ArrayList<>();
                 for(String l : m.getLore()) {
-                    if(!l.startsWith(LORE_PREFIX + enchant.getName() + " ")) {
+                    if(!l.startsWith(LORE_PREFIX + colouredName + " ")) {
                         lore.add(l);
                     }
                 }

@@ -21,13 +21,13 @@ public class AdminCommand implements Runnable {
         @Override
         public void run(CommandBuilder commandBuilder, CommandSender commandSender, int i, String[] strings, int i1, String s) {
             if(commandSender.hasPermission("enc.admin.list")) {
+                enc.chat.sendCommandSender(enc.localeConfig.getString("list_registered_enchantments"), commandSender);
                 if(enc.mainConfig.getBoolean("commands.use_enchantment_id")) {
-                    enc.chat.sendCommandSender("&a" + String.join(", ",
+                    enc.chat.sendCommandSenderNoPrefix(String.join(", ",
                             ENC.getApi().getRegisteredEnchantmentIds()), commandSender);
-                }
-                else{
-                    enc.chat.sendCommandSender("&a" + String.join(", ",
-                            ENC.getApi().getRegisteredEnchantmentNames()), commandSender);
+                } else{
+                    // we do not color the string here
+                    commandSender.sendMessage(String.join(", ", ENC.getApi().getRegisteredEnchantmentNames()));
                 }
             } else {
                 enc.chat.sendCommandSender(enc.localeConfig.getString("not_have_permission"), commandSender);
@@ -46,7 +46,7 @@ public class AdminCommand implements Runnable {
                         enc.chat.sendCommandSender(enc.localeConfig.getString("must_hold_item"), commandSender);
                         return;
                     }
-                    Group<Enchantment, Integer> enchantment = ArgUtils.findEnchantment(enc, strings, 1);
+                    Group<Enchantment, Integer> enchantment = ArgUtils.enchantAndLevel(enc, strings, 1);
                     if(enchantment.getA() == null){
                         enc.chat.sendCommandSender(enc.localeConfig.getString("enchantment_not_found"), commandSender);
                         return;
@@ -86,12 +86,12 @@ public class AdminCommand implements Runnable {
                         enc.chat.sendCommandSender(enc.localeConfig.getString("must_hold_item"), commandSender);
                         return;
                     }
-                    Group<Enchantment, Integer> enchantment = ArgUtils.findEnchantment(enc, strings, 1);
-                    if(enchantment.getA() == null){
+                    Enchantment enchantment = ArgUtils.onlyEnchant(enc, strings, 1);
+                    if(enchantment == null){
                         enc.chat.sendCommandSender(enc.localeConfig.getString("enchantment_not_found"), commandSender);
                         return;
                     }
-                    ENC.getApi().removeEnchantment(item, enchantment.getA());
+                    ENC.getApi().removeEnchantment(item, enchantment);
                 } else {
                     enc.chat.sendCommandSender(enc.localeConfig.getString("must_be_player"), commandSender);
                 }
