@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class EnchantmentAPI {
     private static final List<String> DEFAULT_WORLDS_LIST = CommonUtils.toList(new String[]{"world"});
-    private static final String LORE_PREFIX = Chat.color("&2&6&7");
+    private static final String LORE_PREFIX = Chat.color("&1&7");
     private static final InitialisationValidator INIT_LOCK = new InitialisationValidator();
     private static final HashMap<String, Enchantment> ENCHANT_MAP = new HashMap<>();
     private ConfigurationSection config;
@@ -140,7 +140,8 @@ public class EnchantmentAPI {
     }
 
     /**
-     * Checks whether the given stack of items is enchanted by an enchantment.
+     * Checks whether the given stack of items is enchanted by an enchantment.<br>
+     * This validation is not strict at all since it is not sure whether the enchantment exists or not.
      * @param enchant the enchantment
      * @param itemStack the stack of items
      * @return true if yes
