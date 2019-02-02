@@ -37,7 +37,7 @@ public abstract class Enchantment {
         this.description = Arrays.copyOf(description, description.length);
         this.author = author;
         this.proposer = proposer;
-        this.maxLevel = maxLevel <= 0 ? 1 : maxLevel;
+        this.maxLevel = Math.max(maxLevel, 1);
         this.itemTarget = ArrayBinarySearch.search(targets, EnchantmentTarget.ALL) >= 0 ? new EnchantmentTarget[]{EnchantmentTarget.ALL} : targets; // optimize the targets
     }
 

@@ -9,7 +9,10 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 public class EnchantmentAPI {
     private static final List<String> DEFAULT_WORLDS_LIST = CommonUtils.toList(new String[]{"world"});
