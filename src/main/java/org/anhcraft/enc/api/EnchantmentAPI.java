@@ -34,14 +34,6 @@ public class EnchantmentAPI {
     }
 
     /**
-     * Applies changes for the configuration of an enchantment.
-     * @param enchant the enchantment
-     */
-    public void applyEnchantmentConfig(Enchantment enchant) {
-        enchant.initConfig(config.getConfigurationSection(enchant.getId().toUpperCase()));
-    }
-
-    /**
      * Applies changes for all configuration of enchantments.
      */
     public void applyEnchantmentConfigs() {
@@ -63,7 +55,9 @@ public class EnchantmentAPI {
      */
     public void registerEnchantment(Enchantment enchant) {
         String id = enchant.getId().toUpperCase();
-        ExceptionThrower.ifTrue(ENCHANT_MAP.containsKey(id), new Exception("Enchantment is already registered"));
+        ExceptionThrower.ifTrue(ENCHANT_MAP.containsKey(id), new Exception("Enchantment is already registered: Id must be unique"));
+        ExceptionThrower.ifFalse(ENCHANT_MAP.values().stream().noneMatch(enchantment ->
+                enchantment.getName().equals(enchant.getName())), new Exception("Enchantment is already registered: Name must be unique"));
         ENCHANT_MAP.put(id, enchant);
         if(config.isSet(id)) {
             enchant.initConfig(config.getConfigurationSection(id));
@@ -76,7 +70,7 @@ public class EnchantmentAPI {
             section.set("allowed_worlds_list", true);
             section.set("name", enchant.getId());
             config.set(id, section);
-            applyEnchantmentConfig(enchant);
+            enchant.initConfig(section);
             saveEnchantmentConfig();
         }
     }
