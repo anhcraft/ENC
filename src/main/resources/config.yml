@@ -30,17 +30,11 @@ enchant_config_saver:
 
 # settings for commands
 commands:
-  # should we find the enchantment by its id or not?
-  # if not, its name will be used
-  # warning: change this is not recommended since it makes the performance worse
-  find_enchantment_by_id: true
+  # when interacts with enchantment, whether we use its id or its name?
+  # warning: using names can make the performance worse
+  use_enchantment_id: true
 
-# general settings for enchantment
-# specific configuration for each enchantment can be found in the enchantments.yml file
-enchantment:
-  # allow unsafe enchantment?
-  # players may be able to add any enchantments to an item without validation: level check, items type check, etc
-  # however, enables this option does not make them able to bypass permission
+  # should we allow unsafe enchantment (enchanting unsupported items with unlimited level)?
   unsafe_enchantments: false
 
 # =====================

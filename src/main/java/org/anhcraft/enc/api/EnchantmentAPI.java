@@ -105,7 +105,7 @@ public class EnchantmentAPI {
 
     /**
      * Gets the enchantment by its name.<br>
-     * The name can be coloured or not
+     * The name can be coloured or not.
      * @param enchantName the enchantment's name
      * @return the enchantment (may be null if it is not found)
      */

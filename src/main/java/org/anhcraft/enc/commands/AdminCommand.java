@@ -21,8 +21,14 @@ public class AdminCommand implements Runnable {
         @Override
         public void run(CommandBuilder commandBuilder, CommandSender commandSender, int i, String[] strings, int i1, String s) {
             if(commandSender.hasPermission("enc.admin.list")) {
-                enc.chat.sendCommandSender("&a" + String.join(", ",
-                        ENC.getApi().getRegisteredEnchantmentNames()), commandSender);
+                if(enc.mainConfig.getBoolean("commands.use_enchantment_id")) {
+                    enc.chat.sendCommandSender("&a" + String.join(", ",
+                            ENC.getApi().getRegisteredEnchantmentIds()), commandSender);
+                }
+                else{
+                    enc.chat.sendCommandSender("&a" + String.join(", ",
+                            ENC.getApi().getRegisteredEnchantmentNames()), commandSender);
+                }
             } else {
                 enc.chat.sendCommandSender(enc.localeConfig.getString("not_have_permission"), commandSender);
             }
@@ -49,7 +55,7 @@ public class AdminCommand implements Runnable {
                         enc.chat.sendCommandSender(enc.localeConfig.getString("invalid_enchantment_level"), commandSender);
                         return;
                     }
-                    if(enc.mainConfig.getBoolean("enchantment.unsafe_enchantments")){
+                    if(enc.mainConfig.getBoolean("commands.unsafe_enchantments")){
                         if(enchantment.getB() > enchantment.getA().getMaxLevel()){
                             enc.chat.sendCommandSender(enc.localeConfig.getString("over_limited_enchantment_level"), commandSender);
                             return;
