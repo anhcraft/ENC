@@ -1,0 +1,64 @@
+#    ______ _   _  _____
+#   |  ____| \ | |/ ____|
+#   | |__  |  \| | |
+#   |  __| | . ` | |
+#   | |____| |\  | |____
+#   |______|_| \_|\_____|
+#
+#    CREATED BY ANHCRAFT
+
+
+# Plugin settings
+plugin:
+  # The prefix of plugin's chat messages
+  prefix: "&f/&5ENC&f/ "
+
+  # Customize your locale for messages and texts
+  # Write the name of your wanted localization file here (checks it in the folder /locale/)
+  # Available: en-us.yml, vi-vn.yml
+  locale_file: en-us.yml
+
+
+# Command settings
+commands:
+  # When interacts with enchantment via commands, we use the id or the name?
+  # [!] NOTICE: Using ids does not change the lore in items because they always use names
+  # [!] WARNING: Using names can make the performance worse
+  use_enchantment_by_id: true
+
+  # Should we allow unsafe enchantment (enchanting unsupported items with unlimited level)?
+  unsafe_enchantment: false
+
+  # Should we use another thread for plugin-reloading?
+  # This option can improve the performance a bit
+  async_reload: true
+
+
+# General enchantment settings
+enchantment:
+  # Patterns of a lore line
+  # This is the place where you can customize enchantment lore
+  # [!] WARNING: Do not touch this section if you are not sure. Any changes to this section may destroy all existing enchantments
+  lore_patterns:
+    # Raw pattern for lore line
+    # Placeholders: {name}, {coloured_name}, {level}, {roman_level}
+    full_raw: "&1&7{coloured_name} {roman_level}"
+
+    # RegEx pattern for general enchantment validations
+    full_general_regex: "^&1&7(.*)+ ([IVXLCDM]+)$"
+
+    # RegEx pattern for certain enchantment validations
+    # Placeholders: {name}
+    full_individual_regex: "^&1&7({name})+ ([IVXLCDM]+)$"
+
+    # RegEx pattern for getting enchantment's names
+    name_regex: "(?<=&1&7)(.*)+(?= [IVXLCDM]+)"
+
+    # RegEx pattern for getting enchantment's levels
+    level_regex: "[IVXLCDM]+$"
+
+
+
+# =====================
+# Do not change this!
+config_version: ${enc.configVersion}

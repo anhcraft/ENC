@@ -4,26 +4,38 @@ import org.anhcraft.algorithmlib.array.searching.ArrayBinarySearch;
 import org.anhcraft.enc.utils.ChatUtils;
 import org.anhcraft.spaciouslib.builders.EqualsBuilder;
 import org.anhcraft.spaciouslib.builders.HashCodeBuilder;
+import org.anhcraft.spaciouslib.io.FileManager;
 import org.anhcraft.spaciouslib.utils.Chat;
+import org.anhcraft.spaciouslib.utils.CommonUtils;
 import org.anhcraft.spaciouslib.utils.ExceptionThrower;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Represents an enchantment.
  */
 public abstract class Enchantment {
+    private static final List<String> DEFAULT_WORLDS_LIST = CommonUtils.toList(new String[]{"world"});
+
     private String id;
     private String[] description;
     private String author;
-    private ConfigurationSection configuration;
     private String proposer;
     private int maxLevel;
     private EnchantmentTarget[] itemTarget;
+    private final YamlConfiguration config = new YamlConfiguration();
+    private File configFile;
     private Chat chat;
+    private boolean needSaveConfig;
 
     /**
      * Creates an instance of enchantment.
@@ -50,10 +62,17 @@ public abstract class Enchantment {
                 .replace("{enchant_id}", id);
     }
 
-    void initConfig(ConfigurationSection config){
-        configuration = config;
-        chat = new Chat(replaceStr(config.getString("chat_prefix")));
-        ExceptionThrower.ifFalse(getName().indexOf(ChatUtils.SECTION_SIGN) == -1, new Exception("enchantment name can not contain section signs due to unexpected bugs, please use ampersands instead"));
+    private void initConfigEntry(String key, Object value){
+        if(!config.isSet(key)){
+            config.set(key, value);
+            needSaveConfig = true;
+        }
+    }
+
+    void initConfig(File configFile){
+        this.configFile = configFile;
+        new FileManager(configFile).create();
+        reloadConfig();
     }
 
     /**
@@ -81,12 +100,44 @@ public abstract class Enchantment {
     }
 
     /**
-     * Gets the separate configuration of this enchantment.<br>
-     * For applying changes, saves the configuration by calling the method {@link EnchantmentAPI#saveEnchantmentConfig()}.
+     * Gets the configuration of this enchantment.
      * @return enchantment's configuration
      */
-    public ConfigurationSection getConfiguration() {
-        return configuration;
+    public ConfigurationSection getConfig() {
+        return config;
+    }
+
+    /**
+     * Reloads the configuration of this enchantment.
+     */
+    public void reloadConfig() {
+        try {
+            config.load(configFile);
+        } catch(IOException | InvalidConfigurationException e) {
+            e.printStackTrace();
+        }
+        needSaveConfig = false;
+        initConfigEntry("enabled", true);
+        initConfigEntry("chat_prefix", "&5#{lowercase_enchant_id} > &f");
+        initConfigEntry("worlds_list", new ArrayList<>(DEFAULT_WORLDS_LIST));
+        initConfigEntry("allowed_worlds_list", true);
+        initConfigEntry("name", id);
+        if(needSaveConfig){
+            saveConfig();
+        }
+        chat = new Chat(replaceStr(config.getString("chat_prefix")));
+        ExceptionThrower.ifFalse(getName().indexOf(ChatUtils.SECTION_SIGN) == -1, new Exception("enchantment name can not contain section signs due to unexpected bugs, please use ampersands instead"));
+    }
+
+    /**
+     * Saves the configuration of this enchantment.
+     */
+    public void saveConfig() {
+        try {
+            config.save(configFile);
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -94,7 +145,7 @@ public abstract class Enchantment {
      * @return enchantment's name
      */
     public String getName() {
-        return configuration.getString("name");
+        return config.getString("name");
     }
 
     /**
@@ -126,7 +177,7 @@ public abstract class Enchantment {
      * @return true if yes
      */
     public boolean isEnabled() {
-        return configuration.getBoolean("enabled");
+        return config.getBoolean("enabled");
     }
 
     /**
@@ -135,10 +186,10 @@ public abstract class Enchantment {
      * @return true if yes
      */
     public boolean isAllowedWorld(String world) {
-        if(configuration.getBoolean("allowed_worlds_list")){
-            return configuration.getStringList("worlds_list").contains(world);
+        if(config.getBoolean("allowed_worlds_list")){
+            return config.getStringList("worlds_list").contains(world);
         } else {
-            return !configuration.getStringList("worlds_list").contains(world);
+            return !config.getStringList("worlds_list").contains(world);
         }
     }
 
@@ -151,7 +202,7 @@ public abstract class Enchantment {
     }
 
     /**
-     * Checks whether this enchantment is suitable for the given stack of item
+     * Checks whether this enchantment is suitable for the given stack of item.
      * @param itemStack the stack of items
      * @return true if yes
      */
@@ -161,10 +212,7 @@ public abstract class Enchantment {
     public boolean equals(Object object){
         if(object != null && object.getClass() == this.getClass()){
             Enchantment e = (Enchantment) object;
-            return new EqualsBuilder()
-                    .append(e.id, this.id)
-                    .append(e.configuration.getString("name"), this.configuration.getString("name"))
-                    .build();
+            return new EqualsBuilder().append(e.id, this.id).build();
         }
         return false;
     }
@@ -173,7 +221,6 @@ public abstract class Enchantment {
     public int hashCode(){
         return new HashCodeBuilder(17, 21)
                 .append(this.id)
-                .append(this.configuration.getString("name"))
                 .append(this.author)
                 .append(this.itemTarget)
                 .append(this.proposer)

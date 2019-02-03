@@ -9,6 +9,7 @@ import org.anhcraft.spaciouslib.utils.InventoryUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class AdminCommand implements Runnable {
     private static ENC enc;
@@ -22,7 +23,7 @@ public class AdminCommand implements Runnable {
         public void run(CommandBuilder commandBuilder, CommandSender commandSender, int i, String[] strings, int i1, String s) {
             if(commandSender.hasPermission("enc.admin.list")) {
                 enc.chat.sendCommandSender(enc.localeConfig.getString("list_registered_enchantments"), commandSender);
-                if(enc.mainConfig.getBoolean("commands.use_enchantment_id")) {
+                if(enc.generalConfig.getBoolean("commands.use_enchantment_by_id")) {
                     enc.chat.sendCommandSenderNoPrefix(String.join(", ",
                             ENC.getApi().getRegisteredEnchantmentIds()), commandSender);
                 } else{
@@ -55,7 +56,7 @@ public class AdminCommand implements Runnable {
                         enc.chat.sendCommandSender(enc.localeConfig.getString("invalid_enchantment_level"), commandSender);
                         return;
                     }
-                    if(enc.mainConfig.getBoolean("commands.unsafe_enchantments")){
+                    if(!enc.generalConfig.getBoolean("commands.unsafe_enchantment")){
                         if(enchantment.getB() > enchantment.getA().getMaxLevel()){
                             enc.chat.sendCommandSender(enc.localeConfig.getString("over_limited_enchantment_level"), commandSender);
                             return;
@@ -105,11 +106,24 @@ public class AdminCommand implements Runnable {
         @Override
         public void run(CommandBuilder commandBuilder, CommandSender commandSender, int i, String[] strings, int i1, String s) {
             if(commandSender.hasPermission("enc.admin.reload")) {
-                try {
-                    enc.reloadPlugin();
-                } catch(Exception e) {
-                    e.printStackTrace();
-                } finally {
+                if(enc.generalConfig.getBoolean("commands.async_reload")) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                enc.initPlugin();
+                            } catch(Exception e) {
+                                e.printStackTrace();
+                            }
+                            enc.chat.sendCommandSender(enc.localeConfig.getString("plugin_reloaded"), commandSender);
+                        }
+                    }.runTaskAsynchronously(enc);
+                } else {
+                    try {
+                        enc.initPlugin();
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                    }
                     enc.chat.sendCommandSender(enc.localeConfig.getString("plugin_reloaded"), commandSender);
                 }
             } else {
