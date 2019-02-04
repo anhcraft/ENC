@@ -1,8 +1,8 @@
 package org.anhcraft.enc.listeners;
 
 import org.anhcraft.enc.ENC;
+import org.anhcraft.enc.api.ActionReport;
 import org.anhcraft.enc.api.Enchantment;
-import org.anhcraft.enc.api.EnchantmentExecutor;
 import org.anhcraft.enc.api.listeners.AttackEvent;
 import org.anhcraft.enc.api.listeners.EventListener;
 import org.anhcraft.spaciouslib.utils.InventoryUtils;
@@ -26,12 +26,11 @@ public class AttackListener implements Listener {
                 HashMap<Enchantment, Integer> enchants = ENC.getApi().listEnchantments(item);
                 for(Map.Entry<Enchantment, Integer> e : enchants.entrySet()) {
                     Enchantment enc = e.getKey();
-                    int lv = e.getValue();
                     if(enc.isEnabled() && enc.isAllowedWorld(damager.getWorld().getName())) {
                         for(EventListener eventListener : enc.getEventListeners()) {
                             if(eventListener instanceof AttackEvent) {
                                 ((AttackEvent) eventListener).onAttack(
-                                        new EnchantmentExecutor(damager, enc, lv),
+                                        new ActionReport(damager, item, enchants),
                                         (LivingEntity) event.getEntity(), event.getDamage());
                             }
                         }
