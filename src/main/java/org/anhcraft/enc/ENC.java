@@ -9,7 +9,6 @@ import org.anhcraft.spaciouslib.io.DirectoryManager;
 import org.anhcraft.spaciouslib.io.FileManager;
 import org.anhcraft.spaciouslib.utils.Chat;
 import org.anhcraft.spaciouslib.utils.IOUtils;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -20,13 +19,21 @@ public final class ENC extends JavaPlugin {
     private static final File LOCALE_FOLDER = new File(ROOT_FOLDER, "locale/");
     private static final File ENCHANTMENT_FOLDER = new File(ROOT_FOLDER, "enchantment/");
     private static final File GENERAL_CONFIG_FILE = new File(ROOT_FOLDER, "general.yml");
+    private static final YamlConfiguration localeConfig = new YamlConfiguration();
+    private static final YamlConfiguration generalConfig = new YamlConfiguration();
     private static EnchantmentAPI api;
-    public final FileConfiguration localeConfig = new YamlConfiguration();
-    public final FileConfiguration generalConfig = new YamlConfiguration();
     public Chat chat;
 
     public static EnchantmentAPI getApi() {
         return api;
+    }
+
+    public static YamlConfiguration getLocaleConfig() {
+        return localeConfig;
+    }
+
+    public static YamlConfiguration getGeneralConfig() {
+        return generalConfig;
     }
 
     public void initPlugin() throws Exception {
