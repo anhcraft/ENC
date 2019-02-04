@@ -22,7 +22,7 @@ public final class ENC extends JavaPlugin {
     private static final YamlConfiguration localeConfig = new YamlConfiguration();
     private static final YamlConfiguration generalConfig = new YamlConfiguration();
     private static EnchantmentAPI api;
-    public static Chat chat;
+    private static Chat chat;
 
     public static EnchantmentAPI getApi() {
         return api;
