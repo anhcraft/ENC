@@ -278,6 +278,11 @@ public abstract class Enchantment {
      */
     public abstract boolean canEnchantItem(ItemStack itemStack);
 
+    /**
+     * This method is called after this enchantment is registered successfully.
+     */
+    public void onRegistered(){}
+
     @Override
     public boolean equals(Object object){
         if(object != null && object.getClass() == this.getClass()){

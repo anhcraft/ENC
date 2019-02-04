@@ -43,6 +43,7 @@ public class EnchantmentAPI {
                 enchantment.getName().equals(enchant.getName())), new Exception("Enchantment is already registered: Name must be unique"));
         ENCHANT_MAP.put(id, enchant);
         enchant.initConfig(new File(enchantFolder, enchant.getId()+".yml"));
+        enchant.onRegistered();
     }
 
     /**
