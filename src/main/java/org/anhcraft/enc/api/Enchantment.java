@@ -1,6 +1,7 @@
 package org.anhcraft.enc.api;
 
 import org.anhcraft.algorithmlib.array.searching.ArrayBinarySearch;
+import org.anhcraft.enc.ENC;
 import org.anhcraft.enc.api.listeners.EventListener;
 import org.anhcraft.enc.utils.ChatUtils;
 import org.anhcraft.spaciouslib.builders.EqualsBuilder;
@@ -9,6 +10,7 @@ import org.anhcraft.spaciouslib.io.FileManager;
 import org.anhcraft.spaciouslib.utils.Chat;
 import org.anhcraft.spaciouslib.utils.CommonUtils;
 import org.anhcraft.spaciouslib.utils.ExceptionThrower;
+import org.anhcraft.spaciouslib.utils.MathUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -18,6 +20,8 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Represents an enchantment.
@@ -116,6 +120,38 @@ public abstract class Enchantment {
      */
     public ConfigurationSection getConfig() {
         return config;
+    }
+
+    /**
+     * Computes the value of a configuration entry by its key.<br>
+     * By using the given action report, all placeholder will be replaced.
+     * @param key the key
+     * @param report the action report
+     * @return the computed value
+     */
+    public double computeConfigValue(String key, ActionReport report) {
+        Object value = config.get(key);
+        if(value instanceof String){
+            String str = (String) value;
+            Pattern levelCheck = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.level.full_regex"));
+            Pattern levelGet = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.level.value_regex"));
+            Matcher levelCheck_;
+            // find all {level} placeholder
+            while((levelCheck_ = levelCheck.matcher(str)).find()){
+                // when get a {level} placeholder, check its is {level} or {level:<ENCHANTMENT_ID>}
+                Matcher levelGet_ = levelGet.matcher(levelCheck_.group());
+                // if {level:<ENCHANTMENT_ID>}
+                if(levelGet_.find()){
+                    str = levelCheck_.replaceFirst(Integer.toString(report.getEnchantmentMap()
+                            .get(ENC.getApi().getEnchantmentById(levelGet_.group()))));
+                } else { // or {level}
+                    str = levelCheck_.replaceFirst(Integer.toString(report.getEnchantmentMap().get(this)));
+                }
+            }
+            return MathUtils.eval(str);
+        } else {
+            return -1;
+        }
     }
 
     /**
