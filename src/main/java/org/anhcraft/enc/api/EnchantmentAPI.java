@@ -164,8 +164,10 @@ public class EnchantmentAPI {
                         if(nameMatcher.find()){
                             Matcher lvMatcher = regex3.matcher(l);
                             if(lvMatcher.find()){
-                                map.put(getEnchantmentByName(nameMatcher.group()),
-                                        RomanNumber.toDecimal(lvMatcher.group()));
+                                Enchantment enc = getEnchantmentByName(nameMatcher.group());
+                                if(enc != null) {
+                                    map.put(enc, RomanNumber.toDecimal(lvMatcher.group()));
+                                }
                             }
                         }
                     }
