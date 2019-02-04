@@ -7,3 +7,4 @@ over_limited_enchantment_level: "&cCấp độ phù phép đã vượt giới h�
 unsuitable_item: "&cVật phẩm không phù hợp để sử dụng phù phép."
 plugin_reloaded: "&aPlugin đã được nạp lại thành công."
 list_registered_enchantments: "&bToàn bộ phù phép đã được đăng ký:"
+enchantment_not_enabled: "&cPhù phép đã bị tắt."

@@ -57,6 +57,10 @@ public class AdminCommand implements Runnable {
                         return;
                     }
                     if(!ENC.getGeneralConfig().getBoolean("commands.unsafe_enchantment")){
+                        if(!enchantment.getA().isEnabled()){
+                            ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("enchantment_not_enabled"), commandSender);
+                            return;
+                        }
                         if(enchantment.getB() > enchantment.getA().getMaxLevel()){
                             ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("over_limited_enchantment_level"), commandSender);
                             return;
