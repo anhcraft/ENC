@@ -26,7 +26,11 @@ commands:
   # [!] WARNING: Using names can make the performance worse
   use_enchantment_by_id: true
 
-  # Should we allow unsafe enchantment (enchanting unsupported items with unlimited level)?
+  # Should we allow unsafe enchantment
+  # With enabled option, operators can:
+  # - Access to disabled enchantments
+  # - Access to unsupported items
+  # - Bypass the level limit
   unsafe_enchantment: false
 
   # Should we use another thread for plugin-reloading?
