@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 public class ColouredSheep extends AttackEnchantment {
     public ColouredSheep() {
         super("ColouredSheep", new String[]{
-            "Colour a sheep randomly when a player attack it"
+            "Colour the target sheep every attacks"
         }, "anhcraft", null, 1, EnchantmentTarget.ALL);
     }
 
