@@ -22,7 +22,7 @@ public final class ENC extends JavaPlugin {
     private static final YamlConfiguration localeConfig = new YamlConfiguration();
     private static final YamlConfiguration generalConfig = new YamlConfiguration();
     private static EnchantmentAPI api;
-    public Chat chat;
+    public static Chat chat;
 
     public static EnchantmentAPI getApi() {
         return api;
@@ -34,6 +34,10 @@ public final class ENC extends JavaPlugin {
 
     public static YamlConfiguration getGeneralConfig() {
         return generalConfig;
+    }
+
+    public static Chat getPluginChat() {
+        return chat;
     }
 
     public void initPlugin() throws Exception {
@@ -76,7 +80,7 @@ public final class ENC extends JavaPlugin {
             e.printStackTrace();
         }
         // init API
-        api = new EnchantmentAPI(this, ENCHANTMENT_FOLDER);
+        api = new EnchantmentAPI(ENCHANTMENT_FOLDER);
         // register stuffs
         registerListeners();
         registerEnchants();

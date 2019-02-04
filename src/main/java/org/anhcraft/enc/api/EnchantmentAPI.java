@@ -21,16 +21,14 @@ import java.util.stream.Collectors;
 public class EnchantmentAPI {
     private static final InitialisationValidator INIT_LOCK = new InitialisationValidator();
     private static final HashMap<String, Enchantment> ENCHANT_MAP = new HashMap<>();
-    private ENC enc;
     private File enchantFolder;
 
-    public EnchantmentAPI(ENC enc, File enchantFolder){
+    public EnchantmentAPI(File enchantFolder){
         try {
             INIT_LOCK.validate();
         } catch(Exception e) {
             e.printStackTrace();
         }
-        this.enc = enc;
         this.enchantFolder = enchantFolder;
     }
 
@@ -119,7 +117,7 @@ public class EnchantmentAPI {
         if(!InventoryUtils.isNull(itemStack)) {
             ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                return m.getLore().stream().anyMatch(s -> ChatUtils.reverseColorCode(s).matches(enc.generalConfig.getString("enchantment.lore_patterns.full_general_regex")));
+                return m.getLore().stream().anyMatch(s -> ChatUtils.reverseColorCode(s).matches(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_general_regex")));
             }
         }
         return false;
@@ -135,7 +133,7 @@ public class EnchantmentAPI {
         if(!InventoryUtils.isNull(itemStack)) {
             ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                Pattern regex = Pattern.compile(enc.generalConfig.getString("enchantment.lore_patterns.full_individual_regex").replace("{name}", enchant.getName()));
+                Pattern regex = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_individual_regex").replace("{name}", enchant.getName()));
                 return m.getLore().stream().anyMatch(s -> {
                     Matcher matcher = regex.matcher(ChatUtils.reverseColorCode(s));
                     return matcher.find() && matcher.group().equals(enchant.getName());
@@ -154,9 +152,9 @@ public class EnchantmentAPI {
         if(!InventoryUtils.isNull(itemStack)) {
             ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                String regex1 = enc.generalConfig.getString("enchantment.lore_patterns.full_general_regex");
-                Pattern regex2 = Pattern.compile(enc.generalConfig.getString("enchantment.lore_patterns.name_regex"));
-                Pattern regex3 = Pattern.compile(enc.generalConfig.getString("enchantment.lore_patterns.level_regex"));
+                String regex1 = ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_general_regex");
+                Pattern regex2 = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.name_regex"));
+                Pattern regex3 = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.level_regex"));
                 HashMap<Enchantment, Integer> map = new HashMap<>();
                 for(String l : m.getLore()) {
                     l = ChatUtils.reverseColorCode(l);
@@ -187,8 +185,8 @@ public class EnchantmentAPI {
         if(!InventoryUtils.isNull(itemStack)) {
             ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                String regex1 = enc.generalConfig.getString("enchantment.lore_patterns.full_individual_regex").replace("{name}", enchant.getName());
-                Pattern regex2 = Pattern.compile(enc.generalConfig.getString("enchantment.lore_patterns.level_regex"));
+                String regex1 = ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_individual_regex").replace("{name}", enchant.getName());
+                Pattern regex2 = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.level_regex"));
                 for(String l : m.getLore()) {
                     l = ChatUtils.reverseColorCode(l);
                     if(l.matches(regex1)) {
@@ -213,13 +211,13 @@ public class EnchantmentAPI {
         if(!InventoryUtils.isNull(itemStack)) {
             ItemMeta m = itemStack.getItemMeta();
             List<String> lore = new ArrayList<>();
-            lore.add(Chat.color(enc.generalConfig.getString("enchantment.lore_patterns.full_raw"))
+            lore.add(Chat.color(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_raw"))
                     .replace("{name}", enchant.getName())
                     .replace("{coloured_name}", Chat.color(enchant.getName()))
                     .replace("{level}", Integer.toString(level))
                     .replace("{roman_level}", RomanNumber.toRoman(level)));
             if(m.hasLore()) {
-                Pattern regex = Pattern.compile(enc.generalConfig.getString("enchantment.lore_patterns.full_individual_regex").replace("{name}", enchant.getName()));
+                Pattern regex = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_individual_regex").replace("{name}", enchant.getName()));
                 lore.addAll(m.getLore().stream().filter(s -> !regex.matcher(ChatUtils.reverseColorCode(s)).find()).collect(Collectors.toList()));
             }
             m.setLore(lore);
@@ -236,7 +234,7 @@ public class EnchantmentAPI {
         if(!InventoryUtils.isNull(itemStack)) {
             ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                Pattern regex = Pattern.compile(enc.generalConfig.getString("enchantment.lore_patterns.full_individual_regex").replace("{name}", enchant.getName()));
+                Pattern regex = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_individual_regex").replace("{name}", enchant.getName()));
                 m.setLore(m.getLore().stream().filter(s -> !regex.matcher(ChatUtils.reverseColorCode(s)).find()).collect(Collectors.toList()));
                 itemStack.setItemMeta(m);
             }
@@ -251,7 +249,7 @@ public class EnchantmentAPI {
         if(!InventoryUtils.isNull(itemStack)) {
             ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                m.setLore(m.getLore().stream().filter(s -> !ChatUtils.reverseColorCode(s).matches(enc.generalConfig.getString("enchantment.lore_patterns.full_general_regex"))).collect(Collectors.toList()));
+                m.setLore(m.getLore().stream().filter(s -> !ChatUtils.reverseColorCode(s).matches(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_general_regex"))).collect(Collectors.toList()));
                 itemStack.setItemMeta(m);
             }
         }
