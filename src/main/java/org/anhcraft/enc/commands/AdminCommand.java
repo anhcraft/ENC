@@ -9,6 +9,7 @@ import org.anhcraft.spaciouslib.utils.InventoryUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class AdminCommand implements Runnable {
     private static ENC enc;
@@ -21,10 +22,16 @@ public class AdminCommand implements Runnable {
         @Override
         public void run(CommandBuilder commandBuilder, CommandSender commandSender, int i, String[] strings, int i1, String s) {
             if(commandSender.hasPermission("enc.admin.list")) {
-                enc.chat.sendCommandSender("&a" + String.join(", ",
-                        ENC.getApi().getRegisteredEnchantmentNames()), commandSender);
+                ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("list_registered_enchantments"), commandSender);
+                if(ENC.getGeneralConfig().getBoolean("commands.use_enchantment_by_id")) {
+                    ENC.getPluginChat().sendCommandSenderNoPrefix(String.join(", ",
+                            ENC.getApi().getRegisteredEnchantmentIds()), commandSender);
+                } else{
+                    // we do not color the string here
+                    commandSender.sendMessage(String.join(", ", ENC.getApi().getRegisteredEnchantmentNames()));
+                }
             } else {
-                enc.chat.sendCommandSender(enc.localeConfig.getString("not_have_permission"), commandSender);
+                ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("not_have_permission"), commandSender);
             }
         }
     }).build();
@@ -37,34 +44,38 @@ public class AdminCommand implements Runnable {
                     Player player = (Player) commandSender;
                     ItemStack item = player.getInventory().getItemInMainHand();
                     if(InventoryUtils.isNull(item)){
-                        enc.chat.sendCommandSender(enc.localeConfig.getString("must_hold_item"), commandSender);
+                        ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("must_hold_item"), commandSender);
                         return;
                     }
-                    Group<Enchantment, Integer> enchantment = ArgUtils.findEnchantment(enc, strings, 1);
+                    Group<Enchantment, Integer> enchantment = ArgUtils.enchantAndLevel(strings, 1);
                     if(enchantment.getA() == null){
-                        enc.chat.sendCommandSender(enc.localeConfig.getString("enchantment_not_found"), commandSender);
+                        ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("enchantment_not_found"), commandSender);
                         return;
                     }
                     if(enchantment.getB() < 1){
-                        enc.chat.sendCommandSender(enc.localeConfig.getString("invalid_enchantment_level"), commandSender);
+                        ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("invalid_enchantment_level"), commandSender);
                         return;
                     }
-                    if(enc.mainConfig.getBoolean("enchantment.unsafe_enchantments")){
+                    if(!ENC.getGeneralConfig().getBoolean("commands.unsafe_enchantment")){
+                        if(!enchantment.getA().isEnabled()){
+                            ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("enchantment_not_enabled"), commandSender);
+                            return;
+                        }
                         if(enchantment.getB() > enchantment.getA().getMaxLevel()){
-                            enc.chat.sendCommandSender(enc.localeConfig.getString("over_limited_enchantment_level"), commandSender);
+                            ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("over_limited_enchantment_level"), commandSender);
                             return;
                         }
                         if(!enchantment.getA().canEnchantItem(item)){
-                            enc.chat.sendCommandSender(enc.localeConfig.getString("unsuitable_item"), commandSender);
+                            ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("unsuitable_item"), commandSender);
                             return;
                         }
                     }
                     ENC.getApi().addEnchantment(item, enchantment.getA(), enchantment.getB());
                 } else {
-                    enc.chat.sendCommandSender(enc.localeConfig.getString("must_be_player"), commandSender);
+                    ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("must_be_player"), commandSender);
                 }
             } else {
-                enc.chat.sendCommandSender(enc.localeConfig.getString("not_have_permission"), commandSender);
+                ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("not_have_permission"), commandSender);
             }
         }
     }, ArgumentType.POSITIVE_INTEGER).build();
@@ -77,20 +88,20 @@ public class AdminCommand implements Runnable {
                     Player player = (Player) commandSender;
                     ItemStack item = player.getInventory().getItemInMainHand();
                     if(InventoryUtils.isNull(item)){
-                        enc.chat.sendCommandSender(enc.localeConfig.getString("must_hold_item"), commandSender);
+                        ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("must_hold_item"), commandSender);
                         return;
                     }
-                    Group<Enchantment, Integer> enchantment = ArgUtils.findEnchantment(enc, strings, 1);
-                    if(enchantment.getA() == null){
-                        enc.chat.sendCommandSender(enc.localeConfig.getString("enchantment_not_found"), commandSender);
+                    Enchantment enchantment = ArgUtils.onlyEnchant(strings, 1);
+                    if(enchantment == null){
+                        ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("enchantment_not_found"), commandSender);
                         return;
                     }
-                    ENC.getApi().removeEnchantment(item, enchantment.getA());
+                    ENC.getApi().removeEnchantment(item, enchantment);
                 } else {
-                    enc.chat.sendCommandSender(enc.localeConfig.getString("must_be_player"), commandSender);
+                    ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("must_be_player"), commandSender);
                 }
             } else {
-                enc.chat.sendCommandSender(enc.localeConfig.getString("not_have_permission"), commandSender);
+                ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("not_have_permission"), commandSender);
             }
         }
     }, ArgumentType.ANYTHING).build();
@@ -99,15 +110,28 @@ public class AdminCommand implements Runnable {
         @Override
         public void run(CommandBuilder commandBuilder, CommandSender commandSender, int i, String[] strings, int i1, String s) {
             if(commandSender.hasPermission("enc.admin.reload")) {
-                try {
-                    enc.reloadPlugin();
-                } catch(Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    enc.chat.sendCommandSender(enc.localeConfig.getString("plugin_reloaded"), commandSender);
+                if(ENC.getGeneralConfig().getBoolean("commands.async_reload")) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                enc.initPlugin();
+                            } catch(Exception e) {
+                                e.printStackTrace();
+                            }
+                            ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("plugin_reloaded"), commandSender);
+                        }
+                    }.runTaskAsynchronously(enc);
+                } else {
+                    try {
+                        enc.initPlugin();
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                    }
+                    ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("plugin_reloaded"), commandSender);
                 }
             } else {
-                enc.chat.sendCommandSender(enc.localeConfig.getString("not_have_permission"), commandSender);
+                ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("not_have_permission"), commandSender);
             }
         }
     }).build();
