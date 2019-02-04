@@ -1,9 +1,10 @@
 package org.anhcraft.enc.listeners;
 
 import org.anhcraft.enc.ENC;
-import org.anhcraft.enc.api.AttackEnchantment;
 import org.anhcraft.enc.api.Enchantment;
 import org.anhcraft.enc.api.EnchantmentExecutor;
+import org.anhcraft.enc.api.listeners.AttackEvent;
+import org.anhcraft.enc.api.listeners.EventListener;
 import org.anhcraft.spaciouslib.utils.InventoryUtils;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -24,11 +25,15 @@ public class AttackListener implements Listener {
             if(!InventoryUtils.isNull(item)) {
                 HashMap<Enchantment, Integer> enchants = ENC.getApi().listEnchantments(item);
                 for(Map.Entry<Enchantment, Integer> e : enchants.entrySet()) {
-                    if(e.getKey() instanceof AttackEnchantment) {
-                        if(e.getKey().isEnabled() && e.getKey().isAllowedWorld(damager.getWorld().getName())) {
-                            ((AttackEnchantment) e.getKey()).onAttack(
-                                    new EnchantmentExecutor(damager, e.getKey(), e.getValue()),
-                                    (LivingEntity) event.getEntity(), event.getDamage());
+                    Enchantment enc = e.getKey();
+                    int lv = e.getValue();
+                    if(enc.isEnabled() && enc.isAllowedWorld(damager.getWorld().getName())) {
+                        for(EventListener eventListener : enc.getEventListeners()) {
+                            if(eventListener instanceof AttackEvent) {
+                                ((AttackEvent) eventListener).onAttack(
+                                        new EnchantmentExecutor(damager, enc, lv),
+                                        (LivingEntity) event.getEntity(), event.getDamage());
+                            }
                         }
                     }
                 }

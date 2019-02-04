@@ -1,6 +1,7 @@
 package org.anhcraft.enc.api;
 
 import org.anhcraft.algorithmlib.array.searching.ArrayBinarySearch;
+import org.anhcraft.enc.api.listeners.EventListener;
 import org.anhcraft.enc.utils.ChatUtils;
 import org.anhcraft.spaciouslib.builders.EqualsBuilder;
 import org.anhcraft.spaciouslib.builders.HashCodeBuilder;
@@ -16,9 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Represents an enchantment.
@@ -35,7 +34,7 @@ public abstract class Enchantment {
     private final YamlConfiguration config = new YamlConfiguration();
     private File configFile;
     private Chat chat;
-    private boolean needSaveConfig;
+    private final List<EventListener> eventListeners = new ArrayList<>();
 
     /**
      * Creates an instance of enchantment.
@@ -62,10 +61,21 @@ public abstract class Enchantment {
                 .replace("{enchant_id}", id);
     }
 
-    private void initConfigEntry(String key, Object value){
-        if(!config.isSet(key)){
-            config.set(key, value);
-            needSaveConfig = true;
+    /**
+     * Initializes given configuration entries.<br>
+     * A configuration entry is only set in case of absent. Otherwise the current value is still be kept.<br>
+     * File saving is automatic if there is at least one new entry.
+     */
+    public <V> void initConfigEntries(Map<String, V> map){
+        int i = 0;
+        for(Map.Entry<String, V> entry : map.entrySet()) {
+            if(!config.isSet(entry.getKey())) {
+                config.set(entry.getKey(), entry.getValue());
+                i++;
+            }
+        }
+        if(i > 0){
+            saveConfig();
         }
     }
 
@@ -100,7 +110,8 @@ public abstract class Enchantment {
     }
 
     /**
-     * Gets the configuration of this enchantment.
+     * Gets the configuration of this enchantment.<br>
+     * If you are trying to set new entries, it is recommended to use the method {@link Enchantment#initConfigEntries(Map)}.
      * @return enchantment's configuration
      */
     public ConfigurationSection getConfig() {
@@ -116,15 +127,13 @@ public abstract class Enchantment {
         } catch(IOException | InvalidConfigurationException e) {
             e.printStackTrace();
         }
-        needSaveConfig = false;
-        initConfigEntry("enabled", true);
-        initConfigEntry("chat_prefix", "&5#{lowercase_enchant_id} > &f");
-        initConfigEntry("worlds_list", new ArrayList<>(DEFAULT_WORLDS_LIST));
-        initConfigEntry("allowed_worlds_list", true);
-        initConfigEntry("name", id);
-        if(needSaveConfig){
-            saveConfig();
-        }
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("enabled", true);
+        map.put("chat_prefix", "&5#{lowercase_enchant_id} > &f");
+        map.put("worlds_list", new ArrayList<>(DEFAULT_WORLDS_LIST));
+        map.put("allowed_worlds_list", true);
+        map.put("name", id);
+        initConfigEntries(map);
         chat = new Chat(replaceStr(config.getString("chat_prefix")));
         ExceptionThrower.ifFalse(getName().indexOf(ChatUtils.SECTION_SIGN) == -1, new Exception("enchantment name can not contain section signs due to unexpected bugs, please use ampersands instead"));
     }
@@ -199,6 +208,15 @@ public abstract class Enchantment {
      */
     public Chat getChat() {
         return chat;
+    }
+
+    /**
+     * Gets the list of event listeners.<br>
+     * The list is mutable which means can be modified.
+     * @return list of event listeners
+     */
+    public List<EventListener> getEventListeners() {
+        return eventListeners;
     }
 
     /**
