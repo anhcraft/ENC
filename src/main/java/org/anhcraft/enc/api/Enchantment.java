@@ -133,6 +133,7 @@ public abstract class Enchantment {
         Object value = config.get(key);
         if(value instanceof String){
             String str = (String) value;
+
             Pattern levelCheck = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.level.full_regex"));
             Pattern levelGet = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.level.value_regex"));
             Matcher levelCheck_;
@@ -146,6 +147,21 @@ public abstract class Enchantment {
                             .get(ENC.getApi().getEnchantmentById(levelGet_.group()))));
                 } else { // or {level}
                     str = levelCheck_.replaceFirst(Integer.toString(report.getEnchantmentMap().get(this)));
+                }
+            }
+
+            Pattern maxLevelCheck = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.max_level.full_regex"));
+            Pattern maxLevelGet = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.max_level.value_regex"));
+            Matcher maxLevelCheck_;
+            // find all {max_level} placeholder
+            while((maxLevelCheck_ = maxLevelCheck.matcher(str)).find()){
+                // when get a {max_level} placeholder, check its is {max_level} or {max_level:<ENCHANTMENT_ID>}
+                Matcher maxLevelGet_ = maxLevelGet.matcher(maxLevelCheck_.group());
+                // if {max_level:<ENCHANTMENT_ID>}
+                if(maxLevelGet_.find()){
+                    str = maxLevelCheck_.replaceFirst(Integer.toString(ENC.getApi().getEnchantmentById(maxLevelGet_.group()).maxLevel));
+                } else { // or {max_level}
+                    str = maxLevelCheck_.replaceFirst(Integer.toString(maxLevel));
                 }
             }
             return MathUtils.eval(str);

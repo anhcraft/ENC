@@ -73,6 +73,14 @@ enchantment:
         # RegEx pattern for getting the enchantment id in the placeholder {level:<ENCHANTMENT_ID>}
         value_regex: "(?<=\{level:)([0-9a-zA-Z_]+)(?=})"
 
+      # {max_level} placeholder
+      max_level:
+        # RegEx pattern for checking {max_level} and {max_level:<ENCHANTMENT_ID>}
+        full_regex: "\{max_level(:[0-9a-zA-Z_]+)?}"
+
+        # RegEx pattern for getting the enchantment id in the placeholder {max_level:<ENCHANTMENT_ID>}
+        value_regex: "(?<=\{max_level:)([0-9a-zA-Z_]+)(?=})"
+
 
 # =====================
 # Do not change this!
