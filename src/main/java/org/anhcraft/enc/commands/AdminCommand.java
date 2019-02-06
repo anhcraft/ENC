@@ -12,12 +12,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class AdminCommand implements Runnable {
-    private static ENC enc;
-
-    public AdminCommand(ENC enc){
-        AdminCommand.enc = enc;
-    }
-
     private static final Argument[] LIST_ENCHANTMENT_CMD = new ChildCommandBuilder().path("list", new CommandCallback() {
         @Override
         public void run(CommandBuilder commandBuilder, CommandSender commandSender, int i, String[] strings, int i1, String s) {
@@ -115,16 +109,16 @@ public class AdminCommand implements Runnable {
                         @Override
                         public void run() {
                             try {
-                                enc.initPlugin();
+                                ENC.getInstance().reloadPlugin();
                             } catch(Exception e) {
                                 e.printStackTrace();
                             }
                             ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("plugin_reloaded"), commandSender);
                         }
-                    }.runTaskAsynchronously(enc);
+                    }.runTaskAsynchronously(ENC.getInstance());
                 } else {
                     try {
-                        enc.initPlugin();
+                        ENC.getInstance().reloadPlugin();
                     } catch(Exception e) {
                         e.printStackTrace();
                     }
@@ -149,6 +143,6 @@ public class AdminCommand implements Runnable {
                 .addChild("removes an existing enchantment out of the holding item", REMOVE_ENCHANTMENT_CMD)
                 .addChild("reloads the plugin", RELOAD_CMD)
                 .addAlias("encadmin")
-                .build(enc);
+                .build(ENC.getInstance());
     }
 }
