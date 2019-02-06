@@ -4,12 +4,11 @@ import org.anhcraft.enc.api.ActionReport;
 import org.bukkit.entity.LivingEntity;
 
 /**
- * The event represents an attack.
+ * Represents the listener of attack event which is fired synchronously.
  */
-public abstract class AttackEvent implements EventListener {
+public abstract class SyncAttackListener implements IListener {
     /**
-     * This method is triggered when an entity is being attacked by a player.<br>
-     * This method is safe since it has passed strict validations.
+     * This method is called when the attack event happens and the listener determines that the event is related to enchantment.
      * @param report the report of the attack
      * @param entity the entity
      * @param damage amount of damage

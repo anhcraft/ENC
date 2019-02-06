@@ -2,7 +2,7 @@ package org.anhcraft.enc.api;
 
 import org.anhcraft.algorithmlib.array.searching.ArrayBinarySearch;
 import org.anhcraft.enc.ENC;
-import org.anhcraft.enc.api.listeners.EventListener;
+import org.anhcraft.enc.api.listeners.IListener;
 import org.anhcraft.enc.utils.ChatUtils;
 import org.anhcraft.spaciouslib.builders.EqualsBuilder;
 import org.anhcraft.spaciouslib.builders.HashCodeBuilder;
@@ -38,7 +38,7 @@ public abstract class Enchantment {
     private final YamlConfiguration config = new YamlConfiguration();
     private File configFile;
     private Chat chat;
-    private final List<EventListener> eventListeners = new ArrayList<>();
+    private final List<IListener> eventListeners = new ArrayList<>();
 
     /**
      * Creates an instance of enchantment.
@@ -267,7 +267,7 @@ public abstract class Enchantment {
      * The list is mutable which means can be modified.
      * @return list of event listeners
      */
-    public List<EventListener> getEventListeners() {
+    public List<IListener> getEventListeners() {
         return eventListeners;
     }
 
