@@ -8,6 +8,7 @@ import org.anhcraft.enc.commands.AdminCommand;
 import org.anhcraft.enc.enchantments.ColouredSheep;
 import org.anhcraft.enc.enchantments.Wither;
 import org.anhcraft.enc.listeners.AttackListener;
+import org.anhcraft.enc.listeners.KillListener;
 import org.anhcraft.spaciouslib.io.DirectoryManager;
 import org.anhcraft.spaciouslib.io.FileManager;
 import org.anhcraft.spaciouslib.utils.Chat;
@@ -79,6 +80,7 @@ public final class ENC extends JavaPlugin {
 
     private void registerListeners() {
         getServer().getPluginManager().registerEvents(new AttackListener(), this);
+        getServer().getPluginManager().registerEvents(new KillListener(), this);
     }
 
     private void registerCommand() {
