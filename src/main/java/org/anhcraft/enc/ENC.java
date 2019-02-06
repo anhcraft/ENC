@@ -5,6 +5,7 @@ import co.aikar.taskchain.TaskChainFactory;
 import org.anhcraft.enc.api.Enchantment;
 import org.anhcraft.enc.api.EnchantmentAPI;
 import org.anhcraft.enc.commands.AdminCommand;
+import org.anhcraft.enc.enchantments.Chef;
 import org.anhcraft.enc.enchantments.ColouredSheep;
 import org.anhcraft.enc.enchantments.Wither;
 import org.anhcraft.enc.listeners.AttackListener;
@@ -76,6 +77,7 @@ public final class ENC extends JavaPlugin {
     private void registerEnchants() {
         api.registerEnchantment(new ColouredSheep());
         api.registerEnchantment(new Wither());
+        api.registerEnchantment(new Chef());
     }
 
     private void registerListeners() {
