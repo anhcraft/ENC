@@ -1,5 +1,7 @@
 package org.anhcraft.enc;
 
+import co.aikar.taskchain.BukkitTaskChainFactory;
+import co.aikar.taskchain.TaskChainFactory;
 import org.anhcraft.enc.api.Enchantment;
 import org.anhcraft.enc.api.EnchantmentAPI;
 import org.anhcraft.enc.commands.AdminCommand;
@@ -24,6 +26,8 @@ public final class ENC extends JavaPlugin {
     private static final YamlConfiguration generalConfig = new YamlConfiguration();
     private static EnchantmentAPI api;
     private static Chat chat;
+    private static ENC instance;
+    private static TaskChainFactory taskChainFactory;
 
     public static EnchantmentAPI getApi() {
         return api;
@@ -41,7 +45,15 @@ public final class ENC extends JavaPlugin {
         return chat;
     }
 
-    public void initPlugin() throws Exception {
+    public static ENC getInstance(){
+        return instance;
+    }
+
+    public static TaskChainFactory getTaskChainFactory(){
+        return taskChainFactory;
+    }
+
+    public void reloadPlugin() throws Exception {
         // init files and directories
         new DirectoryManager(ROOT_FOLDER).mkdir();
         new DirectoryManager(LOCALE_FOLDER).mkdir();
@@ -70,14 +82,16 @@ public final class ENC extends JavaPlugin {
     }
 
     private void registerCommand() {
-        new AdminCommand(this).run();
+        new AdminCommand().run();
     }
 
     @Override
     public void onEnable() {
+        instance = this;
+        taskChainFactory = BukkitTaskChainFactory.create(this);
         // init plugin
         try {
-            initPlugin();
+            reloadPlugin();
         } catch(Exception e) {
             e.printStackTrace();
         }

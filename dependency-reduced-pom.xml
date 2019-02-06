@@ -46,8 +46,12 @@
       <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
     </repository>
     <repository>
-      <id>sonatype</id>
-      <url>https://oss.sonatype.org/content/groups/public/</url>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
+    </repository>
+    <repository>
+      <id>aikar</id>
+      <url>http://ci.emc.gs/nexus/content/groups/aikar/</url>
     </repository>
   </repositories>
   <dependencies>
@@ -84,11 +88,10 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.anhcraft</groupId>
-      <artifactId>spaciouslib</artifactId>
-      <version>1.8.4</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/libraries/SpaciousLibSpigot.jar</systemPath>
+      <groupId>com.github.d0kg.SpaciousLib</groupId>
+      <artifactId>SpaciousLibSpigot</artifactId>
+      <version>1.8.5</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <properties>
