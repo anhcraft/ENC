@@ -12,10 +12,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class AdminCommand implements Runnable {
-    private static final Argument[] LIST_ENCHANTMENT_CMD = new ChildCommandBuilder().path("list", new CommandCallback() {
+    private static final Argument[] LIST_ENCHANTMENT_CMD = new ChildCommandBuilder().path("enchant list", new CommandCallback() {
         @Override
         public void run(CommandBuilder commandBuilder, CommandSender commandSender, int i, String[] strings, int i1, String s) {
-            if(commandSender.hasPermission("enc.admin.list")) {
+            if(commandSender.hasPermission("enc.admin.enchant.list")) {
                 ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("list_registered_enchantments"), commandSender);
                 if(ENC.getGeneralConfig().getBoolean("commands.use_enchantment_by_id")) {
                     ENC.getPluginChat().sendCommandSenderNoPrefix(String.join(", ",
@@ -30,10 +30,10 @@ public class AdminCommand implements Runnable {
         }
     }).build();
 
-    private static final Argument[] ADD_ENCHANTMENT_CMD = new ChildCommandBuilder().path("add").var("name", ArgumentType.ANYTHING).var("level", new CommandCallback() {
+    private static final Argument[] ADD_ENCHANTMENT_CMD = new ChildCommandBuilder().path("enchant add").var("name", ArgumentType.ANYTHING).var("level", new CommandCallback() {
         @Override
         public void run(CommandBuilder commandBuilder, CommandSender commandSender, int i, String[] strings, int i1, String s) {
-            if(commandSender.hasPermission("enc.admin.add")) {
+            if(commandSender.hasPermission("enc.admin.enchant.add")) {
                 if(commandSender instanceof Player){
                     Player player = (Player) commandSender;
                     ItemStack item = player.getInventory().getItemInMainHand();
@@ -74,10 +74,10 @@ public class AdminCommand implements Runnable {
         }
     }, ArgumentType.POSITIVE_INTEGER).build();
 
-    private static final Argument[] REMOVE_ENCHANTMENT_CMD = new ChildCommandBuilder().path("remove").var("name", new CommandCallback() {
+    private static final Argument[] REMOVE_ENCHANTMENT_CMD = new ChildCommandBuilder().path("enchant remove").var("name", new CommandCallback() {
         @Override
         public void run(CommandBuilder commandBuilder, CommandSender commandSender, int i, String[] strings, int i1, String s) {
-            if(commandSender.hasPermission("enc.admin.remove")) {
+            if(commandSender.hasPermission("enc.admin.enchant.remove")) {
                 if(commandSender instanceof Player){
                     Player player = (Player) commandSender;
                     ItemStack item = player.getInventory().getItemInMainHand();
@@ -99,6 +99,27 @@ public class AdminCommand implements Runnable {
             }
         }
     }, ArgumentType.ANYTHING).build();
+
+    private static final Argument[] REMOVE_ALL_ENCHANTMENT_CMD = new ChildCommandBuilder().path("enchant removeall", new CommandCallback() {
+        @Override
+        public void run(CommandBuilder builder, CommandSender commandSender, int command, String[] args, int arg, String value) {
+            if(commandSender.hasPermission("enc.admin.enchant.removeall")) {
+                if(commandSender instanceof Player){
+                    Player player = (Player) commandSender;
+                    ItemStack item = player.getInventory().getItemInMainHand();
+                    if(InventoryUtils.isNull(item)){
+                        ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("must_hold_item"), commandSender);
+                        return;
+                    }
+                    ENC.getApi().removeEnchantments(item);
+                } else {
+                    ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("must_be_player"), commandSender);
+                }
+            } else {
+                ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("not_have_permission"), commandSender);
+            }
+        }
+    }).build();
 
     private static final Argument[] RELOAD_CMD = new ChildCommandBuilder().path("reload", new CommandCallback() {
         @Override
@@ -138,11 +159,12 @@ public class AdminCommand implements Runnable {
                 commandBuilder.sendHelpMessages(commandSender, true, false);
             }
         })
-                .addChild("lists all available enchantments", LIST_ENCHANTMENT_CMD)
-                .addChild("adds an enchantment to the holding item", ADD_ENCHANTMENT_CMD)
-                .addChild("removes an existing enchantment out of the holding item", REMOVE_ENCHANTMENT_CMD)
-                .addChild("reloads the plugin", RELOAD_CMD)
-                .addAlias("encadmin")
-                .build(ENC.getInstance());
+        .addChild("lists all available enchantments", LIST_ENCHANTMENT_CMD)
+        .addChild("adds an enchantment", ADD_ENCHANTMENT_CMD)
+        .addChild("removes an existing enchantment", REMOVE_ENCHANTMENT_CMD)
+        .addChild("removes all existing enchantments", REMOVE_ALL_ENCHANTMENT_CMD)
+        .addChild("reloads the plugin", RELOAD_CMD)
+        .addAlias("encadmin")
+        .build(ENC.getInstance());
     }
 }
