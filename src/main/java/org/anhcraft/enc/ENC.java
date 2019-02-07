@@ -1,11 +1,15 @@
 package org.anhcraft.enc;
 
+import co.aikar.taskchain.BukkitTaskChainFactory;
+import co.aikar.taskchain.TaskChainFactory;
 import org.anhcraft.enc.api.Enchantment;
 import org.anhcraft.enc.api.EnchantmentAPI;
 import org.anhcraft.enc.commands.AdminCommand;
+import org.anhcraft.enc.enchantments.Chef;
 import org.anhcraft.enc.enchantments.ColouredSheep;
 import org.anhcraft.enc.enchantments.Wither;
 import org.anhcraft.enc.listeners.AttackListener;
+import org.anhcraft.enc.listeners.KillListener;
 import org.anhcraft.spaciouslib.io.DirectoryManager;
 import org.anhcraft.spaciouslib.io.FileManager;
 import org.anhcraft.spaciouslib.utils.Chat;
@@ -24,6 +28,8 @@ public final class ENC extends JavaPlugin {
     private static final YamlConfiguration generalConfig = new YamlConfiguration();
     private static EnchantmentAPI api;
     private static Chat chat;
+    private static ENC instance;
+    private static TaskChainFactory taskChainFactory;
 
     public static EnchantmentAPI getApi() {
         return api;
@@ -41,7 +47,15 @@ public final class ENC extends JavaPlugin {
         return chat;
     }
 
-    public void initPlugin() throws Exception {
+    public static ENC getInstance(){
+        return instance;
+    }
+
+    public static TaskChainFactory getTaskChainFactory(){
+        return taskChainFactory;
+    }
+
+    public void reloadPlugin() throws Exception {
         // init files and directories
         new DirectoryManager(ROOT_FOLDER).mkdir();
         new DirectoryManager(LOCALE_FOLDER).mkdir();
@@ -63,21 +77,25 @@ public final class ENC extends JavaPlugin {
     private void registerEnchants() {
         api.registerEnchantment(new ColouredSheep());
         api.registerEnchantment(new Wither());
+        api.registerEnchantment(new Chef());
     }
 
     private void registerListeners() {
         getServer().getPluginManager().registerEvents(new AttackListener(), this);
+        getServer().getPluginManager().registerEvents(new KillListener(), this);
     }
 
     private void registerCommand() {
-        new AdminCommand(this).run();
+        new AdminCommand().run();
     }
 
     @Override
     public void onEnable() {
+        instance = this;
+        taskChainFactory = BukkitTaskChainFactory.create(this);
         // init plugin
         try {
-            initPlugin();
+            reloadPlugin();
         } catch(Exception e) {
             e.printStackTrace();
         }

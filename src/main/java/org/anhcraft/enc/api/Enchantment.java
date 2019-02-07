@@ -2,7 +2,7 @@ package org.anhcraft.enc.api;
 
 import org.anhcraft.algorithmlib.array.searching.ArrayBinarySearch;
 import org.anhcraft.enc.ENC;
-import org.anhcraft.enc.api.listeners.EventListener;
+import org.anhcraft.enc.api.listeners.IListener;
 import org.anhcraft.enc.utils.ChatUtils;
 import org.anhcraft.spaciouslib.builders.EqualsBuilder;
 import org.anhcraft.spaciouslib.builders.HashCodeBuilder;
@@ -38,7 +38,7 @@ public abstract class Enchantment {
     private final YamlConfiguration config = new YamlConfiguration();
     private File configFile;
     private Chat chat;
-    private final List<EventListener> eventListeners = new ArrayList<>();
+    private final List<IListener> eventListeners = new ArrayList<>();
 
     /**
      * Creates an instance of enchantment.
@@ -50,7 +50,7 @@ public abstract class Enchantment {
      * @param targets item types that may fit the enchantment
      */
     public Enchantment(String id, String[] description, String author, String proposer, int maxLevel, EnchantmentTarget... targets) {
-        ExceptionThrower.ifFalse(id.matches("^[\\w]+$"), new Exception("enchantment id must only contain A-Z, 0-9 and underscore"));
+        ExceptionThrower.ifFalse(id.matches("^[\\w]+$"), new Exception("enchantment id must not empty and can only contain A-Z, 0-9 and underscore"));
         this.id = id;
         this.description = Arrays.copyOf(description, description.length);
         this.author = author;
@@ -267,7 +267,7 @@ public abstract class Enchantment {
      * The list is mutable which means can be modified.
      * @return list of event listeners
      */
-    public List<EventListener> getEventListeners() {
+    public List<IListener> getEventListeners() {
         return eventListeners;
     }
 
