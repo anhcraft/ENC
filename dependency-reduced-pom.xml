@@ -90,7 +90,7 @@
     <dependency>
       <groupId>com.github.d0kg.SpaciousLib</groupId>
       <artifactId>SpaciousLibSpigot</artifactId>
-      <version>1.8.5</version>
+      <version>1.8.6</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
