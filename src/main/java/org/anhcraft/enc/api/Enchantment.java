@@ -50,7 +50,7 @@ public abstract class Enchantment {
      * @param targets item types that may fit the enchantment
      */
     public Enchantment(String id, String[] description, String author, String proposer, int maxLevel, EnchantmentTarget... targets) {
-        ExceptionThrower.ifFalse(id.matches("^[\\w]+$"), new Exception("enchantment id must only contain A-Z, 0-9 and underscore"));
+        ExceptionThrower.ifFalse(id.matches("^[\\w]+$"), new Exception("enchantment id must not empty and can only contain A-Z, 0-9 and underscore"));
         this.id = id;
         this.description = Arrays.copyOf(description, description.length);
         this.author = author;
