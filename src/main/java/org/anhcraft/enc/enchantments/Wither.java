@@ -41,7 +41,7 @@ public class Wither extends Enchantment {
         HashMap<String, Object> map = new HashMap<>();
         map.put("chance", "{level}*3.5");
         map.put("effect_level", "{level}*0.25");
-        map.put("effect_duration", "{level} > ({max_level}/2) ? 40 : 60");
+        map.put("effect_duration", "{level} < ({max_level}/2) ? 40 : 60");
         initConfigEntries(map);
     }
 
