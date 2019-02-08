@@ -1,0 +1,24 @@
+rune1: # rune's id
+  name: "&aColouredSheep Rune" # rune's name, can contain colour codes
+  enchantment:
+    id: ColouredSheep # the id of enchantment, case-insensitive
+    level: 1 # the level of enchantment, must start from 1
+  # the success rate of a rune is random one between two values below (0 <= n <= 100)
+  success_rate:
+    min: 70
+    max: 80 # must higher than the minimum one
+  # the protection rate of a rune is random one between two values below (0 <= n <= 100)
+  protection_rate:
+    min: 30
+    max: 45 # must higher than the minimum one
+rune2:
+  name: "&4Wither Rune"
+  enchantment:
+    id: Wither
+    level: 1
+  success_rate:
+    min: 70
+    max: 80
+  protection_rate:
+    min: 30
+    max: 45
