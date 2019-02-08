@@ -4,6 +4,8 @@ import org.anhcraft.enc.ENC;
 import org.anhcraft.enc.api.rune.Rune;
 import org.anhcraft.enc.api.rune.RuneAPI;
 import org.anhcraft.enc.api.rune.RuneItem;
+import org.anhcraft.spaciouslib.annotations.AnnotationHandler;
+import org.anhcraft.spaciouslib.annotations.PlayerCleaner;
 import org.anhcraft.spaciouslib.utils.Cooldown;
 import org.anhcraft.spaciouslib.utils.Group;
 import org.anhcraft.spaciouslib.utils.InventoryUtils;
@@ -18,7 +20,12 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class RuneApplyListener implements Listener {
+    @PlayerCleaner
     private static final HashMap<UUID, Group<Integer, Cooldown>> SWAP_COOLDOWN = new HashMap<>();
+
+    public RuneApplyListener(){
+        AnnotationHandler.register(RuneApplyListener.class, null);
+    }
 
     @EventHandler
     public void swap(PlayerSwapHandItemsEvent event){

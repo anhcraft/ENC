@@ -4,6 +4,8 @@ import org.anhcraft.enc.ENC;
 import org.anhcraft.enc.api.ActionReport;
 import org.anhcraft.enc.api.Enchantment;
 import org.anhcraft.enc.api.listeners.SyncAttackListener;
+import org.anhcraft.spaciouslib.annotations.AnnotationHandler;
+import org.anhcraft.spaciouslib.annotations.PlayerCleaner;
 import org.anhcraft.spaciouslib.internal.listeners.PlayerListener;
 import org.anhcraft.spaciouslib.utils.PlayerUtils;
 import org.bukkit.enchantments.EnchantmentTarget;
@@ -18,12 +20,15 @@ import java.util.Map;
 import java.util.UUID;
 
 public class Freeze extends Enchantment {
+    @PlayerCleaner
     private static final HashMap<UUID, Long> DATA = new HashMap<>();
 
     public Freeze() {
         super("Freeze", new String[]{
                 "There is a chance to freeze your enemy in a short time"
         }, "anhcraft", null, 3, EnchantmentTarget.ALL);
+
+        AnnotationHandler.register(Freeze.class, null);
 
         new BukkitRunnable() {
             @Override
