@@ -154,25 +154,29 @@ public class RuneAPI {
                 Pattern regex2 = Pattern.compile(ENC.getGeneralConfig().getString("rune.lore_patterns.name_regex"));
                 Pattern regex3 = Pattern.compile(ENC.getGeneralConfig().getString("rune.lore_patterns.success_rate_regex"));
                 Pattern regex4 = Pattern.compile(ENC.getGeneralConfig().getString("rune.lore_patterns.protection_rate_regex"));
+                boolean b = false;
+                String name = null;
+                double sr = 0, pr = 0;
                 for(String l : m.getLore()) {
                     l = ChatUtils.reverseColorCode(l);
                     if(regex1.matcher(l).matches()) {
-                        Matcher nameMatcher = regex2.matcher(l);
-                        if(!nameMatcher.find()) {
-                            continue;
-                        }
-                        String name = nameMatcher.group();
-                        double sr = 0, pr = 0;
-                        Matcher srMatcher = regex3.matcher(l);
-                        if(srMatcher.find()){
-                            sr = Double.parseDouble(srMatcher.group());
-                        }
-                        Matcher prMatcher = regex4.matcher(l);
-                        if(prMatcher.find()){
-                            pr = Double.parseDouble(prMatcher.group());
-                        }
-                        return new RuneItem(getRuneByName(name), sr, pr);
+                        b = true;
                     }
+                    Matcher nameMatcher = regex2.matcher(l);
+                    if(nameMatcher.find()) {
+                        name = nameMatcher.group();
+                    }
+                    Matcher srMatcher = regex3.matcher(l);
+                    if(srMatcher.find()){
+                        sr = Double.parseDouble(srMatcher.group());
+                    }
+                    Matcher prMatcher = regex4.matcher(l);
+                    if(prMatcher.find()){
+                        pr = Double.parseDouble(prMatcher.group());
+                    }
+                }
+                if(b){
+                    return new RuneItem(getRuneByName(name), sr, pr);
                 }
             }
         }
@@ -238,12 +242,11 @@ public class RuneAPI {
     }
 
     /**
-     * Tries to apply the given rune item into a stack of items
+     * Tries to apply the given rune item
      * @param rune the rune item
-     * @param item the stack of items
      * @return the final result
      */
-    public static Rune.ApplyResult tryApplyRune(RuneItem rune, ItemStack item) {
+    public static Rune.ApplyResult tryApplyRune(RuneItem rune) {
         if(Math.random() <= rune.getSuccessRate()/100d){
             return Rune.ApplyResult.SUCCESS;
         } else {
