@@ -17,7 +17,7 @@ public class AdminCommand implements Runnable {
     private static final Argument[] LIST_ENCHANTMENT_CMD = new ChildCommandBuilder().path("enchant list", new CommandCallback() {
         @Override
         public void run(CommandBuilder commandBuilder, CommandSender sender, int i, String[] args, int i1, String s) {
-            if(sender.hasPermission("enc.admin.enchant.list")) {
+            if(sender.hasPermission("enc.command.enchant.list")) {
                 ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("list_available_enchantments"), sender);
                 if(ENC.getGeneralConfig().getBoolean("commands.use_enchantment_by_id")) {
                     ENC.getPluginChat().sendCommandSenderNoPrefix(String.join(", ",
@@ -35,7 +35,7 @@ public class AdminCommand implements Runnable {
     private static final Argument[] ADD_ENCHANTMENT_CMD = new ChildCommandBuilder().path("enchant add").var("name", ArgumentType.ANYTHING).var("level", new CommandCallback() {
         @Override
         public void run(CommandBuilder commandBuilder, CommandSender sender, int i, String[] args, int i1, String s) {
-            if(sender.hasPermission("enc.admin.enchant.add")) {
+            if(sender.hasPermission("enc.command.enchant.add")) {
                 if(sender instanceof Player){
                     Player player = (Player) sender;
                     ItemStack item = player.getInventory().getItemInMainHand();
@@ -79,7 +79,7 @@ public class AdminCommand implements Runnable {
     private static final Argument[] REMOVE_ENCHANTMENT_CMD = new ChildCommandBuilder().path("enchant remove").var("name", new CommandCallback() {
         @Override
         public void run(CommandBuilder commandBuilder, CommandSender sender, int i, String[] args, int i1, String s) {
-            if(sender.hasPermission("enc.admin.enchant.remove")) {
+            if(sender.hasPermission("enc.command.enchant.remove")) {
                 if(sender instanceof Player){
                     Player player = (Player) sender;
                     ItemStack item = player.getInventory().getItemInMainHand();
@@ -105,7 +105,7 @@ public class AdminCommand implements Runnable {
     private static final Argument[] REMOVE_ALL_ENCHANTMENT_CMD = new ChildCommandBuilder().path("enchant removeall", new CommandCallback() {
         @Override
         public void run(CommandBuilder builder, CommandSender sender, int command, String[] args, int arg, String value) {
-            if(sender.hasPermission("enc.admin.enchant.removeall")) {
+            if(sender.hasPermission("enc.command.enchant.removeall")) {
                 if(sender instanceof Player){
                     Player player = (Player) sender;
                     ItemStack item = player.getInventory().getItemInMainHand();
@@ -126,7 +126,7 @@ public class AdminCommand implements Runnable {
     private static final Argument[] LIST_RUNE_CMD = new ChildCommandBuilder().path("rune list", new CommandCallback() {
         @Override
         public void run(CommandBuilder commandBuilder, CommandSender sender, int i, String[] args, int i1, String s) {
-            if(sender.hasPermission("enc.admin.rune.list")) {
+            if(sender.hasPermission("enc.command.rune.list")) {
                 ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("list_registered_runes"), sender);
                 if(ENC.getGeneralConfig().getBoolean("commands.use_rune_by_id")) {
                     ENC.getPluginChat().sendCommandSenderNoPrefix(String.join(", ",
@@ -144,7 +144,7 @@ public class AdminCommand implements Runnable {
     private static final Argument[] ASSIGN_RUNE_CMD = new ChildCommandBuilder().path("rune assign").var("name", new CommandCallback() {
         @Override
         public void run(CommandBuilder commandBuilder, CommandSender sender, int i, String[] args, int i1, String s) {
-            if(sender.hasPermission("enc.admin.rune.assign")) {
+            if(sender.hasPermission("enc.command.rune.assign")) {
                 if(sender instanceof Player){
                     Player player = (Player) sender;
                     ItemStack item = player.getInventory().getItemInMainHand();
@@ -168,7 +168,7 @@ public class AdminCommand implements Runnable {
     }, ArgumentType.ANYTHING).var("successRate", ArgumentType.POSITIVE_REAL_NUMBER).var("protectionRate", new CommandCallback() {
         @Override
         public void run(CommandBuilder builder, CommandSender sender, int command, String[] args, int arg, String value) {
-            if(sender.hasPermission("enc.admin.rune.assign")) {
+            if(sender.hasPermission("enc.command.rune.assign")) {
                 if(sender instanceof Player){
                     Player player = (Player) sender;
                     ItemStack item = player.getInventory().getItemInMainHand();
@@ -194,7 +194,7 @@ public class AdminCommand implements Runnable {
     private static final Argument[] DETACH_RUNE_CMD = new ChildCommandBuilder().path("rune detach", new CommandCallback() {
         @Override
         public void run(CommandBuilder builder, CommandSender sender, int command, String[] args, int arg, String value) {
-            if(sender.hasPermission("enc.admin.rune.detach")) {
+            if(sender.hasPermission("enc.command.rune.detach")) {
                 if(sender instanceof Player){
                     Player player = (Player) sender;
                     ItemStack item = player.getInventory().getItemInMainHand();
@@ -215,7 +215,7 @@ public class AdminCommand implements Runnable {
     private static final Argument[] RELOAD_CMD = new ChildCommandBuilder().path("reload", new CommandCallback() {
         @Override
         public void run(CommandBuilder commandBuilder, CommandSender commandSender, int i, String[] strings, int i1, String s) {
-            if(commandSender.hasPermission("enc.admin.reload")) {
+            if(commandSender.hasPermission("enc.command.reload")) {
                 if(ENC.getGeneralConfig().getBoolean("commands.async_reload")) {
                     new BukkitRunnable() {
                         @Override
