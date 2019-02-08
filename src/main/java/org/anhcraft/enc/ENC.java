@@ -104,6 +104,7 @@ public final class ENC extends JavaPlugin {
         api.registerEnchantment(new Chef());
         api.registerEnchantment(new Freeze());
         api.registerEnchantment(new Blindness());
+        api.registerEnchantment(new Poison());
     }
 
     private void registerListeners() {
