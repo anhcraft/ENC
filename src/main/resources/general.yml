@@ -121,6 +121,33 @@ rune:
     # RegEx pattern for getting rune's protection rate
     protection_rate_regex: "(?<=&1&f- Protection rate: &e)([\\d.]+)(?=%)"
 
+  # Controls how runes and items are joined in together
+  rune_apply:
+    # Second way
+    # - Holds a rune on the main hand or the off hand
+    # - Then holds the target item on another empty hand
+    # - Swaps them between hands continuously until successful
+    swap_items:
+      # Allows this way or not?
+      enabled: true
+
+      # Does this way require permission?
+      need_permission: false
+
+      # If the players attempts to override an existing enchantment,
+      # whether we prevent the action if the existing one has a higher level?
+      strict_override: true
+
+      # How many swap times we need to do?
+      times: 3
+
+      # The maximum accepted delay in one swap time (in ticks, 1 second = 20 ticks)
+      delay: 30
+
+      # Plays sound in each swap?
+      sound: true
+
+
 
 # =====================
 # Do not change this!
