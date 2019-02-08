@@ -25,7 +25,7 @@ public class Wither extends Enchantment {
                     return;
                 }
                 double chance = computeConfigValue("chance", report)/100d;
-                if(Math.random() < chance){
+                if(Math.random() <= chance){
                     int level = (int) Math.ceil(computeConfigValue("effect_level", report));
                     int duration = (int) Math.ceil(computeConfigValue("effect_duration", report));
                     ENC.getTaskChainFactory().newChain().sync(() ->
@@ -41,7 +41,7 @@ public class Wither extends Enchantment {
         HashMap<String, Object> map = new HashMap<>();
         map.put("chance", "{level}*3.5");
         map.put("effect_level", "{level}*0.25");
-        map.put("effect_duration", "{level} > ({max_level}/2) ? 40 : 60");
+        map.put("effect_duration", "{level} < ({max_level}/2) ? 40 : 60");
         initConfigEntries(map);
     }
 

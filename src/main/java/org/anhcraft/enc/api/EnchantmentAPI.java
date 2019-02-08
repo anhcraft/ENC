@@ -19,6 +19,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * The Enchantment API.
+ */
 public class EnchantmentAPI {
     private static final InitialisationValidator INIT_LOCK = new InitialisationValidator();
     private static final ConcurrentHashMap<String, Enchantment> ENCHANT_MAP = new ConcurrentHashMap<>();
@@ -108,6 +111,30 @@ public class EnchantmentAPI {
      */
     public List<String> getRegisteredEnchantmentIds() {
         return ENCHANT_MAP.values().stream().map(Enchantment::getId).collect(Collectors.toList());
+    }
+
+    /**
+     * Gets all available enchantments.
+     * @return an array of enchantments
+     */
+    public List<Enchantment> getAvailableEnchantments() {
+        return ENCHANT_MAP.values().stream().filter(Enchantment::isEnabled).collect(Collectors.toList());
+    }
+
+    /**
+     * Gets names of all available enchantments.
+     * @return an array of names
+     */
+    public List<String> getAvailableEnchantmentNames() {
+        return ENCHANT_MAP.values().stream().filter(Enchantment::isEnabled).map(Enchantment::getName).collect(Collectors.toList());
+    }
+
+    /**
+     * Gets ids of all available enchantments.
+     * @return an array of ids
+     */
+    public List<String> getAvailableEnchantmentIds() {
+        return ENCHANT_MAP.values().stream().filter(Enchantment::isEnabled).map(Enchantment::getId).collect(Collectors.toList());
     }
 
     /**
