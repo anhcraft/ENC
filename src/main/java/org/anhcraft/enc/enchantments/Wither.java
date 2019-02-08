@@ -25,7 +25,7 @@ public class Wither extends Enchantment {
                     return;
                 }
                 double chance = computeConfigValue("chance", report)/100d;
-                if(Math.random() < chance){
+                if(Math.random() <= chance){
                     int level = (int) Math.ceil(computeConfigValue("effect_level", report));
                     int duration = (int) Math.ceil(computeConfigValue("effect_duration", report));
                     ENC.getTaskChainFactory().newChain().sync(() ->
