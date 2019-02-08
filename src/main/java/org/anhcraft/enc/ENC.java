@@ -7,10 +7,7 @@ import org.anhcraft.enc.api.EnchantmentAPI;
 import org.anhcraft.enc.api.rune.Rune;
 import org.anhcraft.enc.api.rune.RuneAPI;
 import org.anhcraft.enc.commands.AdminCommand;
-import org.anhcraft.enc.enchantments.Chef;
-import org.anhcraft.enc.enchantments.ColouredSheep;
-import org.anhcraft.enc.enchantments.Freeze;
-import org.anhcraft.enc.enchantments.Wither;
+import org.anhcraft.enc.enchantments.*;
 import org.anhcraft.enc.listeners.AttackListener;
 import org.anhcraft.enc.listeners.KillListener;
 import org.anhcraft.enc.listeners.RuneApplyListener;
@@ -106,6 +103,7 @@ public final class ENC extends JavaPlugin {
         api.registerEnchantment(new Wither());
         api.registerEnchantment(new Chef());
         api.registerEnchantment(new Freeze());
+        api.registerEnchantment(new Blindness());
     }
 
     private void registerListeners() {
