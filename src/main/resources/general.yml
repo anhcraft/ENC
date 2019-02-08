@@ -123,7 +123,7 @@ rune:
 
   # Controls how runes and items are joined in together
   rune_apply:
-    # Second way
+    # First way: Item-swapping
     # - Holds a rune on the main hand or the off hand
     # - Then holds the target item on another empty hand
     # - Swaps them between hands continuously until successful
