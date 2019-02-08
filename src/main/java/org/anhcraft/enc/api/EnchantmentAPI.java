@@ -19,6 +19,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * The Enchantment API.
+ */
 public class EnchantmentAPI {
     private static final InitialisationValidator INIT_LOCK = new InitialisationValidator();
     private static final ConcurrentHashMap<String, Enchantment> ENCHANT_MAP = new ConcurrentHashMap<>();

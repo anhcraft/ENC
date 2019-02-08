@@ -17,6 +17,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * The Rune API.
+ */
 public class RuneAPI {
     private static final ConcurrentHashMap<String, Rune> RUNE_MAP = new ConcurrentHashMap<>();
     
@@ -105,7 +108,7 @@ public class RuneAPI {
     }
 
     /**
-     * Validates the given stack of items is a rune
+     * Validates whether the given stack of items may be a rune.
      * @param itemStack the stack of items
      * @return true if yes
      */
@@ -114,14 +117,15 @@ public class RuneAPI {
             ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
                 Pattern regex = Pattern.compile(ENC.getGeneralConfig().getString("rune.lore_patterns.full_general_regex"));
-                return m.getLore().stream().anyMatch(s -> regex.matcher(ChatUtils.reverseColorCode(s)).matches());
+                return m.getLore().stream().anyMatch(s ->
+                        regex.matcher(ChatUtils.reverseColorCode(s)).matches());
             }
         }
         return false;
     }
 
     /**
-     * Validates the given stack of items is a certain rune
+     * Validates whether the given stack of items is a certain rune.
      * @param itemStack the stack of items
      * @param rune the rune
      * @return true if yes
@@ -138,7 +142,7 @@ public class RuneAPI {
     }
 
     /**
-     * Searches for a rune that is contained in the given stack of items
+     * Searches for a rune that is contained in the given stack of items.
      * @param itemStack the stack of items
      * @return the rune item
      */
@@ -158,8 +162,7 @@ public class RuneAPI {
                             continue;
                         }
                         String name = nameMatcher.group();
-                        double sr = 0;
-                        double pr = 0;
+                        double sr = 0, pr = 0;
                         Matcher srMatcher = regex3.matcher(l);
                         if(srMatcher.find()){
                             sr = Double.parseDouble(srMatcher.group());
@@ -177,7 +180,7 @@ public class RuneAPI {
     }
 
     /**
-     * Assigns the given rune to a stack of items
+     * Assigns the given rune to a stack of items.
      * @param itemStack stack of items
      * @param runeItem the rune item
      */
@@ -214,7 +217,7 @@ public class RuneAPI {
     }
 
     /**
-     * Detaches the rune from the given stack of items
+     * Detaches the rune from the given stack of items.
      * @param itemStack stack of items
      */
     public static void detachRune(ItemStack itemStack){
