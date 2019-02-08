@@ -111,6 +111,30 @@ public class EnchantmentAPI {
     }
 
     /**
+     * Gets all available enchantments.
+     * @return an array of enchantments
+     */
+    public List<Enchantment> getAvailableEnchantments() {
+        return ENCHANT_MAP.values().stream().filter(Enchantment::isEnabled).collect(Collectors.toList());
+    }
+
+    /**
+     * Gets names of all available enchantments.
+     * @return an array of names
+     */
+    public List<String> getAvailableEnchantmentNames() {
+        return ENCHANT_MAP.values().stream().filter(Enchantment::isEnabled).map(Enchantment::getName).collect(Collectors.toList());
+    }
+
+    /**
+     * Gets ids of all available enchantments.
+     * @return an array of ids
+     */
+    public List<String> getAvailableEnchantmentIds() {
+        return ENCHANT_MAP.values().stream().filter(Enchantment::isEnabled).map(Enchantment::getId).collect(Collectors.toList());
+    }
+
+    /**
      * Checks whether the given stack of items contains any enchantment.
      * @param itemStack the stack of items
      * @return true if yes
