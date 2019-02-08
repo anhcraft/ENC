@@ -255,7 +255,7 @@ public class AdminCommand implements Runnable {
         .addChild("removes an existing enchantment out of the holding item", REMOVE_ENCHANTMENT_CMD)
         .addChild("removes all existing enchantments out of the holding item", REMOVE_ALL_ENCHANTMENT_CMD)
                 .addChild("lists all available runes", LIST_RUNE_CMD)
-        .addChild("assigns a rune to the holding item with random rate", ASSIGN_RUNE_CMD)
+        .addChild("assigns a rune to the holding item", ASSIGN_RUNE_CMD)
                 .addChild("detaches the rune from the holding item", DETACH_RUNE_CMD)
         .addChild("reloads the plugin", RELOAD_CMD)
         .addAlias("encadmin")
