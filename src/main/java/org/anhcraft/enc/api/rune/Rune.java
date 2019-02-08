@@ -130,4 +130,22 @@ public class Rune {
                 .append(this.minProtectionRate)
                 .append(this.maxProtectionRate).build();
     }
+
+    /**
+     * Result of applying a rune to a stack of items.
+     */
+    public enum ApplyResult{
+        /**
+         * There was a success in moving the enchantment of the rune into the stack.
+         */
+        SUCCESS,
+        /**
+         * The rune rejected the stack but luckily its strong did not break up the stack.
+         */
+        FAILURE,
+        /**
+         * The rune rejected the stack and it broken up the stack.
+         */
+        BROKEN
+    }
 }

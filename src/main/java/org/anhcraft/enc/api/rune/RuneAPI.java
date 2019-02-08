@@ -236,4 +236,22 @@ public class RuneAPI {
             }
         }
     }
+
+    /**
+     * Tries to apply the given rune item into a stack of items
+     * @param rune the rune item
+     * @param item the stack of items
+     * @return the final result
+     */
+    public static Rune.ApplyResult tryApplyRune(RuneItem rune, ItemStack item) {
+        if(Math.random() <= rune.getSuccessRate()/100d){
+            return Rune.ApplyResult.SUCCESS;
+        } else {
+            if(Math.random() <= rune.getProtectionRate()/100d){
+                return Rune.ApplyResult.FAILURE;
+            } else {
+                return Rune.ApplyResult.BROKEN;
+            }
+        }
+    }
 }
