@@ -18,8 +18,7 @@ public class Rune {
     private double maxSuccessRate;
     private double minProtectionRate;
     private double maxProtectionRate;
-    private double minDropRate;
-    private double maxDropRate;
+    private double dropRate;
 
     /**
      * Creates an instance of Rune.
@@ -31,10 +30,9 @@ public class Rune {
      * @param maxSuccessRate the maximum success rate
      * @param minProtectionRate the minimum protection rate
      * @param maxProtectionRate the maximum protection rate
-     * @param minDropRate the minimum drop rate
-     * @param maxDropRate the maximum drop rate
+     * @param dropRate the drop rate
      */
-    public Rune(String id, String name, String enchantmentId, int enchantmentLevel, double minSuccessRate, double maxSuccessRate, double minProtectionRate, double maxProtectionRate, double minDropRate, double maxDropRate) {
+    public Rune(String id, String name, String enchantmentId, int enchantmentLevel, double minSuccessRate, double maxSuccessRate, double minProtectionRate, double maxProtectionRate, double dropRate) {
         ExceptionThrower.ifFalse(id.matches("^[\\w]+$"), new Exception("the rune id must only contain A-Z, 0-9 and underscore"));
         ExceptionThrower.ifTrue(enchantmentId == null, new Exception("enchantment id must not be null"));
         this.id = id;
@@ -45,8 +43,7 @@ public class Rune {
         this.maxSuccessRate = Math.min(maxSuccessRate, 100);
         this.minProtectionRate = Math.max(minProtectionRate, 0);
         this.maxProtectionRate = Math.min(maxProtectionRate, 100);
-        this.minDropRate = Math.max(minDropRate, 0);
-        this.maxDropRate = Math.min(maxDropRate, 100);
+        this.dropRate = dropRate;
     }
 
     /**
@@ -122,19 +119,11 @@ public class Rune {
     }
 
     /**
-     * Returns the minimum drop rate.
-     * @return minimum drop rate
+     * Returns the drop rate.
+     * @return drop rate
      */
-    public double getMinDropRate() {
-        return minDropRate;
-    }
-
-    /**
-     * Returns the maximum drop rate.
-     * @return maximum drop rate
-     */
-    public double getMaxDropRate() {
-        return maxDropRate;
+    public double getDropRate() {
+        return dropRate;
     }
 
     @Override

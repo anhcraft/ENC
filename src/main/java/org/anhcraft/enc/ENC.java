@@ -72,8 +72,7 @@ public final class ENC extends JavaPlugin {
                 rune.getDouble("success_rate.max"),
                 rune.getDouble("protection_rate.min"),
                 rune.getDouble("protection_rate.max"),
-                rune.getDouble("drop_rate.min"),
-                rune.getDouble("drop_rate.max")
+                rune.getDouble("drop_rate")
             ));
         });
     }

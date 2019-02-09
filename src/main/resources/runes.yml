@@ -3,18 +3,15 @@ rune1: # rune's id
   enchantment:
     id: ColouredSheep # the id of enchantment, case-insensitive
     level: 1 # the level of enchantment, must start from 1
-  # the success rate will be generated randomly between two values below (0 <= n <= 100)
+  # the success rate will be generated randomly between two values below
   success_rate:
-    min: 70
+    min: 70 # in percent (0 <= n <= 100)
     max: 80 # must higher than the minimum one
-  # the protection rate will be generated randomly between two values below (0 <= n <= 100)
+  # the protection rate will be generated randomly between two values below
   protection_rate:
-    min: 30
+    min: 30 # in percent (0 <= n <= 100)
     max: 45 # must higher than the minimum one
-  # the drop rate will be generated randomly between two values below (0 <= n <= 100)
-  drop_rate:
-    min: 10
-    max: 20 # must higher than the minimum one
+  drop_rate: 10 # in percent, 0 <= n <= 100
 rune2:
   name: "&4Wither Rune"
   enchantment:
