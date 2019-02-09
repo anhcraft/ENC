@@ -4,6 +4,7 @@ import org.anhcraft.algorithmlib.array.searching.ArrayBinarySearch;
 import org.anhcraft.enc.ENC;
 import org.anhcraft.enc.api.listeners.IListener;
 import org.anhcraft.enc.utils.ChatUtils;
+import org.anhcraft.enc.utils.ReplaceUtils;
 import org.anhcraft.spaciouslib.builders.EqualsBuilder;
 import org.anhcraft.spaciouslib.builders.HashCodeBuilder;
 import org.anhcraft.spaciouslib.io.FileManager;
@@ -11,6 +12,8 @@ import org.anhcraft.spaciouslib.utils.Chat;
 import org.anhcraft.spaciouslib.utils.CommonUtils;
 import org.anhcraft.spaciouslib.utils.ExceptionThrower;
 import org.anhcraft.spaciouslib.utils.MathUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -22,12 +25,16 @@ import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Represents an enchantment.
  */
 public abstract class Enchantment {
-    private static final List<String> DEFAULT_WORLDS_LIST = CommonUtils.toList(new String[]{"world"});
+    private static final List<String> DEFAULT_WORLDS_LIST = CommonUtils.toList(new String[]{
+            "$all",
+            "-world"
+    });
 
     private String id;
     private String[] description;
@@ -39,6 +46,7 @@ public abstract class Enchantment {
     private File configFile;
     private Chat chat;
     private final List<IListener> eventListeners = new ArrayList<>();
+    private final List<String> worldList = new ArrayList<>();
 
     /**
      * Creates an instance of enchantment.
@@ -186,8 +194,14 @@ public abstract class Enchantment {
         map.put("allowed_worlds_list", true);
         map.put("name", id);
         initConfigEntries(map);
+
         chat = new Chat(replaceStr(config.getString("chat_prefix")));
         ExceptionThrower.ifFalse(getName().indexOf(ChatUtils.SECTION_SIGN) == -1, new Exception("enchantment name can not contain section signs due to unexpected bugs, please use ampersands instead"));
+        worldList.clear();
+        HashMap<String, List<String>> groups = new HashMap<>();
+        groups.put("all", Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList()));
+        worldList.addAll(ReplaceUtils.replaceVariables(config.getStringList("worlds_list"),
+                groups, true));
     }
 
     /**
@@ -247,11 +261,7 @@ public abstract class Enchantment {
      * @return true if yes
      */
     public boolean isAllowedWorld(String world) {
-        if(config.getBoolean("allowed_worlds_list")){
-            return config.getStringList("worlds_list").contains(world);
-        } else {
-            return !config.getStringList("worlds_list").contains(world);
-        }
+        return config.getBoolean("allowed_worlds_list") == worldList.contains(world);
     }
 
     /**
