@@ -12,6 +12,7 @@ import org.anhcraft.enc.listeners.AttackListener;
 import org.anhcraft.enc.listeners.KillListener;
 import org.anhcraft.enc.listeners.RuneApplyListener;
 import org.anhcraft.enc.listeners.RuneDropListener;
+import org.anhcraft.enc.utils.FilePaths;
 import org.anhcraft.spaciouslib.io.DirectoryManager;
 import org.anhcraft.spaciouslib.io.FileManager;
 import org.anhcraft.spaciouslib.utils.Chat;
@@ -23,22 +24,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 
 public final class ENC extends JavaPlugin {
-    private static final File ROOT_FOLDER = new File("plugins/ENC/");
-    private static final File LOCALE_FOLDER = new File(ROOT_FOLDER, "locale/");
-    private static final File ENCHANTMENT_FOLDER = new File(ROOT_FOLDER, "enchantment/");
-    private static final File GENERAL_CONFIG_FILE = new File(ROOT_FOLDER, "general.yml");
-    private static final File RUNE_CONFIG_FILE = new File(ROOT_FOLDER, "runes.yml");
     private static final YamlConfiguration localeConfig = new YamlConfiguration();
     private static final YamlConfiguration generalConfig = new YamlConfiguration();
     private static final YamlConfiguration runeConfig = new YamlConfiguration();
-    private static EnchantmentAPI api;
     private static Chat chat;
     private static ENC instance;
     private static TaskChainFactory taskChainFactory;
-
-    public static EnchantmentAPI getApi() {
-        return api;
-    }
 
     public static YamlConfiguration getLocaleConfig() {
         return localeConfig;
@@ -60,54 +51,49 @@ public final class ENC extends JavaPlugin {
         return taskChainFactory;
     }
 
-    private void reloadRune(){
+    public void reloadPlugin() throws Exception {
+        // init files and directories
+        new DirectoryManager(FilePaths.ROOT_FOLDER).mkdir();
+        new DirectoryManager(FilePaths.LOCALE_FOLDER).mkdir();
+        new DirectoryManager(FilePaths.ENCHANTMENT_FOLDER).mkdir();
+        new FileManager(FilePaths.GENERAL_CONFIG_FILE).initFile(IOUtils.toByteArray(getResource("general.yml")));
+        new FileManager(FilePaths.RUNE_CONFIG_FILE).initFile(IOUtils.toByteArray(getResource("runes.yml")));
+        // load configs
+        generalConfig.load(FilePaths.GENERAL_CONFIG_FILE);
+        runeConfig.load(FilePaths.RUNE_CONFIG_FILE);
+        File localeFile = new File(FilePaths.LOCALE_FOLDER, generalConfig.getString("plugin.locale_file"));
+        new FileManager(localeFile).initFile(IOUtils.toByteArray(getClass().getResourceAsStream("/locale/"+generalConfig.getString("plugin.locale_file"))));
+        localeConfig.load(localeFile);
+        // init chat
+        chat = new Chat(generalConfig.getString("plugin.prefix"));
+        // reload enchantment config
+        EnchantmentAPI.getRegisteredEnchantments().forEach(Enchantment::reloadConfig);
+        // reload rune config
         RuneAPI.getRegisteredRunes().forEach(RuneAPI::unregisterRune);
         runeConfig.getKeys(false).forEach(s -> {
             ConfigurationSection rune = runeConfig.getConfigurationSection(s);
             RuneAPI.registerRune(new Rune(
-                s,
-                rune.getString("name"),
-                rune.getString("enchantment.id"),
-                rune.getInt("enchantment.level"),
-                rune.getDouble("success_rate.min"),
-                rune.getDouble("success_rate.max"),
-                rune.getDouble("protection_rate.min"),
-                rune.getDouble("protection_rate.max"),
-                rune.getDouble("drop_rate")
+                    s,
+                    rune.getString("name"),
+                    rune.getString("enchantment.id"),
+                    rune.getInt("enchantment.level"),
+                    rune.getDouble("success_rate.min"),
+                    rune.getDouble("success_rate.max"),
+                    rune.getDouble("protection_rate.min"),
+                    rune.getDouble("protection_rate.max"),
+                    rune.getDouble("drop_rate")
             ));
         });
         RuneDropListener.init();
     }
 
-    public void reloadPlugin() throws Exception {
-        // init files and directories
-        new DirectoryManager(ROOT_FOLDER).mkdir();
-        new DirectoryManager(LOCALE_FOLDER).mkdir();
-        new DirectoryManager(ENCHANTMENT_FOLDER).mkdir();
-        new FileManager(GENERAL_CONFIG_FILE).initFile(IOUtils.toByteArray(getResource("general.yml")));
-        new FileManager(RUNE_CONFIG_FILE).initFile(IOUtils.toByteArray(getResource("runes.yml")));
-        // load configs
-        generalConfig.load(GENERAL_CONFIG_FILE);
-        runeConfig.load(RUNE_CONFIG_FILE);
-        File localeFile = new File(LOCALE_FOLDER, generalConfig.getString("plugin.locale_file"));
-        new FileManager(localeFile).initFile(IOUtils.toByteArray(getClass().getResourceAsStream("/locale/"+generalConfig.getString("plugin.locale_file"))));
-        localeConfig.load(localeFile);
-        // init chat
-        chat = new Chat(generalConfig.getString("plugin.prefix"));
-        // reload enchantment/rune configs
-        if(api != null){
-            api.getRegisteredEnchantments().forEach(Enchantment::reloadConfig);
-            reloadRune();
-        }
-    }
-
     private void registerEnchants() {
-        api.registerEnchantment(new ColouredSheep());
-        api.registerEnchantment(new Wither());
-        api.registerEnchantment(new Chef());
-        api.registerEnchantment(new Freeze());
-        api.registerEnchantment(new Blindness());
-        api.registerEnchantment(new Poison());
+        EnchantmentAPI.registerEnchantment(new ColouredSheep());
+        EnchantmentAPI.registerEnchantment(new Wither());
+        EnchantmentAPI.registerEnchantment(new Chef());
+        EnchantmentAPI.registerEnchantment(new Freeze());
+        EnchantmentAPI.registerEnchantment(new Blindness());
+        EnchantmentAPI.registerEnchantment(new Poison());
     }
 
     private void registerListeners() {
@@ -131,14 +117,10 @@ public final class ENC extends JavaPlugin {
         } catch(Exception e) {
             e.printStackTrace();
         }
-        // init API
-        api = new EnchantmentAPI(ENCHANTMENT_FOLDER);
         // register stuffs
         registerListeners();
         registerEnchants();
         registerCommand();
-        // load runes
-        reloadRune();
         chat.sendConsole("&aPlugin has been enabled!");
         chat.sendConsole("&eDonate me if you like this plugin <3");
         chat.sendConsole("&ehttps://paypal.me/anhcraft");

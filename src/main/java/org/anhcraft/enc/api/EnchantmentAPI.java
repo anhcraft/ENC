@@ -2,6 +2,7 @@ package org.anhcraft.enc.api;
 
 import org.anhcraft.enc.ENC;
 import org.anhcraft.enc.utils.ChatUtils;
+import org.anhcraft.enc.utils.FilePaths;
 import org.anhcraft.enc.utils.RomanNumber;
 import org.anhcraft.spaciouslib.utils.Chat;
 import org.anhcraft.spaciouslib.utils.ExceptionThrower;
@@ -25,28 +26,18 @@ import java.util.stream.Collectors;
 public class EnchantmentAPI {
     private static final InitialisationValidator INIT_LOCK = new InitialisationValidator();
     private static final ConcurrentHashMap<String, Enchantment> ENCHANT_MAP = new ConcurrentHashMap<>();
-    private File enchantFolder;
-
-    public EnchantmentAPI(File enchantFolder){
-        try {
-            INIT_LOCK.validate();
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-        this.enchantFolder = enchantFolder;
-    }
 
     /**
      * Registers the given enchantment.
      * @param enchant the enchantment
      */
-    public void registerEnchantment(Enchantment enchant) {
+    public static void registerEnchantment(Enchantment enchant) {
         String id = enchant.getId().toUpperCase();
         ExceptionThrower.ifTrue(ENCHANT_MAP.containsKey(id), new Exception("Enchantment is already registered: Id must be unique"));
         ExceptionThrower.ifFalse(ENCHANT_MAP.values().stream().noneMatch(enchantment ->
                 enchantment.getName().equals(enchant.getName())), new Exception("Enchantment is already registered: Name must be unique"));
         ENCHANT_MAP.put(id, enchant);
-        enchant.initConfig(new File(enchantFolder, enchant.getId()+".yml"));
+        enchant.initConfig(new File(FilePaths.ENCHANTMENT_FOLDER, enchant.getId()+".yml"));
         enchant.onRegistered();
     }
 
@@ -54,7 +45,7 @@ public class EnchantmentAPI {
      * Unregisters the given enchantment.
      * @param enchant the enchantment
      */
-    public void unregisterEnchantment(Enchantment enchant) {
+    public static void unregisterEnchantment(Enchantment enchant) {
         String id = enchant.getId().toUpperCase();
         ExceptionThrower.ifFalse(ENCHANT_MAP.containsKey(id), new Exception("Enchantment is not registered yet"));
         ENCHANT_MAP.remove(id);
@@ -65,7 +56,7 @@ public class EnchantmentAPI {
      * @param enchant the enchantment
      * @return true if yes
      */
-    public boolean isEnchantmentRegistered(Enchantment enchant) {
+    public static boolean isEnchantmentRegistered(Enchantment enchant) {
         return ENCHANT_MAP.containsValue(enchant);
     }
 
@@ -74,7 +65,7 @@ public class EnchantmentAPI {
      * @param enchantId the enchantment's id
      * @return the enchantment (may be null if it is not found)
      */
-    public Enchantment getEnchantmentById(String enchantId) {
+    public static Enchantment getEnchantmentById(String enchantId) {
         return ENCHANT_MAP.get(enchantId.toUpperCase());
     }
 
@@ -84,7 +75,7 @@ public class EnchantmentAPI {
      * @param enchantName the enchantment's name
      * @return the enchantment (may be null if it is not found)
      */
-    public Enchantment getEnchantmentByName(String enchantName) {
+    public static Enchantment getEnchantmentByName(String enchantName) {
         return ENCHANT_MAP.values().stream().filter(enchantment ->
                 enchantment.getName().equals(enchantName)).findFirst().orElse(null);
     }
@@ -93,7 +84,7 @@ public class EnchantmentAPI {
      * Gets all registered enchantments.
      * @return an array of enchantments
      */
-    public List<Enchantment> getRegisteredEnchantments() {
+    public static List<Enchantment> getRegisteredEnchantments() {
         return new ArrayList<>(ENCHANT_MAP.values());
     }
 
@@ -101,7 +92,7 @@ public class EnchantmentAPI {
      * Gets names of all registered enchantments.
      * @return an array of names
      */
-    public List<String> getRegisteredEnchantmentNames() {
+    public static List<String> getRegisteredEnchantmentNames() {
         return ENCHANT_MAP.values().stream().map(Enchantment::getName).collect(Collectors.toList());
     }
 
@@ -109,7 +100,7 @@ public class EnchantmentAPI {
      * Gets ids of all registered enchantments.
      * @return an array of ids
      */
-    public List<String> getRegisteredEnchantmentIds() {
+    public static List<String> getRegisteredEnchantmentIds() {
         return ENCHANT_MAP.values().stream().map(Enchantment::getId).collect(Collectors.toList());
     }
 
@@ -117,7 +108,7 @@ public class EnchantmentAPI {
      * Gets all available enchantments.
      * @return an array of enchantments
      */
-    public List<Enchantment> getAvailableEnchantments() {
+    public static List<Enchantment> getAvailableEnchantments() {
         return ENCHANT_MAP.values().stream().filter(Enchantment::isEnabled).collect(Collectors.toList());
     }
 
@@ -125,7 +116,7 @@ public class EnchantmentAPI {
      * Gets names of all available enchantments.
      * @return an array of names
      */
-    public List<String> getAvailableEnchantmentNames() {
+    public static List<String> getAvailableEnchantmentNames() {
         return ENCHANT_MAP.values().stream().filter(Enchantment::isEnabled).map(Enchantment::getName).collect(Collectors.toList());
     }
 
@@ -133,7 +124,7 @@ public class EnchantmentAPI {
      * Gets ids of all available enchantments.
      * @return an array of ids
      */
-    public List<String> getAvailableEnchantmentIds() {
+    public static List<String> getAvailableEnchantmentIds() {
         return ENCHANT_MAP.values().stream().filter(Enchantment::isEnabled).map(Enchantment::getId).collect(Collectors.toList());
     }
 
@@ -142,7 +133,7 @@ public class EnchantmentAPI {
      * @param itemStack the stack of items
      * @return true if yes
      */
-    public boolean isEnchanted(ItemStack itemStack) {
+    public static boolean isEnchanted(ItemStack itemStack) {
         if(!InventoryUtils.isNull(itemStack)) {
             ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
@@ -159,7 +150,7 @@ public class EnchantmentAPI {
      * @param itemStack the stack of items
      * @return true if yes
      */
-    public boolean isEnchanted(ItemStack itemStack, Enchantment enchant) {
+    public static boolean isEnchanted(ItemStack itemStack, Enchantment enchant) {
         if(!InventoryUtils.isNull(itemStack)) {
             ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
@@ -175,7 +166,7 @@ public class EnchantmentAPI {
      * @param itemStack the stack of items
      * @return a map of enchantments which includes their names and their levels
      */
-    public HashMap<Enchantment, Integer> listEnchantments(ItemStack itemStack) {
+    public static HashMap<Enchantment, Integer> listEnchantments(ItemStack itemStack) {
         if(!InventoryUtils.isNull(itemStack)) {
             ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
@@ -210,7 +201,7 @@ public class EnchantmentAPI {
      * @param enchant the enchantment
      * @return the enchantment level (may be 0 if the enchantment is not found)
      */
-    public int getEnchantmentLevel(ItemStack itemStack, Enchantment enchant) {
+    public static int getEnchantmentLevel(ItemStack itemStack, Enchantment enchant) {
         if(!InventoryUtils.isNull(itemStack)) {
             ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
@@ -236,7 +227,7 @@ public class EnchantmentAPI {
      * @param enchant the enchantment
      * @param level the level
      */
-    public void addEnchantment(ItemStack itemStack, Enchantment enchant, int level) {
+    public static void addEnchantment(ItemStack itemStack, Enchantment enchant, int level) {
         if(!InventoryUtils.isNull(itemStack)) {
             ItemMeta m = itemStack.getItemMeta();
             List<String> lore = new ArrayList<>();
@@ -259,7 +250,7 @@ public class EnchantmentAPI {
      * @param itemStack the stack of items
      * @param enchant the enchantment
      */
-    public void removeEnchantment(ItemStack itemStack, Enchantment enchant) {
+    public static void removeEnchantment(ItemStack itemStack, Enchantment enchant) {
         if(!InventoryUtils.isNull(itemStack)) {
             ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
@@ -274,7 +265,7 @@ public class EnchantmentAPI {
      * Removes all existing enchantment out of the given stack of items.
      * @param itemStack the stack of items
      */
-    public void removeEnchantments(ItemStack itemStack) {
+    public static void removeEnchantments(ItemStack itemStack) {
         if(!InventoryUtils.isNull(itemStack)) {
             ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {

@@ -152,7 +152,7 @@ public abstract class Enchantment {
                 // if {level:<ENCHANTMENT_ID>}
                 if(levelGet_.find()){
                     str = levelCheck_.replaceFirst(Integer.toString(report.getEnchantmentMap()
-                            .get(ENC.getApi().getEnchantmentById(levelGet_.group()))));
+                            .get(EnchantmentAPI.getEnchantmentById(levelGet_.group()))));
                 } else { // or {level}
                     str = levelCheck_.replaceFirst(Integer.toString(report.getEnchantmentMap().get(this)));
                 }
@@ -167,7 +167,7 @@ public abstract class Enchantment {
                 Matcher maxLevelGet_ = maxLevelGet.matcher(maxLevelCheck_.group());
                 // if {max_level:<ENCHANTMENT_ID>}
                 if(maxLevelGet_.find()){
-                    str = maxLevelCheck_.replaceFirst(Integer.toString(ENC.getApi().getEnchantmentById(maxLevelGet_.group()).maxLevel));
+                    str = maxLevelCheck_.replaceFirst(Integer.toString(EnchantmentAPI.getEnchantmentById(maxLevelGet_.group()).maxLevel));
                 } else { // or {max_level}
                     str = maxLevelCheck_.replaceFirst(Integer.toString(maxLevel));
                 }

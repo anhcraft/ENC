@@ -2,6 +2,7 @@ package org.anhcraft.enc.commands;
 
 import org.anhcraft.enc.ENC;
 import org.anhcraft.enc.api.Enchantment;
+import org.anhcraft.enc.api.EnchantmentAPI;
 import org.anhcraft.enc.api.rune.Rune;
 import org.anhcraft.enc.api.rune.RuneAPI;
 import org.anhcraft.enc.api.rune.RuneItem;
@@ -21,10 +22,10 @@ public class AdminCommand implements Runnable {
                 ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("list_available_enchantments"), sender);
                 if(ENC.getGeneralConfig().getBoolean("commands.use_enchantment_by_id")) {
                     ENC.getPluginChat().sendCommandSenderNoPrefix(String.join(", ",
-                            ENC.getApi().getAvailableEnchantmentIds()), sender);
+                            EnchantmentAPI.getAvailableEnchantmentIds()), sender);
                 } else{
                     // we do not color the string here
-                    sender.sendMessage(String.join(", ", ENC.getApi().getAvailableEnchantmentNames()));
+                    sender.sendMessage(String.join(", ", EnchantmentAPI.getAvailableEnchantmentNames()));
                 }
             } else {
                 ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("not_have_permission"), sender);
@@ -66,7 +67,7 @@ public class AdminCommand implements Runnable {
                             return;
                         }
                     }
-                    ENC.getApi().addEnchantment(item, enchantment.getA(), enchantment.getB());
+                    EnchantmentAPI.addEnchantment(item, enchantment.getA(), enchantment.getB());
                 } else {
                     ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("must_be_player"), sender);
                 }
@@ -92,7 +93,7 @@ public class AdminCommand implements Runnable {
                         ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("enchantment_not_found"), sender);
                         return;
                     }
-                    ENC.getApi().removeEnchantment(item, enchantment);
+                    EnchantmentAPI.removeEnchantment(item, enchantment);
                 } else {
                     ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("must_be_player"), sender);
                 }
@@ -113,7 +114,7 @@ public class AdminCommand implements Runnable {
                         ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("must_hold_item"), sender);
                         return;
                     }
-                    ENC.getApi().removeEnchantments(item);
+                    EnchantmentAPI.removeEnchantments(item);
                 } else {
                     ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("must_be_player"), sender);
                 }

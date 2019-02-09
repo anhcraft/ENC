@@ -1,6 +1,7 @@
 package org.anhcraft.enc.listeners;
 
 import org.anhcraft.enc.ENC;
+import org.anhcraft.enc.api.EnchantmentAPI;
 import org.anhcraft.enc.api.rune.Rune;
 import org.anhcraft.enc.api.rune.RuneAPI;
 import org.anhcraft.enc.api.rune.RuneItem;
@@ -88,7 +89,7 @@ public class RuneApplyListener implements Listener {
             rune1: ITEM
             rune2: RUNE
              */
-            if(ENC.getGeneralConfig().getBoolean("rune.rune_apply.swap_items.strict_override") && rune2.getRune().getEnchantmentLevel() <= ENC.getApi().getEnchantmentLevel(main, rune2.getRune().getEnchantment())){
+            if(ENC.getGeneralConfig().getBoolean("rune.rune_apply.swap_items.strict_override") && rune2.getRune().getEnchantmentLevel() <= EnchantmentAPI.getEnchantmentLevel(main, rune2.getRune().getEnchantment())){
                 ENC.getPluginChat().sendPlayer(ENC.getLocaleConfig().getString("cancelled_apply_rune_attempt"), p);
                 return null;
             }
@@ -97,7 +98,7 @@ public class RuneApplyListener implements Listener {
             off.setAmount(off.getAmount()-1);
             switch(result){
                 case SUCCESS:
-                    ENC.getApi().addEnchantment(main,
+                    EnchantmentAPI.addEnchantment(main,
                             rune2.getRune().getEnchantment(), rune2.getRune().getEnchantmentLevel());
                     if(ENC.getGeneralConfig().getBoolean("rune.rune_apply.swap_items.sound")){
                         p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 3f, 1f);
@@ -123,7 +124,7 @@ public class RuneApplyListener implements Listener {
             rune1: RUNE
             rune2: ITEM
              */
-            if(ENC.getGeneralConfig().getBoolean("rune.rune_apply.swap_items.strict_override") && rune1.getRune().getEnchantmentLevel() <= ENC.getApi().getEnchantmentLevel(off, rune1.getRune().getEnchantment())){
+            if(ENC.getGeneralConfig().getBoolean("rune.rune_apply.swap_items.strict_override") && rune1.getRune().getEnchantmentLevel() <= EnchantmentAPI.getEnchantmentLevel(off, rune1.getRune().getEnchantment())){
                 ENC.getPluginChat().sendPlayer(ENC.getLocaleConfig().getString("cancelled_apply_rune_attempt"), p);
                 return null;
             }
@@ -132,7 +133,7 @@ public class RuneApplyListener implements Listener {
             main.setAmount(main.getAmount()-1);
             switch(result){
                 case SUCCESS:
-                    ENC.getApi().addEnchantment(off,
+                    EnchantmentAPI.addEnchantment(off,
                             rune1.getRune().getEnchantment(), rune1.getRune().getEnchantmentLevel());
                     if(ENC.getGeneralConfig().getBoolean("rune.rune_apply.swap_items.sound")){
                         p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 3f, 1f);

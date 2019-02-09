@@ -1,7 +1,7 @@
 package org.anhcraft.enc.api.rune;
 
-import org.anhcraft.enc.ENC;
 import org.anhcraft.enc.api.Enchantment;
+import org.anhcraft.enc.api.EnchantmentAPI;
 import org.anhcraft.spaciouslib.builders.EqualsBuilder;
 import org.anhcraft.spaciouslib.builders.HashCodeBuilder;
 import org.anhcraft.spaciouslib.utils.ExceptionThrower;
@@ -75,7 +75,7 @@ public class Rune {
      * @return enchantment
      */
     public Enchantment getEnchantment() {
-        return ENC.getApi().getEnchantmentById(enchantmentId);
+        return EnchantmentAPI.getEnchantmentById(enchantmentId);
     }
 
     /**
