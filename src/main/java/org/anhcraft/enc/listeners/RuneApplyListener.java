@@ -94,9 +94,9 @@ public class RuneApplyListener implements Listener {
             }
             Rune.ApplyResult result = RuneAPI.tryApplyRune(rune2);
             ENC.getPluginChat().sendPlayer(ENC.getLocaleConfig().getString("applied_rune_"+result.name().toLowerCase()), p);
+            off.setAmount(off.getAmount()-1);
             switch(result){
                 case SUCCESS:
-                    off.setAmount(off.getAmount()-1);
                     ENC.getApi().addEnchantment(main,
                             rune2.getRune().getEnchantment(), rune2.getRune().getEnchantmentLevel());
                     if(ENC.getGeneralConfig().getBoolean("rune.rune_apply.swap_items.sound")){
@@ -104,13 +104,11 @@ public class RuneApplyListener implements Listener {
                     }
                     break;
                 case FAILURE:
-                    off.setAmount(off.getAmount()-1);
                     if(ENC.getGeneralConfig().getBoolean("rune.rune_apply.swap_items.sound")){
                         p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 3f, 1f);
                     }
                     break;
                 case BROKEN:
-                    off.setAmount(off.getAmount()-1);
                     main = null;
                     if(ENC.getGeneralConfig().getBoolean("rune.rune_apply.swap_items.sound")){
                         p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_DESTROY, 3f, 1f);
@@ -131,9 +129,9 @@ public class RuneApplyListener implements Listener {
             }
             Rune.ApplyResult result = RuneAPI.tryApplyRune(rune1);
             ENC.getPluginChat().sendPlayer(ENC.getLocaleConfig().getString("applied_rune_"+result.name().toLowerCase()), p);
+            main.setAmount(main.getAmount()-1);
             switch(result){
                 case SUCCESS:
-                    main.setAmount(main.getAmount()-1);
                     ENC.getApi().addEnchantment(off,
                             rune1.getRune().getEnchantment(), rune1.getRune().getEnchantmentLevel());
                     if(ENC.getGeneralConfig().getBoolean("rune.rune_apply.swap_items.sound")){
@@ -141,13 +139,11 @@ public class RuneApplyListener implements Listener {
                     }
                     break;
                 case FAILURE:
-                    main.setAmount(main.getAmount()-1);
                     if(ENC.getGeneralConfig().getBoolean("rune.rune_apply.swap_items.sound")){
                         p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 3f, 1f);
                     }
                     break;
                 case BROKEN:
-                    main.setAmount(main.getAmount()-1);
                     off = null;
                     if(ENC.getGeneralConfig().getBoolean("rune.rune_apply.swap_items.sound")){
                         p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_DESTROY, 3f, 1f);
