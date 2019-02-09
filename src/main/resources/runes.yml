@@ -15,7 +15,7 @@ rune1: # rune's id
 rune2:
   name: "&4Wither Rune"
   enchantment:
-    id: Wither
+    id: witheR
     level: 2
   success_rate:
     min: 52.4
@@ -23,6 +23,28 @@ rune2:
   protection_rate:
     min: 20
     max: 27.1
-  drop_rate:
-    min: 8.2
-    max: 12.5
+  drop_rate: 15
+rune3:
+  name: "&1Blindness Rune"
+  enchantment:
+    id: BlindNess
+    level: 3
+  success_rate:
+    min: 32.5
+    max: 48
+  protection_rate:
+    min: 50
+    max: 55
+  drop_rate: 11.9
+rune4:
+  name: "&fFre&beze &aRune"
+  enchantment:
+    id: FreeZe
+    level: 2
+  success_rate:
+    min: 42.5
+    max: 48
+  protection_rate:
+    min: 11.3
+    max: 17.6
+  drop_rate: 10.5
