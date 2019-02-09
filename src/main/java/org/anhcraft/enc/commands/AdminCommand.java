@@ -127,7 +127,7 @@ public class AdminCommand implements Runnable {
         @Override
         public void run(CommandBuilder commandBuilder, CommandSender sender, int i, String[] args, int i1, String s) {
             if(sender.hasPermission("enc.command.rune.list")) {
-                ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("list_registered_runes"), sender);
+                ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("list_available_runes"), sender);
                 if(ENC.getGeneralConfig().getBoolean("commands.use_rune_by_id")) {
                     ENC.getPluginChat().sendCommandSenderNoPrefix(String.join(", ",
                             RuneAPI.getRegisteredRuneIds()), sender);
