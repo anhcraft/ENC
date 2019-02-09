@@ -147,6 +147,42 @@ rune:
       # Plays sound in each swap?
       sound: true
 
+  # Controls how runes are dropped in the world for player uses
+  rune_drop:
+    # First way: Killing mobs
+    kill_mobs:
+      # Allows this way or not?
+      enabled: false
+
+      # Does this way require permission?
+      need_permission: false
+
+      # Non-drop rate (in percent, 0 <= n <= 100)
+      no_drop_rate: 20
+
+      # Which types of entity that support?
+      # Groups: $entities, $monsters, $animals
+      # [✓] TIP:
+      # - Puts '$' at the beginning to include a group
+      # - Puts '-' at the beginning to exclude something from the previous selection
+      # - Puts '-$' at the beginning to exclude a group from the previous selection
+      # - Sees all entity types here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html#enum.constant.summary
+      # [!] WARNING:
+      # Groups should be put at first
+      entity_types:
+      - $entities
+      - -EnderMan
+
+      # Which worlds that this way is allowed?
+      # Groups: $all
+      # [✓] TIP:
+      # - Puts '$' at the beginning to include a group
+      # - Puts '-' at the beginning to exclude something from previous selection
+      # - Puts '-$' at the beginning to exclude a group from the previous selection
+      # [!] WARNING:
+      # Groups should be put at first
+      worlds:
+      - $all
 
 
 # =====================

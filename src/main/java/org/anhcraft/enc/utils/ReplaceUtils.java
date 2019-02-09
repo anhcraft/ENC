@@ -14,13 +14,21 @@ public class ReplaceUtils {
             if(a == '$'){
                 if(groups.containsKey(w)){
                     for(String v : groups.get(w)){
-                        n.add(v.toUpperCase());
+                        n.add(caseSensitive ? v : v.toUpperCase());
                     }
                 }
                 continue;
             }
             else if(a == '-'){
-                n.remove(caseSensitive ? w : w.toUpperCase());
+                if(s.length() >= 2 && s.charAt(1) == '$'){
+                    if(groups.containsKey(w)){
+                        for(String v : groups.get(w)){
+                            n.remove(caseSensitive ? v : v.toUpperCase());
+                        }
+                    }
+                } else {
+                    n.remove(caseSensitive ? w : w.toUpperCase());
+                }
                 continue;
             }
             else if(a == '\\' && s.length() >= 2) {

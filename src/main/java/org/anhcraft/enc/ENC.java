@@ -11,6 +11,7 @@ import org.anhcraft.enc.enchantments.*;
 import org.anhcraft.enc.listeners.AttackListener;
 import org.anhcraft.enc.listeners.KillListener;
 import org.anhcraft.enc.listeners.RuneApplyListener;
+import org.anhcraft.enc.listeners.RuneDropListener;
 import org.anhcraft.spaciouslib.io.DirectoryManager;
 import org.anhcraft.spaciouslib.io.FileManager;
 import org.anhcraft.spaciouslib.utils.Chat;
@@ -75,6 +76,7 @@ public final class ENC extends JavaPlugin {
                 rune.getDouble("drop_rate")
             ));
         });
+        RuneDropListener.init();
     }
 
     public void reloadPlugin() throws Exception {
@@ -112,6 +114,7 @@ public final class ENC extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new AttackListener(), this);
         getServer().getPluginManager().registerEvents(new KillListener(), this);
         getServer().getPluginManager().registerEvents(new RuneApplyListener(), this);
+        getServer().getPluginManager().registerEvents(new RuneDropListener(), this);
     }
 
     private void registerCommand() {
