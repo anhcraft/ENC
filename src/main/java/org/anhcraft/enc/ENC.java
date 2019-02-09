@@ -66,7 +66,7 @@ public final class ENC extends JavaPlugin {
             RuneAPI.registerRune(new Rune(
                 s,
                 rune.getString("name"),
-                api.getEnchantmentById(rune.getString("enchantment.id")),
+                rune.getString("enchantment.id"),
                 rune.getInt("enchantment.level"),
                 rune.getDouble("success_rate.min"),
                 rune.getDouble("success_rate.max"),

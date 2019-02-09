@@ -1,5 +1,6 @@
 package org.anhcraft.enc.api.rune;
 
+import org.anhcraft.enc.ENC;
 import org.anhcraft.enc.api.Enchantment;
 import org.anhcraft.spaciouslib.builders.EqualsBuilder;
 import org.anhcraft.spaciouslib.builders.HashCodeBuilder;
@@ -11,7 +12,7 @@ import org.anhcraft.spaciouslib.utils.ExceptionThrower;
 public class Rune {
     private String id;
     private String name;
-    private Enchantment enchantment;
+    private String enchantmentId;
     private int enchantmentLevel;
     private double minSuccessRate;
     private double maxSuccessRate;
@@ -22,19 +23,19 @@ public class Rune {
      * Creates an instance of Rune.
      * @param id the id of rune
      * @param name the name of rune
-     * @param enchantment the enchantment which is contained in this rune
+     * @param enchantmentId the enchantment which is contained in this rune
      * @param enchantmentLevel the enchantment level
      * @param minSuccessRate the minimum success rate
      * @param maxSuccessRate the maximum success rate
      * @param minProtectionRate the minimum protection rate
      * @param maxProtectionRate the maximum protection rate
      */
-    public Rune(String id, String name, Enchantment enchantment, int enchantmentLevel, double minSuccessRate, double maxSuccessRate, double minProtectionRate, double maxProtectionRate) {
+    public Rune(String id, String name, String enchantmentId, int enchantmentLevel, double minSuccessRate, double maxSuccessRate, double minProtectionRate, double maxProtectionRate) {
         ExceptionThrower.ifFalse(id.matches("^[\\w]+$"), new Exception("the rune id must only contain A-Z, 0-9 and underscore"));
-        ExceptionThrower.ifTrue(enchantment == null, new Exception("enchantment must not be null"));
+        ExceptionThrower.ifTrue(enchantmentId == null, new Exception("enchantment id must not be null"));
         this.id = id;
         this.name = name;
-        this.enchantment = enchantment;
+        this.enchantmentId = enchantmentId;
         this.enchantmentLevel = Math.max(enchantmentLevel, 1);
         this.minSuccessRate = Math.max(minSuccessRate, 0);
         this.maxSuccessRate = Math.min(maxSuccessRate, 100);
@@ -59,11 +60,20 @@ public class Rune {
     }
 
     /**
+     * Returns the id of enchantment which is contained in this rune.
+     * @return enchantment's id
+     */
+    public String getEnchantmentId() {
+        return enchantmentId;
+    }
+
+
+    /**
      * Returns the enchantment which is contained in this rune.
      * @return enchantment
      */
     public Enchantment getEnchantment() {
-        return enchantment;
+        return ENC.getApi().getEnchantmentById(enchantmentId);
     }
 
     /**
@@ -123,7 +133,7 @@ public class Rune {
         return new HashCodeBuilder(17, 23)
                 .append(this.id)
                 .append(this.name)
-                .append(this.enchantment)
+                .append(this.enchantmentId)
                 .append(this.enchantmentLevel)
                 .append(this.minSuccessRate)
                 .append(this.maxSuccessRate)
