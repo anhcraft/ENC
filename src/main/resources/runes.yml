@@ -3,22 +3,29 @@ rune1: # rune's id
   enchantment:
     id: ColouredSheep # the id of enchantment, case-insensitive
     level: 1 # the level of enchantment, must start from 1
-  # the success rate of a rune is random one between two values below (0 <= n <= 100)
+  # the success rate will be generated randomly between two values below (0 <= n <= 100)
   success_rate:
     min: 70
     max: 80 # must higher than the minimum one
-  # the protection rate of a rune is random one between two values below (0 <= n <= 100)
+  # the protection rate will be generated randomly between two values below (0 <= n <= 100)
   protection_rate:
     min: 30
     max: 45 # must higher than the minimum one
+  # the drop rate will be generated randomly between two values below (0 <= n <= 100)
+  drop_rate:
+    min: 10
+    max: 20 # must higher than the minimum one
 rune2:
   name: "&4Wither Rune"
   enchantment:
     id: Wither
-    level: 1
+    level: 2
   success_rate:
-    min: 70
-    max: 80
+    min: 52.4
+    max: 65.2
   protection_rate:
-    min: 30
-    max: 45
+    min: 20
+    max: 27.1
+  drop_rate:
+    min: 8.2
+    max: 12.5
