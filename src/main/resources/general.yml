@@ -121,12 +121,9 @@ gem:
     # RegEx pattern for getting gem's protection rate
     protection_rate_regex: "(?<=&1&f- Protection rate: &e)([\\d.]+)(?=%)"
 
-  # Controls how gems merge into items
+  # Controls how gems are merged into items
   gem_merge:
-    # First way: Swapping items
-    # - Holds a gem on the main hand or the off hand
-    # - Then holds the target item on another empty hand
-    # - Swaps them between hands continuously until successful
+    # Swapping items
     swap_items:
       # Allows this way or not?
       enabled: true
@@ -147,9 +144,9 @@ gem:
       # Plays sound in each swap?
       sound: true
 
-  # Controls how gems are dropped in the world for player uses
+  # Controls how gems are dropped for player uses
   gem_drop:
-    # First way: Killing mobs
+    # Killing mobs
     kill_mobs:
       # Allows this way or not?
       enabled: false

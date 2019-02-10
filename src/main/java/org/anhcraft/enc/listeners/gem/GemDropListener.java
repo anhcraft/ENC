@@ -1,4 +1,4 @@
-package org.anhcraft.enc.listeners;
+package org.anhcraft.enc.listeners.gem;
 
 import org.anhcraft.enc.ENC;
 import org.anhcraft.enc.api.gem.Gem;

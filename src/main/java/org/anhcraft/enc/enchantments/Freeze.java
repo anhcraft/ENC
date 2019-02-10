@@ -4,6 +4,7 @@ import org.anhcraft.enc.ENC;
 import org.anhcraft.enc.api.ActionReport;
 import org.anhcraft.enc.api.Enchantment;
 import org.anhcraft.enc.api.listeners.SyncAttackListener;
+import org.anhcraft.enc.utils.UnitUtils;
 import org.anhcraft.spaciouslib.annotations.AnnotationHandler;
 import org.anhcraft.spaciouslib.annotations.PlayerCleaner;
 import org.anhcraft.spaciouslib.internal.listeners.PlayerListener;
@@ -56,7 +57,7 @@ public class Freeze extends Enchantment {
                     return;
                 }
                 PlayerUtils.freeze((Player) entity);
-                long duration = (long) computeConfigValue("duration", report)*50;
+                long duration = (long) UnitUtils.tick2ms(computeConfigValue("duration", report));
                 DATA.put(entity.getUniqueId(), System.currentTimeMillis()+duration);
             }
         });
