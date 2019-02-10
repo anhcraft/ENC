@@ -1,4 +1,4 @@
-package org.anhcraft.enc.api.rune;
+package org.anhcraft.enc.api.gem;
 
 import org.anhcraft.enc.api.Enchantment;
 import org.anhcraft.enc.api.EnchantmentAPI;
@@ -7,9 +7,9 @@ import org.anhcraft.spaciouslib.builders.HashCodeBuilder;
 import org.anhcraft.spaciouslib.utils.ExceptionThrower;
 
 /**
- * Represents a rune.
+ * Represents a gem.
  */
-public class Rune {
+public class Gem {
     private String id;
     private String name;
     private String enchantmentId;
@@ -21,10 +21,10 @@ public class Rune {
     private double dropRate;
 
     /**
-     * Creates an instance of Rune.
-     * @param id the id of rune
-     * @param name the name of rune
-     * @param enchantmentId the enchantment which is contained in this rune
+     * Creates an instance of Gem.
+     * @param id the id of gem
+     * @param name the name of gem
+     * @param enchantmentId the enchantment which is contained in this gem
      * @param enchantmentLevel the enchantment level
      * @param minSuccessRate the minimum success rate
      * @param maxSuccessRate the maximum success rate
@@ -32,8 +32,8 @@ public class Rune {
      * @param maxProtectionRate the maximum protection rate
      * @param dropRate the drop rate
      */
-    public Rune(String id, String name, String enchantmentId, int enchantmentLevel, double minSuccessRate, double maxSuccessRate, double minProtectionRate, double maxProtectionRate, double dropRate) {
-        ExceptionThrower.ifFalse(id.matches("^[\\w]+$"), new Exception("the rune id must only contain A-Z, 0-9 and underscore"));
+    public Gem(String id, String name, String enchantmentId, int enchantmentLevel, double minSuccessRate, double maxSuccessRate, double minProtectionRate, double maxProtectionRate, double dropRate) {
+        ExceptionThrower.ifFalse(id.matches("^[\\w]+$"), new Exception("the gem id must only contain A-Z, 0-9 and underscore"));
         ExceptionThrower.ifTrue(enchantmentId == null, new Exception("enchantment id must not be null"));
         this.id = id;
         this.name = name;
@@ -47,23 +47,23 @@ public class Rune {
     }
 
     /**
-     * Returns the id of this rune.
-     * @return rune's id
+     * Returns the id of this gem.
+     * @return gem's id
      */
     public String getId() {
         return id;
     }
 
     /**
-     * Returns the name of this rune.
-     * @return rune's name
+     * Returns the name of this gem.
+     * @return gem's name
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Returns the id of enchantment which is contained in this rune.
+     * Returns the id of enchantment which is contained in this gem.
      * @return enchantment's id
      */
     public String getEnchantmentId() {
@@ -71,7 +71,7 @@ public class Rune {
     }
 
     /**
-     * Returns the enchantment which is contained in this rune.
+     * Returns the enchantment which is contained in this gem.
      * @return enchantment
      */
     public Enchantment getEnchantment() {
@@ -129,7 +129,7 @@ public class Rune {
     @Override
     public boolean equals(Object object){
         if(object != null && object.getClass() == this.getClass()){
-            Rune r = (Rune) object;
+            Gem r = (Gem) object;
             return new EqualsBuilder()
                     .append(r.id, this.id)
                     .append(r.name, this.name)
@@ -149,23 +149,5 @@ public class Rune {
                 .append(this.maxSuccessRate)
                 .append(this.minProtectionRate)
                 .append(this.maxProtectionRate).build();
-    }
-
-    /**
-     * Result of applying a rune to a stack of items.
-     */
-    public enum ApplyResult{
-        /**
-         * There was a success in moving the enchantment of the rune into the stack.
-         */
-        SUCCESS,
-        /**
-         * The rune rejected the stack but luckily its strong did not break up the stack.
-         */
-        FAILURE,
-        /**
-         * The rune rejected the stack and it broken up the stack.
-         */
-        BROKEN
     }
 }

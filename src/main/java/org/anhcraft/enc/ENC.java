@@ -4,14 +4,14 @@ import co.aikar.taskchain.BukkitTaskChainFactory;
 import co.aikar.taskchain.TaskChainFactory;
 import org.anhcraft.enc.api.Enchantment;
 import org.anhcraft.enc.api.EnchantmentAPI;
-import org.anhcraft.enc.api.rune.Rune;
-import org.anhcraft.enc.api.rune.RuneAPI;
+import org.anhcraft.enc.api.gem.Gem;
+import org.anhcraft.enc.api.gem.GemAPI;
 import org.anhcraft.enc.commands.AdminCommand;
 import org.anhcraft.enc.enchantments.*;
 import org.anhcraft.enc.listeners.AttackListener;
+import org.anhcraft.enc.listeners.GemDropListener;
+import org.anhcraft.enc.listeners.GemMergeListener;
 import org.anhcraft.enc.listeners.KillListener;
-import org.anhcraft.enc.listeners.RuneApplyListener;
-import org.anhcraft.enc.listeners.RuneDropListener;
 import org.anhcraft.enc.utils.FilePaths;
 import org.anhcraft.spaciouslib.io.DirectoryManager;
 import org.anhcraft.spaciouslib.io.FileManager;
@@ -26,7 +26,7 @@ import java.io.File;
 public final class ENC extends JavaPlugin {
     private static final YamlConfiguration localeConfig = new YamlConfiguration();
     private static final YamlConfiguration generalConfig = new YamlConfiguration();
-    private static final YamlConfiguration runeConfig = new YamlConfiguration();
+    private static final YamlConfiguration gemConfig = new YamlConfiguration();
     private static Chat chat;
     private static ENC instance;
     private static TaskChainFactory taskChainFactory;
@@ -57,10 +57,10 @@ public final class ENC extends JavaPlugin {
         new DirectoryManager(FilePaths.LOCALE_FOLDER).mkdir();
         new DirectoryManager(FilePaths.ENCHANTMENT_FOLDER).mkdir();
         new FileManager(FilePaths.GENERAL_CONFIG_FILE).initFile(IOUtils.toByteArray(getResource("general.yml")));
-        new FileManager(FilePaths.RUNE_CONFIG_FILE).initFile(IOUtils.toByteArray(getResource("runes.yml")));
+        new FileManager(FilePaths.GEM_CONFIG_FILE).initFile(IOUtils.toByteArray(getResource("gems.yml")));
         // load configs
         generalConfig.load(FilePaths.GENERAL_CONFIG_FILE);
-        runeConfig.load(FilePaths.RUNE_CONFIG_FILE);
+        gemConfig.load(FilePaths.GEM_CONFIG_FILE);
         File localeFile = new File(FilePaths.LOCALE_FOLDER, generalConfig.getString("plugin.locale_file"));
         new FileManager(localeFile).initFile(IOUtils.toByteArray(getClass().getResourceAsStream("/locale/"+generalConfig.getString("plugin.locale_file"))));
         localeConfig.load(localeFile);
@@ -68,23 +68,23 @@ public final class ENC extends JavaPlugin {
         chat = new Chat(generalConfig.getString("plugin.prefix"));
         // reload enchantment config
         EnchantmentAPI.getRegisteredEnchantments().forEach(Enchantment::reloadConfig);
-        // reload rune config
-        RuneAPI.getRegisteredRunes().forEach(RuneAPI::unregisterRune);
-        runeConfig.getKeys(false).forEach(s -> {
-            ConfigurationSection rune = runeConfig.getConfigurationSection(s);
-            RuneAPI.registerRune(new Rune(
+        // reload gem config
+        GemAPI.getRegisteredGems().forEach(GemAPI::unregisterGem);
+        gemConfig.getKeys(false).forEach(s -> {
+            ConfigurationSection gem = gemConfig.getConfigurationSection(s);
+            GemAPI.registerGem(new Gem(
                     s,
-                    rune.getString("name"),
-                    rune.getString("enchantment.id"),
-                    rune.getInt("enchantment.level"),
-                    rune.getDouble("success_rate.min"),
-                    rune.getDouble("success_rate.max"),
-                    rune.getDouble("protection_rate.min"),
-                    rune.getDouble("protection_rate.max"),
-                    rune.getDouble("drop_rate")
+                    gem.getString("name"),
+                    gem.getString("enchantment.id"),
+                    gem.getInt("enchantment.level"),
+                    gem.getDouble("success_rate.min"),
+                    gem.getDouble("success_rate.max"),
+                    gem.getDouble("protection_rate.min"),
+                    gem.getDouble("protection_rate.max"),
+                    gem.getDouble("drop_rate")
             ));
         });
-        RuneDropListener.init();
+        GemDropListener.init();
     }
 
     private void registerEnchants() {
@@ -99,8 +99,8 @@ public final class ENC extends JavaPlugin {
     private void registerListeners() {
         getServer().getPluginManager().registerEvents(new AttackListener(), this);
         getServer().getPluginManager().registerEvents(new KillListener(), this);
-        getServer().getPluginManager().registerEvents(new RuneApplyListener(), this);
-        getServer().getPluginManager().registerEvents(new RuneDropListener(), this);
+        getServer().getPluginManager().registerEvents(new GemMergeListener(), this);
+        getServer().getPluginManager().registerEvents(new GemDropListener(), this);
     }
 
     private void registerCommand() {

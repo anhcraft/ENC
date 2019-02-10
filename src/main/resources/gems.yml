@@ -1,5 +1,5 @@
-rune1: # rune's id
-  name: "&aColouredSheep Rune" # rune's name, can contain colour codes
+gem1: # gem's id
+  name: "&aColouredSheep Gem" # gem's name, can contain colour codes
   enchantment:
     id: ColouredSheep # the id of enchantment, case-insensitive
     level: 1 # the level of enchantment, must start from 1
@@ -12,8 +12,8 @@ rune1: # rune's id
     min: 30 # in percent (0 <= n <= 100)
     max: 45 # must higher than the minimum one
   drop_rate: 10 # in percent, 0 <= n <= 100
-rune2:
-  name: "&4Wither Rune"
+gem2:
+  name: "&4Wither Gem"
   enchantment:
     id: witheR
     level: 2
@@ -24,8 +24,8 @@ rune2:
     min: 20
     max: 27.1
   drop_rate: 15
-rune3:
-  name: "&1Blindness Rune"
+gem3:
+  name: "&1Blindness Gem"
   enchantment:
     id: BlindNess
     level: 3
@@ -36,8 +36,8 @@ rune3:
     min: 50
     max: 55
   drop_rate: 11.9
-rune4:
-  name: "&fFre&beze &aRune"
+gem4:
+  name: "&fFre&beze &aGem"
   enchantment:
     id: FreeZe
     level: 2

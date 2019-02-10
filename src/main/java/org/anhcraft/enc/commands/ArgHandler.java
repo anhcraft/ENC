@@ -3,9 +3,9 @@ package org.anhcraft.enc.commands;
 import org.anhcraft.enc.ENC;
 import org.anhcraft.enc.api.Enchantment;
 import org.anhcraft.enc.api.EnchantmentAPI;
-import org.anhcraft.enc.api.rune.Rune;
-import org.anhcraft.enc.api.rune.RuneAPI;
-import org.anhcraft.enc.api.rune.RuneItem;
+import org.anhcraft.enc.api.gem.Gem;
+import org.anhcraft.enc.api.gem.GemAPI;
+import org.anhcraft.enc.api.gem.GemItem;
 import org.anhcraft.spaciouslib.utils.Group;
 
 import java.util.Arrays;
@@ -28,19 +28,19 @@ class ArgHandler {
         }
     }
 
-    static Rune onlyRune(String[] args, int from){
-        if(ENC.getGeneralConfig().getBoolean("commands.use_rune_by_id")){
-            return RuneAPI.getRuneById(args[args.length-1]);
+    static Gem onlyGem(String[] args, int from){
+        if(ENC.getGeneralConfig().getBoolean("commands.use_gem_by_id")){
+            return GemAPI.getGemById(args[args.length-1]);
         } else {
-            return RuneAPI.getRuneByName(String.join(" ", Arrays.copyOfRange(args, from, args.length)));
+            return GemAPI.getGemByName(String.join(" ", Arrays.copyOfRange(args, from, args.length)));
         }
     }
 
-    static RuneItem runeAndRate(String[] args, int from){
-        if(ENC.getGeneralConfig().getBoolean("commands.use_rune_by_id")){
-            return new RuneItem(RuneAPI.getRuneById(args[args.length-3]), Double.parseDouble(args[args.length-2]), Double.parseDouble(args[args.length-1]));
+    static GemItem gemAndRate(String[] args, int from){
+        if(ENC.getGeneralConfig().getBoolean("commands.use_gem_by_id")){
+            return new GemItem(GemAPI.getGemById(args[args.length-3]), Double.parseDouble(args[args.length-2]), Double.parseDouble(args[args.length-1]));
         } else {
-            return new RuneItem(RuneAPI.getRuneByName(String.join(" ", Arrays.copyOfRange(args, from, args.length-2))), Double.parseDouble(args[args.length-2]), Double.parseDouble(args[args.length-1]));
+            return new GemItem(GemAPI.getGemByName(String.join(" ", Arrays.copyOfRange(args, from, args.length-2))), Double.parseDouble(args[args.length-2]), Double.parseDouble(args[args.length-1]));
         }
     }
 }

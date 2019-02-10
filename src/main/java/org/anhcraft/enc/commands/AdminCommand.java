@@ -3,9 +3,9 @@ package org.anhcraft.enc.commands;
 import org.anhcraft.enc.ENC;
 import org.anhcraft.enc.api.Enchantment;
 import org.anhcraft.enc.api.EnchantmentAPI;
-import org.anhcraft.enc.api.rune.Rune;
-import org.anhcraft.enc.api.rune.RuneAPI;
-import org.anhcraft.enc.api.rune.RuneItem;
+import org.anhcraft.enc.api.gem.Gem;
+import org.anhcraft.enc.api.gem.GemAPI;
+import org.anhcraft.enc.api.gem.GemItem;
 import org.anhcraft.spaciouslib.builders.command.*;
 import org.anhcraft.spaciouslib.utils.Group;
 import org.anhcraft.spaciouslib.utils.InventoryUtils;
@@ -124,17 +124,17 @@ public class AdminCommand implements Runnable {
         }
     }).build();
 
-    private static final Argument[] LIST_RUNE_CMD = new ChildCommandBuilder().path("rune list", new CommandCallback() {
+    private static final Argument[] LIST_GEM_CMD = new ChildCommandBuilder().path("gem list", new CommandCallback() {
         @Override
         public void run(CommandBuilder commandBuilder, CommandSender sender, int i, String[] args, int i1, String s) {
-            if(sender.hasPermission("enc.command.rune.list")) {
-                ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("list_available_runes"), sender);
-                if(ENC.getGeneralConfig().getBoolean("commands.use_rune_by_id")) {
+            if(sender.hasPermission("enc.command.gem.list")) {
+                ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("list_available_gems"), sender);
+                if(ENC.getGeneralConfig().getBoolean("commands.use_gem_by_id")) {
                     ENC.getPluginChat().sendCommandSenderNoPrefix(String.join(", ",
-                            RuneAPI.getRegisteredRuneIds()), sender);
+                            GemAPI.getRegisteredGemIds()), sender);
                 } else{
                     // we do not color the string here
-                    sender.sendMessage(String.join(", ", RuneAPI.getRegisteredRuneNames()));
+                    sender.sendMessage(String.join(", ", GemAPI.getRegisteredGemNames()));
                 }
             } else {
                 ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("not_have_permission"), sender);
@@ -142,10 +142,10 @@ public class AdminCommand implements Runnable {
         }
     }).build();
 
-    private static final Argument[] ASSIGN_RUNE_CMD = new ChildCommandBuilder().path("rune assign").var("name", new CommandCallback() {
+    private static final Argument[] ASSIGN_GEM_CMD = new ChildCommandBuilder().path("gem assign").var("name", new CommandCallback() {
         @Override
         public void run(CommandBuilder commandBuilder, CommandSender sender, int i, String[] args, int i1, String s) {
-            if(sender.hasPermission("enc.command.rune.assign")) {
+            if(sender.hasPermission("enc.command.gem.assign")) {
                 if(sender instanceof Player){
                     Player player = (Player) sender;
                     ItemStack item = player.getInventory().getItemInMainHand();
@@ -153,12 +153,12 @@ public class AdminCommand implements Runnable {
                         ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("must_hold_item"), sender);
                         return;
                     }
-                    Rune rune = ArgHandler.onlyRune(args, 1);
-                    if(rune == null){
-                        ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("rune_not_found"), sender);
+                    Gem gem = ArgHandler.onlyGem(args, 1);
+                    if(gem == null){
+                        ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("gem_not_found"), sender);
                         return;
                     }
-                    RuneAPI.assignRune(item, new RuneItem(rune));
+                    GemAPI.assignGem(item, new GemItem(gem));
                 } else {
                     ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("must_be_player"), sender);
                 }
@@ -169,7 +169,7 @@ public class AdminCommand implements Runnable {
     }, ArgumentType.ANYTHING).var("successRate", ArgumentType.POSITIVE_REAL_NUMBER).var("protectionRate", new CommandCallback() {
         @Override
         public void run(CommandBuilder builder, CommandSender sender, int command, String[] args, int arg, String value) {
-            if(sender.hasPermission("enc.command.rune.assign")) {
+            if(sender.hasPermission("enc.command.gem.assign")) {
                 if(sender instanceof Player){
                     Player player = (Player) sender;
                     ItemStack item = player.getInventory().getItemInMainHand();
@@ -177,12 +177,12 @@ public class AdminCommand implements Runnable {
                         ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("must_hold_item"), sender);
                         return;
                     }
-                    RuneItem rune = ArgHandler.runeAndRate(args, 1);
-                    if(rune.getRune() == null){
-                        ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("rune_not_found"), sender);
+                    GemItem gem = ArgHandler.gemAndRate(args, 1);
+                    if(gem.getGem() == null){
+                        ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("gem_not_found"), sender);
                         return;
                     }
-                    RuneAPI.assignRune(item, rune);
+                    GemAPI.assignGem(item, gem);
                 } else {
                     ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("must_be_player"), sender);
                 }
@@ -192,10 +192,10 @@ public class AdminCommand implements Runnable {
         }
     }, ArgumentType.POSITIVE_REAL_NUMBER).build();
     
-    private static final Argument[] DETACH_RUNE_CMD = new ChildCommandBuilder().path("rune detach", new CommandCallback() {
+    private static final Argument[] DETACH_GEM_CMD = new ChildCommandBuilder().path("gem detach", new CommandCallback() {
         @Override
         public void run(CommandBuilder builder, CommandSender sender, int command, String[] args, int arg, String value) {
-            if(sender.hasPermission("enc.command.rune.detach")) {
+            if(sender.hasPermission("enc.command.gem.detach")) {
                 if(sender instanceof Player){
                     Player player = (Player) sender;
                     ItemStack item = player.getInventory().getItemInMainHand();
@@ -203,7 +203,7 @@ public class AdminCommand implements Runnable {
                         ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("must_hold_item"), sender);
                         return;
                     }
-                    RuneAPI.detachRune(item);
+                    GemAPI.detachGem(item);
                 } else {
                     ENC.getPluginChat().sendCommandSender(ENC.getLocaleConfig().getString("must_be_player"), sender);
                 }
@@ -255,9 +255,9 @@ public class AdminCommand implements Runnable {
         .addChild("adds an enchantment to the holding item", ADD_ENCHANTMENT_CMD)
         .addChild("removes an existing enchantment out of the holding item", REMOVE_ENCHANTMENT_CMD)
         .addChild("removes all existing enchantments out of the holding item", REMOVE_ALL_ENCHANTMENT_CMD)
-                .addChild("lists all available runes", LIST_RUNE_CMD)
-        .addChild("assigns a rune to the holding item", ASSIGN_RUNE_CMD)
-                .addChild("detaches the rune from the holding item", DETACH_RUNE_CMD)
+                .addChild("lists all available gems", LIST_GEM_CMD)
+        .addChild("assigns a gem to the holding item", ASSIGN_GEM_CMD)
+                .addChild("detaches the gem from the holding item", DETACH_GEM_CMD)
         .addChild("reloads the plugin", RELOAD_CMD)
         .addAlias("encadmin")
         .build(ENC.getInstance());

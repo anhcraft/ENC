@@ -1,9 +1,9 @@
 package org.anhcraft.enc.listeners;
 
 import org.anhcraft.enc.ENC;
-import org.anhcraft.enc.api.rune.Rune;
-import org.anhcraft.enc.api.rune.RuneAPI;
-import org.anhcraft.enc.api.rune.RuneItem;
+import org.anhcraft.enc.api.gem.Gem;
+import org.anhcraft.enc.api.gem.GemAPI;
+import org.anhcraft.enc.api.gem.GemItem;
 import org.anhcraft.enc.utils.ReplaceUtils;
 import org.anhcraft.enc.utils.RouletteSelect;
 import org.anhcraft.spaciouslib.utils.CommonUtils;
@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RuneDropListener implements Listener {
+public class GemDropListener implements Listener {
     private static final List<String> KILL_MOBS_WORLDS = new ArrayList<>();
     private static final List<EntityType> KILL_MOBS_ENTITIES = new ArrayList<>();
 
@@ -30,7 +30,7 @@ public class RuneDropListener implements Listener {
         HashMap<String, List<String>> group1 = new HashMap<>();
         group1.put("all", Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList()));
         KILL_MOBS_WORLDS.addAll(ReplaceUtils.replaceVariables(
-                ENC.getGeneralConfig().getStringList("rune.rune_drop.kill_mobs.worlds"),
+                ENC.getGeneralConfig().getStringList("gem.gem_drop.kill_mobs.worlds"),
                 group1, true));
 
         KILL_MOBS_ENTITIES.clear();
@@ -39,7 +39,7 @@ public class RuneDropListener implements Listener {
         group2.put("animals", getEntityTypes(Animals.class));
         group2.put("monsters", getEntityTypes(Monster.class));
         KILL_MOBS_ENTITIES.addAll(ReplaceUtils.replaceVariables(
-                ENC.getGeneralConfig().getStringList("rune.rune_drop.kill_mobs.entity_types"),
+                ENC.getGeneralConfig().getStringList("gem.gem_drop.kill_mobs.entity_types"),
                 group2, false)
                 .stream()
                 .map(EntityType::valueOf)
@@ -57,25 +57,25 @@ public class RuneDropListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void kill(EntityDeathEvent event){
-        if(ENC.getGeneralConfig().getBoolean("rune.rune_drop.kill_mobs.enabled") &&
+        if(ENC.getGeneralConfig().getBoolean("gem.gem_drop.kill_mobs.enabled") &&
                 event.getEntity().getKiller() != null &&
                 KILL_MOBS_WORLDS.contains(event.getEntity().getWorld().getName()) &&
                 KILL_MOBS_ENTITIES.contains(event.getEntity().getType())) {
             Player killer = event.getEntity().getKiller();
-            if(ENC.getGeneralConfig().getBoolean("rune.rune_drop.kill_mobs.need_permission")
-                    && !killer.hasPermission("enc.rune_drop.kill_mobs")){
+            if(ENC.getGeneralConfig().getBoolean("gem.gem_drop.kill_mobs.need_permission")
+                    && !killer.hasPermission("enc.gem_drop.kill_mobs")){
                 return;
             }
-            List<Rune> runes = RuneAPI.getRegisteredRunes();
-            List<Double> rates = runes.stream().map(Rune::getDropRate).collect(Collectors.toList());
-            rates.add(ENC.getGeneralConfig().getDouble("rune.rune_drop.kill_mobs.no_drop_rate"));
+            List<Gem> gems = GemAPI.getRegisteredGems();
+            List<Double> rates = gems.stream().map(Gem::getDropRate).collect(Collectors.toList());
+            rates.add(ENC.getGeneralConfig().getDouble("gem.gem_drop.kill_mobs.no_drop_rate"));
             int in = RouletteSelect.chooseFromList(rates);
-            if(in == runes.size()){
+            if(in == gems.size()){
                 return;
             }
-            Rune rune = runes.get(in);
+            Gem gem = gems.get(in);
             ItemStack itemStack = new ItemStack(Material.EMERALD, 1);
-            RuneAPI.assignRune(itemStack, new RuneItem(rune));
+            GemAPI.assignGem(itemStack, new GemItem(gem));
             event.getDrops().add(itemStack);
         }
     }
