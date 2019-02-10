@@ -4,6 +4,7 @@ import co.aikar.taskchain.TaskChain;
 import org.anhcraft.enc.ENC;
 import org.anhcraft.enc.api.ActionReport;
 import org.anhcraft.enc.api.Enchantment;
+import org.anhcraft.enc.api.EnchantmentAPI;
 import org.anhcraft.enc.api.listeners.AsyncAttackListener;
 import org.anhcraft.enc.api.listeners.SyncAttackListener;
 import org.anhcraft.spaciouslib.utils.InventoryUtils;
@@ -24,7 +25,7 @@ public class AttackListener implements Listener {
             Player damager = (Player) event.getDamager();
             ItemStack item = damager.getInventory().getItemInMainHand();
             if(!InventoryUtils.isNull(item)) {
-                HashMap<Enchantment, Integer> enchants = ENC.getApi().listEnchantments(item);
+                HashMap<Enchantment, Integer> enchants = EnchantmentAPI.listEnchantments(item);
                 if(enchants.isEmpty()){
                     return;
                 }

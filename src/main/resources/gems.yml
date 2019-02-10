@@ -1,0 +1,50 @@
+gem1: # gem's id
+  name: "&aColouredSheep Gem" # gem's name, can contain colour codes
+  enchantment:
+    id: ColouredSheep # the id of enchantment, case-insensitive
+    level: 1 # the level of enchantment, must start from 1
+  # the success rate will be generated randomly between two values below
+  success_rate:
+    min: 70 # in percent (0 <= n <= 100)
+    max: 80 # must higher than the minimum one
+  # the protection rate will be generated randomly between two values below
+  protection_rate:
+    min: 30 # in percent (0 <= n <= 100)
+    max: 45 # must higher than the minimum one
+  drop_rate: 10 # in percent, 0 <= n <= 100
+gem2:
+  name: "&4Wither Gem"
+  enchantment:
+    id: witheR
+    level: 2
+  success_rate:
+    min: 52.4
+    max: 65.2
+  protection_rate:
+    min: 20
+    max: 27.1
+  drop_rate: 15
+gem3:
+  name: "&1Blindness Gem"
+  enchantment:
+    id: BlindNess
+    level: 3
+  success_rate:
+    min: 32.5
+    max: 48
+  protection_rate:
+    min: 50
+    max: 55
+  drop_rate: 11.9
+gem4:
+  name: "&fFre&beze &aGem"
+  enchantment:
+    id: FreeZe
+    level: 2
+  success_rate:
+    min: 42.5
+    max: 48
+  protection_rate:
+    min: 11.3
+    max: 17.6
+  drop_rate: 10.5

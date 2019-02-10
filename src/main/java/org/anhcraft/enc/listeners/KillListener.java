@@ -4,6 +4,7 @@ import co.aikar.taskchain.TaskChain;
 import org.anhcraft.enc.ENC;
 import org.anhcraft.enc.api.ActionReport;
 import org.anhcraft.enc.api.Enchantment;
+import org.anhcraft.enc.api.EnchantmentAPI;
 import org.anhcraft.enc.api.listeners.AsyncKillListener;
 import org.anhcraft.enc.api.listeners.SyncKillListener;
 import org.anhcraft.spaciouslib.utils.InventoryUtils;
@@ -23,7 +24,7 @@ public class KillListener implements Listener {
             Player killer = event.getEntity().getKiller();
             ItemStack item = killer.getInventory().getItemInMainHand();
             if(!InventoryUtils.isNull(item)) {
-                HashMap<Enchantment, Integer> enchants = ENC.getApi().listEnchantments(item);
+                HashMap<Enchantment, Integer> enchants = EnchantmentAPI.listEnchantments(item);
                 if(enchants.isEmpty()){
                     return;
                 }

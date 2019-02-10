@@ -26,10 +26,10 @@ commands:
   # Using names can make the performance worse
   use_enchantment_by_id: true
 
-  # When interacts with rune via commands, whether we use the id or the name?
+  # When interacts with gem via commands, whether we use the id or the name?
   # [!] WARNING:
   # Using names can make the performance worse
-  use_rune_by_id: true
+  use_gem_by_id: true
 
   # Should we allow unsafe enchantment
   # With enabled option, operators can:
@@ -89,44 +89,41 @@ enchantment:
         value_regex: "(?<=\\{max_level:)([0-9a-zA-Z_]+)(?=})"
 
 
-# General rune settings
-rune:
-  # This is the place where you can customize rune's lore
+# General gem settings
+gem:
+  # This is the place where you can customize gem's lore
   # [!] WARNING:
-  # Do not touch this section if you are not sure. Any changes to this section may destroy all existing runes
+  # Do not touch this section if you are not sure. Any changes to this section may destroy all existing gems
   lore_patterns:
     # Raw pattern for lore lines
-    # Placeholders: {rune_name}, {coloured_rune_name}, {success_rate}, {protection_rate}, {min_success_rate}, {max_success_rate}, {min_protection_rate}, {max_protection_rate}, {enchantment_name}, {coloured_enchantment_name}, {level}, {roman_level}
+    # Placeholders: {gem_name}, {coloured_gem_name}, {success_rate}, {protection_rate}, {min_success_rate}, {max_success_rate}, {min_protection_rate}, {max_protection_rate}, {enchantment_name}, {coloured_enchantment_name}, {level}, {roman_level}
     # [!] WARNING:
-    # - Required placeholders are {rune_name}/{coloured_rune_name}, {success_rate} and {protection_rate}
+    # - Required placeholders are {gem_name}/{coloured_gem_name}, {success_rate} and {protection_rate}
     # - If you modify this option, make sure to change the patterns below
     full_raw:
-    - "&1&a◆ {coloured_rune_name} | {coloured_enchantment_name} {roman_level}"
+    - "&1&a◆ {coloured_gem_name} | {coloured_enchantment_name} {roman_level}"
     - "&1&f- Success rate: &e{success_rate}%"
     - "&1&f- Protection rate: &e{protection_rate}%"
 
-    # RegEx pattern for general rune validations
+    # RegEx pattern for general gem validations
     full_general_regex: "^&1&a◆ (.*)+ \\| (.*)+ ([IVXLCDM]+)$"
 
-    # RegEx pattern for certain rune validations
-    # Placeholders: {rune_name}
-    full_individual_regex: "^&1&a◆ {rune_name} \\| (.*)+ ([IVXLCDM]+)$"
+    # RegEx pattern for certain gem validations
+    # Placeholders: {gem_name}
+    full_individual_regex: "^&1&a◆ {gem_name} \\| (.*)+ ([IVXLCDM]+)$"
 
-    # RegEx pattern for getting rune's names
+    # RegEx pattern for getting gem's names
     name_regex: "(?<=&1&a◆ )(.*)(?= \\| (.*)+ ([IVXLCDM]+))"
 
-    # RegEx pattern for getting rune's success rate
+    # RegEx pattern for getting gem's success rate
     success_rate_regex: "(?<=&1&f- Success rate: &e)([\\d.]+)(?=%)"
 
-    # RegEx pattern for getting rune's protection rate
+    # RegEx pattern for getting gem's protection rate
     protection_rate_regex: "(?<=&1&f- Protection rate: &e)([\\d.]+)(?=%)"
 
-  # Controls how runes and items are joined in together
-  rune_apply:
-    # Second way
-    # - Holds a rune on the main hand or the off hand
-    # - Then holds the target item on another empty hand
-    # - Swaps them between hands continuously until successful
+  # Controls how gems are merged into items
+  gem_merge:
+    # Swapping items
     swap_items:
       # Allows this way or not?
       enabled: true
@@ -147,6 +144,42 @@ rune:
       # Plays sound in each swap?
       sound: true
 
+  # Controls how gems are dropped for player uses
+  gem_drop:
+    # Killing mobs
+    kill_mobs:
+      # Allows this way or not?
+      enabled: false
+
+      # Does this way require permission?
+      need_permission: false
+
+      # Non-drop rate (in percent, 0 <= n <= 100)
+      no_drop_rate: 20
+
+      # Which types of entity that support?
+      # Groups: $entities, $monsters, $animals
+      # [✓] TIP:
+      # - Puts '$' at the beginning to include a group
+      # - Puts '-' at the beginning to exclude something from the previous selection
+      # - Puts '-$' at the beginning to exclude a group from the previous selection
+      # - Sees all entity types here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html#enum.constant.summary
+      # [!] WARNING:
+      # Groups should be put at first
+      entity_types:
+      - $entities
+      - -EnderMan
+
+      # Which worlds that this way is allowed?
+      # Groups: $all
+      # [✓] TIP:
+      # - Puts '$' at the beginning to include a group
+      # - Puts '-' at the beginning to exclude something from previous selection
+      # - Puts '-$' at the beginning to exclude a group from the previous selection
+      # [!] WARNING:
+      # Groups should be put at first
+      worlds:
+      - $all
 
 
 # =====================
