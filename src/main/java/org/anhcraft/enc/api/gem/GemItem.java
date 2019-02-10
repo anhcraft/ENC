@@ -5,7 +5,7 @@ import org.anhcraft.spaciouslib.utils.MathUtils;
 import org.anhcraft.spaciouslib.utils.RandomUtils;
 
 /**
- * Represents a gem item.
+ * Represents an item which was assigned as a gem.
  */
 public class GemItem {
     private Gem gem;
@@ -40,7 +40,7 @@ public class GemItem {
     }
 
     /**
-     * Gets the gem that this item represents for.
+     * Gets the original gem.
      * @return the gem
      */
     public Gem getGem() {

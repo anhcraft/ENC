@@ -108,7 +108,7 @@ public class GemAPI {
     }
 
     /**
-     * Validates whether the given stack of items may be a gem.
+     * Validates whether the given stack of items is a somehow gem.
      * @param itemStack the stack of items
      * @return true if yes
      */
@@ -184,9 +184,9 @@ public class GemAPI {
     }
 
     /**
-     * Assigns the given gem to a stack of items.
+     * Assigns the given stack of items to be a gem.
      * @param itemStack stack of items
-     * @param gemItem the gem item
+     * @param gemItem the gem
      */
     public static void assignGem(ItemStack itemStack, GemItem gemItem) {
         if(!InventoryUtils.isNull(itemStack)) {
@@ -221,7 +221,7 @@ public class GemAPI {
     }
 
     /**
-     * Detaches the gem from the given stack of items.
+     * Detaches the gem out of the given stack of items.
      * @param itemStack stack of items
      */
     public static void detachGem(ItemStack itemStack){
