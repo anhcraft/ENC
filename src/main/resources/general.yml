@@ -31,11 +31,7 @@ commands:
   # Using names can make the performance worse
   use_gem_by_id: true
 
-  # Should we allow unsafe enchantment
-  # With enabled option, operators can:
-  # - Access to disabled enchantments
-  # - Access to unsupported items
-  # - Bypass the level limit
+  # Should we allow unsafe enchantment?
   unsafe_enchantment: false
 
   # Should we use another thread for plugin-reloading?
@@ -132,7 +128,7 @@ gem:
       need_permission: false
 
       # If the players attempts to override an existing enchantment,
-      # whether we prevent the action if the existing one has a higher level?
+      # Whether we prevent the action if the existing one has a higher level?
       strict_override: true
 
       # How many swap times we need to do?
