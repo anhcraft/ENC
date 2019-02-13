@@ -18,6 +18,7 @@
     </properties>
 
     <build>
+        <finalName>${project.artifactId}</finalName>
         <defaultGoal>clean package</defaultGoal>
         <plugins>
             <plugin>
@@ -87,6 +88,12 @@
             <artifactId>taskchain-bukkit</artifactId>
             <version>3.7.2</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.anhcraft</groupId>
+            <artifactId>KeepMyLife</artifactId>
+            <version>1.3.7</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
