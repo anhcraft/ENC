@@ -11,7 +11,7 @@ import java.util.HashMap;
 public class Soulbound extends Enchantment {
     public Soulbound() {
         super("Soulbound", new String[]{
-                "Rescues an item from the being dropped"
+                "Rescues an item from being dropped"
         }, "anhcraft", null, 5, EnchantmentTarget.ALL);
 
         // we will make modification so that we must use the sync event
