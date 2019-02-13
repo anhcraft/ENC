@@ -9,6 +9,7 @@ import org.anhcraft.enc.api.gem.GemAPI;
 import org.anhcraft.enc.commands.AdminCommand;
 import org.anhcraft.enc.enchantments.*;
 import org.anhcraft.enc.listeners.AttackListener;
+import org.anhcraft.enc.listeners.DeathDropListener;
 import org.anhcraft.enc.listeners.KillListener;
 import org.anhcraft.enc.listeners.gem.GemDropListener;
 import org.anhcraft.enc.listeners.gem.GemMergeListener;
@@ -30,6 +31,7 @@ public final class ENC extends JavaPlugin {
     private static Chat chat;
     private static ENC instance;
     private static TaskChainFactory taskChainFactory;
+    private static boolean KMLReady;
 
     public static YamlConfiguration getLocaleConfig() {
         return localeConfig;
@@ -101,6 +103,7 @@ public final class ENC extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new KillListener(), this);
         getServer().getPluginManager().registerEvents(new GemMergeListener(), this);
         getServer().getPluginManager().registerEvents(new GemDropListener(), this);
+        getServer().getPluginManager().registerEvents(KMLReady ? new DeathDropListener.KeepMyLife() : new DeathDropListener.Default(), this);
     }
 
     private void registerCommand() {
@@ -117,11 +120,15 @@ public final class ENC extends JavaPlugin {
         } catch(Exception e) {
             e.printStackTrace();
         }
+        // integrations
+        if(KMLReady = getServer().getPluginManager().isPluginEnabled("KeepMyLife")){
+            chat.sendConsole("&aHooked to KeepMyLife successfully!");
+        }
         // register stuffs
         registerListeners();
         registerEnchants();
         registerCommand();
-        chat.sendConsole("&aPlugin has been enabled!");
+
         chat.sendConsole("&eDonate me if you like this plugin <3");
         chat.sendConsole("&ehttps://paypal.me/anhcraft");
     }
