@@ -3,7 +3,7 @@ package org.anhcraft.enc.enchantments;
 import org.anhcraft.enc.ENC;
 import org.anhcraft.enc.api.ActionReport;
 import org.anhcraft.enc.api.Enchantment;
-import org.anhcraft.enc.api.listeners.SyncAttackListener;
+import org.anhcraft.enc.api.listeners.AsyncAttackListener;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
@@ -18,7 +18,7 @@ public class Wither extends Enchantment {
                 "There is a chance to give your enemy the wither effect"
         }, "anhcraft", null, 10, EnchantmentTarget.ALL);
 
-        getEventListeners().add(new SyncAttackListener() {
+        getEventListeners().add(new AsyncAttackListener() {
             @Override
             public void onAttack(ActionReport report, LivingEntity entity, double damage) {
                 if(report.isPrevented()){

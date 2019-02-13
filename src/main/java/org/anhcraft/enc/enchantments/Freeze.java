@@ -3,7 +3,7 @@ package org.anhcraft.enc.enchantments;
 import org.anhcraft.enc.ENC;
 import org.anhcraft.enc.api.ActionReport;
 import org.anhcraft.enc.api.Enchantment;
-import org.anhcraft.enc.api.listeners.SyncAttackListener;
+import org.anhcraft.enc.api.listeners.AsyncAttackListener;
 import org.anhcraft.enc.utils.UnitUtils;
 import org.anhcraft.spaciouslib.annotations.AnnotationHandler;
 import org.anhcraft.spaciouslib.annotations.PlayerCleaner;
@@ -45,7 +45,7 @@ public class Freeze extends Enchantment {
             }
         }.runTaskTimerAsynchronously(ENC.getInstance(), 0, 20);
 
-        getEventListeners().add(new SyncAttackListener() {
+        getEventListeners().add(new AsyncAttackListener() {
             @Override
             public void onAttack(ActionReport report, LivingEntity entity, double damage) {
                 if(report.isPrevented() || DATA.containsKey(entity.getUniqueId())
