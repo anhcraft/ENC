@@ -31,10 +31,7 @@ import java.util.stream.Collectors;
  * Represents an enchantment.
  */
 public abstract class Enchantment {
-    private static final List<String> DEFAULT_WORLDS_LIST = CommonUtils.toList(new String[]{
-            "$all",
-            "-world"
-    });
+    private static final List<String> DEFAULT_WORLDS_LIST = CommonUtils.toList(new String[]{"$all"});
 
     private String id;
     private String[] description;
