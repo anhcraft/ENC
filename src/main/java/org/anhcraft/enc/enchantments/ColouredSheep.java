@@ -16,6 +16,7 @@ public class ColouredSheep extends Enchantment {
             "Colours the target sheep every attacks"
         }, "anhcraft", null, 1, EnchantmentTarget.ALL);
 
+        // we will make modification so that we must use the sync event
         getEventListeners().add(new SyncAttackListener() {
             @Override
             public void onAttack(ActionReport report, LivingEntity entity, double damage) {
