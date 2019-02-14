@@ -98,6 +98,7 @@ public final class ENC extends JavaPlugin {
         EnchantmentAPI.registerEnchantment(new Poison());
         EnchantmentAPI.registerEnchantment(new Soulbound());
         EnchantmentAPI.registerEnchantment(new Dizziness());
+        EnchantmentAPI.registerEnchantment(new Slowness());
     }
 
     private void registerListeners() {
