@@ -221,7 +221,7 @@ public class GemAPI {
     }
 
     /**
-     * Detaches the gem out of the given stack of items.
+     * Detaches the gem from the given stack of items.
      * @param itemStack stack of items
      */
     public static void detachGem(ItemStack itemStack){

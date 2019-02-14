@@ -17,9 +17,10 @@ public class Chef extends Enchantment {
 
     public Chef() {
         super("Chef", new String[]{
-                "Kills entities and cook all dropped food later"
+                "Kills entities and cooks all dropped food"
         }, "anhcraft", null, 1, EnchantmentTarget.ALL);
 
+        // we will make modification so that we must use the sync event
         getEventListeners().add(new SyncKillListener() {
             @Override
             public void onAttack(ActionReport report, LivingEntity entity, List<ItemStack> drops) {

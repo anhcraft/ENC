@@ -3,6 +3,6 @@ version: ${project.version}
 main: org.anhcraft.enc.ENC
 api-version: 1.13
 depend: [SpaciousLib]
-softdepend: [Essentials, WorldGuard, WorldEdit]
+softdepend: [KeepMyLife,Essentials,WorldGuard,WorldEdit]
 authors: [anhcraft]
 description: Brings more enchantments to your servers

@@ -12,10 +12,10 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
 
-public class Wither extends Enchantment {
-    public Wither() {
-        super("Wither", new String[]{
-                "There is a chance to give your enemy the wither effect"
+public class Slowness extends Enchantment {
+    public Slowness() {
+        super("Slowness", new String[]{
+                "There is a chance to slow someone else"
         }, "anhcraft", null, 10, EnchantmentTarget.ALL);
 
         getEventListeners().add(new AsyncAttackListener() {
@@ -25,11 +25,11 @@ public class Wither extends Enchantment {
                     return;
                 }
                 double chance = computeConfigValue("chance", report)/100d;
-                if(Math.random() <= chance){
+                if(Math.random() <= chance) {
                     int level = (int) Math.ceil(computeConfigValue("effect_level", report));
                     int duration = (int) Math.ceil(computeConfigValue("effect_duration", report));
                     ENC.getTaskChainFactory().newChain().sync(() ->
-                            entity.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, duration, level))
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, duration, level))
                     ).execute();
                 }
             }
@@ -39,9 +39,9 @@ public class Wither extends Enchantment {
     @Override
     public void onRegistered(){
         HashMap<String, Object> map = new HashMap<>();
-        map.put("chance", "{level}*3.5");
-        map.put("effect_level", "{level}*0.25");
-        map.put("effect_duration", "{level} < ({max_level}/2) ? 40 : 60");
+        map.put("chance", "{level}*3.7");
+        map.put("effect_level", "{level}*0.5");
+        map.put("effect_duration", "{level}*12+30");
         initConfigEntries(map);
     }
 

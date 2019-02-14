@@ -257,7 +257,7 @@ public class AdminCommand implements Runnable {
         .addChild("removes all existing enchantments out of the holding item", REMOVE_ALL_ENCHANTMENT_CMD)
                 .addChild("lists all available gems", LIST_GEM_CMD)
         .addChild("assigns the holding item to be a gem", ASSIGN_GEM_CMD)
-                .addChild("detaches the gem out of the holding item", DETACH_GEM_CMD)
+                .addChild("detaches the gem from the holding item", DETACH_GEM_CMD)
         .addChild("reloads the plugin", RELOAD_CMD)
         .addAlias("encadmin")
         .build(ENC.getInstance());

@@ -12,10 +12,10 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
 
-public class Wither extends Enchantment {
-    public Wither() {
-        super("Wither", new String[]{
-                "There is a chance to give your enemy the wither effect"
+public class Dizziness extends Enchantment {
+    public Dizziness() {
+        super("Dizziness", new String[]{
+                "Has a chance to make someone feel dizzy"
         }, "anhcraft", null, 10, EnchantmentTarget.ALL);
 
         getEventListeners().add(new AsyncAttackListener() {
@@ -25,13 +25,14 @@ public class Wither extends Enchantment {
                     return;
                 }
                 double chance = computeConfigValue("chance", report)/100d;
-                if(Math.random() <= chance){
-                    int level = (int) Math.ceil(computeConfigValue("effect_level", report));
-                    int duration = (int) Math.ceil(computeConfigValue("effect_duration", report));
-                    ENC.getTaskChainFactory().newChain().sync(() ->
-                            entity.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, duration, level))
-                    ).execute();
+                if(Math.random() > chance) {
+                    return;
                 }
+                int level = (int) Math.ceil(computeConfigValue("effect_level", report));
+                int duration = (int) Math.ceil(computeConfigValue("effect_duration", report));
+                ENC.getTaskChainFactory().newChain().sync(() ->
+                        entity.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, duration, level))
+                ).execute();
             }
         });
     }
@@ -40,8 +41,8 @@ public class Wither extends Enchantment {
     public void onRegistered(){
         HashMap<String, Object> map = new HashMap<>();
         map.put("chance", "{level}*3.5");
-        map.put("effect_level", "{level}*0.25");
-        map.put("effect_duration", "{level} < ({max_level}/2) ? 40 : 60");
+        map.put("effect_level", "{level}*0.4");
+        map.put("effect_duration", "{level}*10+30");
         initConfigEntries(map);
     }
 
