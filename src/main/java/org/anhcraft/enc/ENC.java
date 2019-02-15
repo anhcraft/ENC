@@ -7,6 +7,7 @@ import org.anhcraft.enc.api.EnchantmentAPI;
 import org.anhcraft.enc.api.gem.Gem;
 import org.anhcraft.enc.api.gem.GemAPI;
 import org.anhcraft.enc.commands.AdminCommand;
+import org.anhcraft.enc.commands.UserCommand;
 import org.anhcraft.enc.enchantments.*;
 import org.anhcraft.enc.listeners.AttackListener;
 import org.anhcraft.enc.listeners.DeathDropListener;
@@ -111,6 +112,7 @@ public final class ENC extends JavaPlugin {
 
     private void registerCommand() {
         new AdminCommand().run();
+        new UserCommand().run();
     }
 
     @Override
