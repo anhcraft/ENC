@@ -18,6 +18,12 @@ plugin:
   # Available: en-us.yml, vi-vn.yml
   locale_file: en-us.yml
 
+  # What is the type of math expression parser to use?
+  # Available: JAVASCRIPT, EXP4J
+  # [!] WARNING:
+  # If you switch to another parser, make sure to recheck all math expressions in configuration files
+  expression_parser: EXP4J
+
 
 # Command settings
 commands:

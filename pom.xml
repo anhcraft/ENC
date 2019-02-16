@@ -14,7 +14,7 @@
     <description>Brings more enchantments to your servers</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <enc.configVersion>1</enc.configVersion>
+        <enc.configVersion>2</enc.configVersion>
     </properties>
 
     <build>

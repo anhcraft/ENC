@@ -1,5 +1,6 @@
 package org.anhcraft.enc.api;
 
+import net.objecthunter.exp4j.ExpressionBuilder;
 import org.anhcraft.algorithmlib.array.searching.ArrayBinarySearch;
 import org.anhcraft.enc.ENC;
 import org.anhcraft.enc.api.listeners.IListener;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
  * Represents an enchantment.
  */
 public abstract class Enchantment {
+    private static final ExpressionParser EXPRESSION_PARSER = ExpressionParser.valueOf(ENC.getGeneralConfig().getString("plugin.expression_parser").toUpperCase());
     private static final List<String> DEFAULT_WORLDS_LIST = CommonUtils.toList(new String[]{"$all"});
 
     private String id;
@@ -138,7 +140,6 @@ public abstract class Enchantment {
         Object value = config.get(key);
         if(value instanceof String){
             String str = (String) value;
-
             Pattern levelCheck = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.level.full_regex"));
             Pattern levelGet = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.level.value_regex"));
             Matcher levelCheck_;
@@ -169,10 +170,15 @@ public abstract class Enchantment {
                     str = maxLevelCheck_.replaceFirst(Integer.toString(maxLevel));
                 }
             }
-            return MathUtils.eval(str);
-        } else {
-            return -1;
+
+            switch(EXPRESSION_PARSER){
+                case JAVASCRIPT:
+                    return MathUtils.eval(str);
+                case EXP4J:
+                    return new ExpressionBuilder(str).build().evaluate();
+            }
         }
+        return -1;
     }
 
     /**
