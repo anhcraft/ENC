@@ -28,8 +28,8 @@ public class Blindness extends Enchantment {
                 if(Math.random() > chance) {
                     return;
                 }
-                int level = (int) Math.ceil(computeConfigValue("effect_level", report));
-                int duration = (int) Math.ceil(computeConfigValue("effect_duration", report));
+                int level = (int) computeConfigValue("effect_level", report);
+                int duration = (int) computeConfigValue("effect_duration", report);
                 ENC.getTaskChainFactory().newChain().sync(() ->
                         entity.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, duration, level))
                 ).execute();

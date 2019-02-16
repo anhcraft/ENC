@@ -28,8 +28,8 @@ public class Dizziness extends Enchantment {
                 if(Math.random() > chance) {
                     return;
                 }
-                int level = (int) Math.ceil(computeConfigValue("effect_level", report));
-                int duration = (int) Math.ceil(computeConfigValue("effect_duration", report));
+                int level = (int) computeConfigValue("effect_level", report);
+                int duration = (int) computeConfigValue("effect_duration", report);
                 ENC.getTaskChainFactory().newChain().sync(() ->
                         entity.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, duration, level))
                 ).execute();
@@ -41,7 +41,7 @@ public class Dizziness extends Enchantment {
     public void onRegistered(){
         HashMap<String, Object> map = new HashMap<>();
         map.put("chance", "{level}*3.5");
-        map.put("effect_level", "{level}*0.4");
+        map.put("effect_level", "ceil({level}*0.4)");
         map.put("effect_duration", "{level}*10+30");
         initConfigEntries(map);
     }

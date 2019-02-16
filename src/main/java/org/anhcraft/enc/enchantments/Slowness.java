@@ -26,8 +26,8 @@ public class Slowness extends Enchantment {
                 }
                 double chance = computeConfigValue("chance", report)/100d;
                 if(Math.random() <= chance) {
-                    int level = (int) Math.ceil(computeConfigValue("effect_level", report));
-                    int duration = (int) Math.ceil(computeConfigValue("effect_duration", report));
+                    int level = (int) computeConfigValue("effect_level", report);
+                    int duration = (int) computeConfigValue("effect_duration", report);
                     ENC.getTaskChainFactory().newChain().sync(() ->
                             entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, duration, level))
                     ).execute();
@@ -40,7 +40,7 @@ public class Slowness extends Enchantment {
     public void onRegistered(){
         HashMap<String, Object> map = new HashMap<>();
         map.put("chance", "{level}*3.7");
-        map.put("effect_level", "{level}*0.5");
+        map.put("effect_level", "ceil({level}*0.5)");
         map.put("effect_duration", "{level}*12+30");
         initConfigEntries(map);
     }
