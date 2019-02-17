@@ -1,6 +1,7 @@
 package org.anhcraft.enc.api.listeners;
 
 import org.anhcraft.enc.api.ActionReport;
+import org.anhcraft.spaciouslib.inventory.EquipSlot;
 import org.bukkit.entity.LivingEntity;
 
 /**
@@ -14,4 +15,14 @@ public abstract class SyncAttackListener implements IListener {
      * @param damage amount of damage
      */
     public abstract void onAttack(ActionReport report, LivingEntity entity, double damage);
+
+    @Override
+    public boolean canPrevent(){
+        return true;
+    }
+
+    @Override
+    public EquipSlot getItemSlot(){
+        return EquipSlot.MAINHAND;
+    }
 }

@@ -1,6 +1,7 @@
 package org.anhcraft.enc.api.listeners;
 
 import org.anhcraft.enc.api.ActionReport;
+import org.anhcraft.spaciouslib.inventory.EquipSlot;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 
@@ -17,5 +18,15 @@ public abstract class SyncKillListener implements IListener {
      * @param drops stacks of items which will drop when the entity dies
      */
     public abstract void onKill(ActionReport report, LivingEntity entity, List<ItemStack> drops);
+
+    @Override
+    public boolean canPrevent(){
+        return false;
+    }
+
+    @Override
+    public EquipSlot getItemSlot(){
+        return EquipSlot.MAINHAND;
+    }
 }
 

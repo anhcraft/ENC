@@ -1,6 +1,7 @@
 package org.anhcraft.enc.api.listeners;
 
 import org.anhcraft.enc.api.ActionReport;
+import org.anhcraft.spaciouslib.inventory.EquipSlot;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -13,5 +14,15 @@ public abstract class SyncDeathDropListener implements IListener {
      * @param itemStack the stack of items
      */
     public abstract void onDrop(ActionReport report, ItemStack itemStack);
+
+    @Override
+    public boolean canPrevent(){
+        return true;
+    }
+
+    @Override
+    public EquipSlot getItemSlot(){
+        return null;
+    }
 }
 
