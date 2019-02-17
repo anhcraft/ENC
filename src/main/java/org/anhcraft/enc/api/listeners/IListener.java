@@ -7,7 +7,7 @@ import org.anhcraft.spaciouslib.inventory.EquipSlot;
  */
 public interface IListener {
     /**
-     * Returns whether this listener can be prevented by using {@link org.anhcraft.enc.api.ActionReport#setPrevented(boolean)}.
+     * Returns whether this listener can prevent the event by using {@link org.anhcraft.enc.api.ActionReport#setPrevented(boolean)}.
      * @return true if yes
      */
     boolean canPrevent();
