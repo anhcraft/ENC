@@ -40,7 +40,7 @@ public abstract class Enchantment {
     private String author;
     private String proposer;
     private int maxLevel;
-    private EnchantmentTarget[] itemTarget;
+    private EnchantmentTarget[] itemTargets;
     private final YamlConfiguration config = new YamlConfiguration();
     private File configFile;
     private Chat chat;
@@ -63,7 +63,7 @@ public abstract class Enchantment {
         this.author = author;
         this.proposer = proposer;
         this.maxLevel = Math.max(maxLevel, 1);
-        this.itemTarget = ArrayBinarySearch.search(targets, EnchantmentTarget.ALL) >= 0 ? new EnchantmentTarget[]{EnchantmentTarget.ALL} : targets; // optimize the targets
+        this.itemTargets = ArrayBinarySearch.search(targets, EnchantmentTarget.ALL) >= 0 ? new EnchantmentTarget[]{EnchantmentTarget.ALL} : targets; // optimize the targets
     }
 
     private String replaceStr(String str){
@@ -227,11 +227,11 @@ public abstract class Enchantment {
     }
 
     /**
-     * Gets types of item that may fit this enchantment.
+     * Returns types of item that may fit this enchantment.
      * @return enchantment's target item types
      */
-    public EnchantmentTarget[] getItemTarget() {
-        return itemTarget;
+    public EnchantmentTarget[] getItemTargets() {
+        return itemTargets;
     }
 
     /**
@@ -289,7 +289,14 @@ public abstract class Enchantment {
      * @param itemStack the stack of items
      * @return true if yes
      */
-    public abstract boolean canEnchantItem(ItemStack itemStack);
+    public boolean canEnchantItem(ItemStack itemStack){
+        for(EnchantmentTarget t : getItemTargets()){
+            if(t.includes(itemStack)){
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * This method is called after this enchantment is registered successfully.
@@ -310,7 +317,7 @@ public abstract class Enchantment {
         return new HashCodeBuilder(17, 21)
                 .append(this.id)
                 .append(this.author)
-                .append(this.itemTarget)
+                .append(this.itemTargets)
                 .append(this.proposer)
                 .append(this.maxLevel)
                 .append(this.description).build();
