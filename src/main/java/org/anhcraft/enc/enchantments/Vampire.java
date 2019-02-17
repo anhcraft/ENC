@@ -6,7 +6,6 @@ import org.anhcraft.enc.api.listeners.AsyncAttackListener;
 import org.anhcraft.spaciouslib.attribute.Attribute;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 
@@ -48,10 +47,5 @@ public class Vampire extends Enchantment {
         map.put("low_health", "7+{level}*0.5");
         map.put("damage_percent", "{level}*10+20");
         initConfigEntries(map);
-    }
-
-    @Override
-    public boolean canEnchantItem(ItemStack itemStack) {
-        return EnchantmentTarget.WEAPON.includes(itemStack);
     }
 }

@@ -35,9 +35,4 @@ public class Soulbound extends Enchantment {
         map.put("chance", "{level}*20");
         initConfigEntries(map);
     }
-
-    @Override
-    public boolean canEnchantItem(ItemStack itemStack) {
-        return true;
-    }
 }

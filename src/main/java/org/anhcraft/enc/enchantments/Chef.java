@@ -59,9 +59,4 @@ public class Chef extends Enchantment {
             }
         });
     }
-
-    @Override
-    public boolean canEnchantItem(ItemStack itemStack) {
-        return true;
-    }
 }

@@ -6,7 +6,6 @@ import org.anhcraft.enc.api.Enchantment;
 import org.anhcraft.enc.api.listeners.AsyncAttackListener;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -44,10 +43,5 @@ public class Blindness extends Enchantment {
         map.put("effect_level", "1");
         map.put("effect_duration", "{level}*20+30");
         initConfigEntries(map);
-    }
-
-    @Override
-    public boolean canEnchantItem(ItemStack itemStack) {
-        return true;
     }
 }
