@@ -23,7 +23,7 @@ public class Chef extends Enchantment {
         // we will make modification so that we must use the sync event
         getEventListeners().add(new SyncKillListener() {
             @Override
-            public void onAttack(ActionReport report, LivingEntity entity, List<ItemStack> drops) {
+            public void onKill(ActionReport report, LivingEntity entity, List<ItemStack> drops) {
                 for(ItemStack drop : drops) {
                     String mt = drop.getType().toString();
                     switch(mt) {

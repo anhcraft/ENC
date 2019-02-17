@@ -8,7 +8,7 @@ import org.bukkit.entity.LivingEntity;
  */
 public abstract class SyncAttackListener implements IListener {
     /**
-     * This method is called when the attack event happens and the listener determines that the event is related to enchantment.
+     * This method is called when a player attacks an entity.
      * @param report the report
      * @param entity the entity
      * @param damage amount of damage
