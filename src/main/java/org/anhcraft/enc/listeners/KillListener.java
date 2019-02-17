@@ -41,10 +41,10 @@ public class KillListener implements Listener {
                         .forEach(eventListener -> {
                             if(eventListener instanceof AsyncKillListener) {
                                 listenerChain.async(() -> ((AsyncKillListener) eventListener)
-                                        .onAttack(report, event.getEntity(), event.getDrops()));
+                                        .onKill(report, event.getEntity(), event.getDrops()));
                             } else{
                                 listenerChain.sync(() -> ((SyncKillListener) eventListener)
-                                        .onAttack(report, event.getEntity(), event.getDrops()));
+                                        .onKill(report, event.getEntity(), event.getDrops()));
                             }
                         });
                 }
