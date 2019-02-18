@@ -11,6 +11,7 @@ import org.anhcraft.enc.commands.UserCommand;
 import org.anhcraft.enc.enchantments.*;
 import org.anhcraft.enc.listeners.AttackListener;
 import org.anhcraft.enc.listeners.DeathDropListener;
+import org.anhcraft.enc.listeners.JumpListener;
 import org.anhcraft.enc.listeners.KillListener;
 import org.anhcraft.enc.listeners.gem.GemDropListener;
 import org.anhcraft.enc.listeners.gem.GemMergeListener;
@@ -106,6 +107,7 @@ public final class ENC extends JavaPlugin {
     private void registerListeners() {
         getServer().getPluginManager().registerEvents(new AttackListener(), this);
         getServer().getPluginManager().registerEvents(new KillListener(), this);
+        getServer().getPluginManager().registerEvents(new JumpListener(), this);
         getServer().getPluginManager().registerEvents(new GemMergeListener(), this);
         getServer().getPluginManager().registerEvents(new GemDropListener(), this);
         getServer().getPluginManager().registerEvents(KMLReady ? new DeathDropListener.KeepMyLife() : new DeathDropListener.Default(), this);
