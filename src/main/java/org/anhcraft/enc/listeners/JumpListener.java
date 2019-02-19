@@ -40,10 +40,10 @@ public class JumpListener implements Listener {
                         .forEach(eventListener -> {
                             if(eventListener instanceof AsyncJumpListener) {
                                 listenerChain.async(() -> ((AsyncJumpListener) eventListener)
-                                        .onKill(report, event.isOnSpot()));
+                                        .onJump(report, event.isOnSpot()));
                             } else{
                                 listenerChain.sync(() -> ((SyncJumpListener) eventListener)
-                                        .onKill(report, event.isOnSpot()));
+                                        .onJump(report, event.isOnSpot()));
                             }
                         });
             }
