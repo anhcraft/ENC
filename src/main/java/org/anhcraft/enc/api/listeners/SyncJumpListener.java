@@ -12,7 +12,7 @@ public abstract class SyncJumpListener implements IListener {
      * @param report the report
      * @param onSpot whether the player jumps on spot
      */
-    public abstract void onKill(ActionReport report, boolean onSpot);
+    public abstract void onJump(ActionReport report, boolean onSpot);
 
     @Override
     public boolean canPrevent(){
