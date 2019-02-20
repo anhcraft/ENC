@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class KillListener implements Listener {
-    @EventHandler(ignoreCancelled = true)
-    public void attack(EntityDeathEvent event){
+    @EventHandler
+    public void death(EntityDeathEvent event){
         if(event.getEntity().getKiller() != null){
             Player killer = event.getEntity().getKiller();
             ItemStack item = killer.getInventory().getItemInMainHand();
