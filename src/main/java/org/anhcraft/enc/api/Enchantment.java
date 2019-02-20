@@ -9,10 +9,7 @@ import org.anhcraft.enc.utils.ReplaceUtils;
 import org.anhcraft.spaciouslib.builders.EqualsBuilder;
 import org.anhcraft.spaciouslib.builders.HashCodeBuilder;
 import org.anhcraft.spaciouslib.io.FileManager;
-import org.anhcraft.spaciouslib.utils.Chat;
-import org.anhcraft.spaciouslib.utils.CommonUtils;
-import org.anhcraft.spaciouslib.utils.ExceptionThrower;
-import org.anhcraft.spaciouslib.utils.MathUtils;
+import org.anhcraft.spaciouslib.utils.*;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -41,11 +38,12 @@ public abstract class Enchantment {
     private String proposer;
     private int maxLevel;
     private EnchantmentTarget[] itemTargets;
-    private final YamlConfiguration config = new YamlConfiguration();
     private File configFile;
     private Chat chat;
+    private final YamlConfiguration config = new YamlConfiguration();
     private final List<IListener> eventListeners = new ArrayList<>();
     private final List<String> worldList = new ArrayList<>();
+    private final HashMap<String, Group<Double, Long>> COMPUTATION_CACHING = new HashMap<>();
 
     /**
      * Creates an instance of enchantment.
@@ -137,7 +135,17 @@ public abstract class Enchantment {
      * @return the computed value
      */
     public double computeConfigValue(String key, ActionReport report) {
+        if(config.getBoolean("computation_caching.enabled")){
+            Group<Double, Long> ent = COMPUTATION_CACHING.get(key);
+            if(ent != null){
+                if(System.currentTimeMillis()-ent.getB() <= config.getLong("computation_caching.caching_time")){
+                    return ent.getA();
+                }
+            }
+        }
+        double v = -1;
         Object value = config.get(key);
+        boolean ignored = false;
         if(value instanceof String){
             String str = (String) value;
             Pattern levelCheck = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.level.full_regex"));
@@ -154,6 +162,7 @@ public abstract class Enchantment {
                 } else { // or {level}
                     str = levelCheck_.replaceFirst(Integer.toString(report.getEnchantmentMap().get(this)));
                 }
+                ignored = true;
             }
 
             Pattern maxLevelCheck = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.max_level.full_regex"));
@@ -173,12 +182,18 @@ public abstract class Enchantment {
 
             switch(EXPRESSION_PARSER){
                 case JAVASCRIPT:
-                    return MathUtils.eval(str);
+                    v = MathUtils.eval(str);
+                    break;
                 case EXP4J:
-                    return new ExpressionBuilder(str).build().evaluate();
+                    v = new ExpressionBuilder(str).build().evaluate();
+                    break;
             }
         }
-        return -1;
+        if(config.getBoolean("computation_caching.enabled") &&
+                (!config.getBoolean("computation_caching.strict_mode") || !ignored)){
+            COMPUTATION_CACHING.put(key, new Group<>(v, System.currentTimeMillis()));
+        }
+        return v;
     }
 
     /**
@@ -196,6 +211,9 @@ public abstract class Enchantment {
         map.put("worlds_list", new ArrayList<>(DEFAULT_WORLDS_LIST));
         map.put("allowed_worlds_list", true);
         map.put("name", id);
+        map.put("computation_caching.enabled", false);
+        map.put("computation_caching.caching_time", 72000);
+        map.put("computation_caching.strict_mode", true);
         initConfigEntries(map);
 
         chat = new Chat(replaceStr(config.getString("chat_prefix")));
