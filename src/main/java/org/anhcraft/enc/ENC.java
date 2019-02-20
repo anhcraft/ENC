@@ -102,6 +102,7 @@ public final class ENC extends JavaPlugin {
         EnchantmentAPI.registerEnchantment(new Dizziness());
         EnchantmentAPI.registerEnchantment(new Slowness());
         EnchantmentAPI.registerEnchantment(new Vampire());
+        EnchantmentAPI.registerEnchantment(new Collapse());
     }
 
     private void registerListeners() {
