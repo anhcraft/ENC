@@ -107,6 +107,7 @@ public final class ENC extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new KillListener(), this);
         getServer().getPluginManager().registerEvents(new JumpListener(), this);
         getServer().getPluginManager().registerEvents(new EquipListener(), this);
+        getServer().getPluginManager().registerEvents(new BlockBreakListener(), this);
         getServer().getPluginManager().registerEvents(new GemMergeListener(), this);
         getServer().getPluginManager().registerEvents(new GemDropListener(), this);
         getServer().getPluginManager().registerEvents(KMLReady ? new DeathDropListener.KeepMyLife() : new DeathDropListener.Default(), this);
