@@ -81,11 +81,11 @@ public class Collapse extends Enchantment implements Listener {
                 // reverse the order to put lowest blocks at first
                 Collections.reverse(breakBlocks);
                 ENC.getTaskChainFactory().newChain()
-                        .async(() -> breakBlocks.forEach(block1 -> BlockBreakAnimation.create(RandomUtils.randomInt(0, 9999), block1, 1).sendNearby(block1, 50))).delay(5)
-                        .async(() -> breakBlocks.forEach(block1 -> BlockBreakAnimation.create(RandomUtils.randomInt(0, 9999), block1, 3).sendNearby(block1, 50))).delay(5)
-                        .async(() -> breakBlocks.forEach(block1 -> BlockBreakAnimation.create(RandomUtils.randomInt(0, 9999), block1, 5).sendNearby(block1, 50))).delay(5)
-                        .async(() -> breakBlocks.forEach(block1 -> BlockBreakAnimation.create(RandomUtils.randomInt(0, 9999), block1, 7).sendNearby(block1, 50))).delay(5)
-                        .async(() -> breakBlocks.forEach(block1 -> BlockBreakAnimation.create(RandomUtils.randomInt(0, 9999), block1, 9).sendNearby(block1, 50))).delay(5)
+                        .async(() -> breakBlocks.forEach(block1 -> BlockBreakAnimation.create(block1.hashCode(), block1, 1).sendNearby(block1, 50))).delay(10)
+                        .async(() -> breakBlocks.forEach(block1 -> BlockBreakAnimation.create(block1.hashCode(), block1, 3).sendNearby(block1, 50))).delay(10)
+                        .async(() -> breakBlocks.forEach(block1 -> BlockBreakAnimation.create(block1.hashCode(), block1, 5).sendNearby(block1, 50))).delay(10)
+                        .async(() -> breakBlocks.forEach(block1 -> BlockBreakAnimation.create(block1.hashCode(), block1, 7).sendNearby(block1, 50))).delay(10)
+                        .async(() -> breakBlocks.forEach(block1 -> BlockBreakAnimation.create(block1.hashCode(), block1, 9).sendNearby(block1, 50))).delay(10)
                         .sync(() -> {
                             if(GameVersion.is1_13Above()) {
                                 breakBlocks.forEach(block1 -> {
