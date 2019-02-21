@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class KillListener implements Listener {
-    @EventHandler(ignoreCancelled = true)
-    public void attack(EntityDeathEvent event){
+    @EventHandler
+    public void death(EntityDeathEvent event){
         if(event.getEntity().getKiller() != null){
             Player killer = event.getEntity().getKiller();
             ItemStack item = killer.getInventory().getItemInMainHand();
@@ -41,10 +41,10 @@ public class KillListener implements Listener {
                         .forEach(eventListener -> {
                             if(eventListener instanceof AsyncKillListener) {
                                 listenerChain.async(() -> ((AsyncKillListener) eventListener)
-                                        .onAttack(report, event.getEntity(), event.getDrops()));
+                                        .onKill(report, event.getEntity(), event.getDrops()));
                             } else{
                                 listenerChain.sync(() -> ((SyncKillListener) eventListener)
-                                        .onAttack(report, event.getEntity(), event.getDrops()));
+                                        .onKill(report, event.getEntity(), event.getDrops()));
                             }
                         });
                 }

@@ -2,19 +2,18 @@ package org.anhcraft.enc.api.listeners;
 
 import org.anhcraft.enc.api.ActionReport;
 import org.anhcraft.spaciouslib.inventory.EquipSlot;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.block.Block;
 
 /**
- * The listener of attack events.
+ * The listener of block-breaking events.
  */
-public abstract class SyncAttackListener implements IListener {
+public abstract class SyncBlockBreakListener implements IListener {
     /**
-     * This method is called when a player attacks an entity.
+     * This method is called when a player breaks a block.
      * @param report the report
-     * @param entity the entity
-     * @param damage amount of damage
+     * @param block the block
      */
-    public abstract void onAttack(ActionReport report, LivingEntity entity, double damage);
+    public abstract void onBreakBlock(ActionReport report, Block block);
 
     @Override
     public boolean canPrevent(){
@@ -26,3 +25,4 @@ public abstract class SyncAttackListener implements IListener {
         return EquipSlot.MAINHAND;
     }
 }
+

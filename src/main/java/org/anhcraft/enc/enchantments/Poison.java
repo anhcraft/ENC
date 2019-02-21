@@ -6,7 +6,6 @@ import org.anhcraft.enc.api.Enchantment;
 import org.anhcraft.enc.api.listeners.AsyncAttackListener;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -26,8 +25,8 @@ public class Poison extends Enchantment {
                 }
                 double chance = computeConfigValue("chance", report)/100d;
                 if(Math.random() <= chance){
-                    int level = (int) Math.ceil(computeConfigValue("effect_level", report));
-                    int duration = (int) Math.ceil(computeConfigValue("effect_duration", report));
+                    int level = (int) computeConfigValue("effect_level", report);
+                    int duration = (int) computeConfigValue("effect_duration", report);
                     ENC.getTaskChainFactory().newChain().sync(() ->
                             entity.addPotionEffect(new PotionEffect(PotionEffectType.POISON, duration, level))
                     ).execute();
@@ -40,13 +39,8 @@ public class Poison extends Enchantment {
     public void onRegistered(){
         HashMap<String, Object> map = new HashMap<>();
         map.put("chance", "{level}*3.5");
-        map.put("effect_level", "{level}*0.5");
+        map.put("effect_level", "ceil({level}*0.5)");
         map.put("effect_duration", "{level}*30+20");
         initConfigEntries(map);
-    }
-
-    @Override
-    public boolean canEnchantItem(ItemStack itemStack) {
-        return true;
     }
 }

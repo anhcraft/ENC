@@ -2,6 +2,8 @@ package org.anhcraft.enc;
 
 import co.aikar.taskchain.BukkitTaskChainFactory;
 import co.aikar.taskchain.TaskChainFactory;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.anhcraft.enc.api.Enchantment;
 import org.anhcraft.enc.api.EnchantmentAPI;
 import org.anhcraft.enc.api.gem.Gem;
@@ -9,9 +11,7 @@ import org.anhcraft.enc.api.gem.GemAPI;
 import org.anhcraft.enc.commands.AdminCommand;
 import org.anhcraft.enc.commands.UserCommand;
 import org.anhcraft.enc.enchantments.*;
-import org.anhcraft.enc.listeners.AttackListener;
-import org.anhcraft.enc.listeners.DeathDropListener;
-import org.anhcraft.enc.listeners.KillListener;
+import org.anhcraft.enc.listeners.*;
 import org.anhcraft.enc.listeners.gem.GemDropListener;
 import org.anhcraft.enc.listeners.gem.GemMergeListener;
 import org.anhcraft.enc.utils.FilePaths;
@@ -29,6 +29,7 @@ public final class ENC extends JavaPlugin {
     private static final YamlConfiguration localeConfig = new YamlConfiguration();
     private static final YamlConfiguration generalConfig = new YamlConfiguration();
     private static final YamlConfiguration gemConfig = new YamlConfiguration();
+    private static JsonObject systemConfig;
     private static Chat chat;
     private static ENC instance;
     private static TaskChainFactory taskChainFactory;
@@ -54,6 +55,29 @@ public final class ENC extends JavaPlugin {
         return taskChainFactory;
     }
 
+    private void updateConfig() {
+        int currentVersion = systemConfig.getAsJsonPrimitive("config_version").getAsInt();
+        if(generalConfig.getInt("config_version", 0) < currentVersion){
+            try {
+                getLogger().warning("BE WARNED THAT YOUR CONFIGURATION IS OUTDATED!");
+                getLogger().info("We are going to update your current configuration!");
+                getLogger().info(">> Creating the backup for the old one...");
+                new FileManager(FilePaths.OLD_GENERAL_CONFIG_FILE).create().write(
+                        new FileManager(FilePaths.GENERAL_CONFIG_FILE).read());
+                getLogger().info(">> Updating the configuration to be latest...");
+                new FileManager(FilePaths.GENERAL_CONFIG_FILE).write(IOUtils.toByteArray(
+                        getResource("general.yml")));
+                generalConfig.load(FilePaths.GENERAL_CONFIG_FILE);
+                getLogger().info("Updated successfully!");
+            } catch(Exception e) {
+                getLogger().warning("Failed to upgrade the configuration!");
+                getLogger().warning("For security reasons, the plugin will be disabled!");
+                e.printStackTrace();
+                taskChainFactory.newChain().delay(60).sync(() -> getServer().getPluginManager().disablePlugin(this)).execute();
+            }
+        }
+    }
+
     public void reloadPlugin() throws Exception {
         // init files and directories
         new DirectoryManager(FilePaths.ROOT_FOLDER).mkdir();
@@ -61,8 +85,12 @@ public final class ENC extends JavaPlugin {
         new DirectoryManager(FilePaths.ENCHANTMENT_FOLDER).mkdir();
         new FileManager(FilePaths.GENERAL_CONFIG_FILE).initFile(IOUtils.toByteArray(getResource("general.yml")));
         new FileManager(FilePaths.GEM_CONFIG_FILE).initFile(IOUtils.toByteArray(getResource("gems.yml")));
-        // load configs
+        // load main configs
+        systemConfig = new Gson().fromJson(IOUtils.toString(getResource("system.json")), JsonObject.class);
         generalConfig.load(FilePaths.GENERAL_CONFIG_FILE);
+        // update the general config
+        updateConfig();
+        // load other configs
         gemConfig.load(FilePaths.GEM_CONFIG_FILE);
         File localeFile = new File(FilePaths.LOCALE_FOLDER, generalConfig.getString("plugin.locale_file"));
         new FileManager(localeFile).initFile(IOUtils.toByteArray(getClass().getResourceAsStream("/locale/"+generalConfig.getString("plugin.locale_file"))));
@@ -100,11 +128,16 @@ public final class ENC extends JavaPlugin {
         EnchantmentAPI.registerEnchantment(new Soulbound());
         EnchantmentAPI.registerEnchantment(new Dizziness());
         EnchantmentAPI.registerEnchantment(new Slowness());
+        EnchantmentAPI.registerEnchantment(new Vampire());
+        EnchantmentAPI.registerEnchantment(new Collapse());
     }
 
     private void registerListeners() {
         getServer().getPluginManager().registerEvents(new AttackListener(), this);
         getServer().getPluginManager().registerEvents(new KillListener(), this);
+        getServer().getPluginManager().registerEvents(new JumpListener(), this);
+        getServer().getPluginManager().registerEvents(new EquipListener(), this);
+        getServer().getPluginManager().registerEvents(new BlockBreakListener(), this);
         getServer().getPluginManager().registerEvents(new GemMergeListener(), this);
         getServer().getPluginManager().registerEvents(new GemDropListener(), this);
         getServer().getPluginManager().registerEvents(KMLReady ? new DeathDropListener.KeepMyLife() : new DeathDropListener.Default(), this);

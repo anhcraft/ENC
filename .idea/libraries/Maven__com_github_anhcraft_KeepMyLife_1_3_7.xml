@@ -8,7 +8,6 @@
     </JAVADOC>
     <SOURCES>
       <root url="jar://$MAVEN_REPOSITORY$/com/github/anhcraft/KeepMyLife/1.3.7/KeepMyLife-1.3.7-sources.jar!/" />
-      <root url="jar://$MAVEN_REPOSITORY$/com/github/anhcraft/KeepMyLife/1.3.7/KeepMyLife-1.3.7.jar!/" />
     </SOURCES>
   </library>
 </component>

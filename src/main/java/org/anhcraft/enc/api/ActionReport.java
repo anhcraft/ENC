@@ -18,7 +18,7 @@ public class ActionReport {
     /**
      * Creates an instance of ActionReport.
      * @param player the player who did the action
-     * @param itemStack the stack of items which is checked
+     * @param itemStack the stack of items which is validated
      * @param enchantmentMap all available enchantments in the checked stack
      * @param prevented whether the action is going to be prevented
      */
@@ -38,8 +38,8 @@ public class ActionReport {
     }
 
     /**
-     * Gets the stack of items which is checked.
-     * @return checked stacks of items
+     * Gets the stack of items which is validated.
+     * @return validated stack of items
      */
     public ItemStack getItemStack() {
         return itemStack;

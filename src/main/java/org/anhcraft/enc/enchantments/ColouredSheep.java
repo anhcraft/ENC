@@ -8,7 +8,6 @@ import org.bukkit.DyeColor;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Sheep;
-import org.bukkit.inventory.ItemStack;
 
 public class ColouredSheep extends Enchantment {
     public ColouredSheep() {
@@ -28,10 +27,5 @@ public class ColouredSheep extends Enchantment {
                 }
             }
         });
-    }
-
-    @Override
-    public boolean canEnchantItem(ItemStack itemStack) {
-        return true;
     }
 }

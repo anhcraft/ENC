@@ -1,5 +1,6 @@
 package org.anhcraft.enc.api;
 
+import net.objecthunter.exp4j.ExpressionBuilder;
 import org.anhcraft.algorithmlib.array.searching.ArrayBinarySearch;
 import org.anhcraft.enc.ENC;
 import org.anhcraft.enc.api.listeners.IListener;
@@ -8,10 +9,7 @@ import org.anhcraft.enc.utils.ReplaceUtils;
 import org.anhcraft.spaciouslib.builders.EqualsBuilder;
 import org.anhcraft.spaciouslib.builders.HashCodeBuilder;
 import org.anhcraft.spaciouslib.io.FileManager;
-import org.anhcraft.spaciouslib.utils.Chat;
-import org.anhcraft.spaciouslib.utils.CommonUtils;
-import org.anhcraft.spaciouslib.utils.ExceptionThrower;
-import org.anhcraft.spaciouslib.utils.MathUtils;
+import org.anhcraft.spaciouslib.utils.*;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -31,6 +29,7 @@ import java.util.stream.Collectors;
  * Represents an enchantment.
  */
 public abstract class Enchantment {
+    private static final ExpressionParser EXPRESSION_PARSER = ExpressionParser.valueOf(ENC.getGeneralConfig().getString("plugin.expression_parser").toUpperCase());
     private static final List<String> DEFAULT_WORLDS_LIST = CommonUtils.toList(new String[]{"$all"});
 
     private String id;
@@ -38,12 +37,13 @@ public abstract class Enchantment {
     private String author;
     private String proposer;
     private int maxLevel;
-    private EnchantmentTarget[] itemTarget;
-    private final YamlConfiguration config = new YamlConfiguration();
+    private EnchantmentTarget[] itemTargets;
     private File configFile;
     private Chat chat;
+    private final YamlConfiguration config = new YamlConfiguration();
     private final List<IListener> eventListeners = new ArrayList<>();
     private final List<String> worldList = new ArrayList<>();
+    private final HashMap<String, Group<Double, Long>> COMPUTATION_CACHING = new HashMap<>();
 
     /**
      * Creates an instance of enchantment.
@@ -61,7 +61,7 @@ public abstract class Enchantment {
         this.author = author;
         this.proposer = proposer;
         this.maxLevel = Math.max(maxLevel, 1);
-        this.itemTarget = ArrayBinarySearch.search(targets, EnchantmentTarget.ALL) >= 0 ? new EnchantmentTarget[]{EnchantmentTarget.ALL} : targets; // optimize the targets
+        this.itemTargets = ArrayBinarySearch.search(targets, EnchantmentTarget.ALL) >= 0 ? new EnchantmentTarget[]{EnchantmentTarget.ALL} : targets; // optimize the targets
     }
 
     private String replaceStr(String str){
@@ -135,10 +135,19 @@ public abstract class Enchantment {
      * @return the computed value
      */
     public double computeConfigValue(String key, ActionReport report) {
+        if(config.getBoolean("computation_caching.enabled")){
+            Group<Double, Long> ent = COMPUTATION_CACHING.get(key);
+            if(ent != null){
+                if(System.currentTimeMillis()-ent.getB() <= config.getLong("computation_caching.caching_time")){
+                    return ent.getA();
+                }
+            }
+        }
+        double v = -1;
         Object value = config.get(key);
+        boolean ignored = false;
         if(value instanceof String){
             String str = (String) value;
-
             Pattern levelCheck = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.level.full_regex"));
             Pattern levelGet = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.level.value_regex"));
             Matcher levelCheck_;
@@ -153,6 +162,7 @@ public abstract class Enchantment {
                 } else { // or {level}
                     str = levelCheck_.replaceFirst(Integer.toString(report.getEnchantmentMap().get(this)));
                 }
+                ignored = true;
             }
 
             Pattern maxLevelCheck = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.max_level.full_regex"));
@@ -169,10 +179,21 @@ public abstract class Enchantment {
                     str = maxLevelCheck_.replaceFirst(Integer.toString(maxLevel));
                 }
             }
-            return MathUtils.eval(str);
-        } else {
-            return -1;
+
+            switch(EXPRESSION_PARSER){
+                case JAVASCRIPT:
+                    v = MathUtils.eval(str);
+                    break;
+                case EXP4J:
+                    v = new ExpressionBuilder(str).build().evaluate();
+                    break;
+            }
         }
+        if(config.getBoolean("computation_caching.enabled") &&
+                (!config.getBoolean("computation_caching.strict_mode") || !ignored)){
+            COMPUTATION_CACHING.put(key, new Group<>(v, System.currentTimeMillis()));
+        }
+        return v;
     }
 
     /**
@@ -190,6 +211,9 @@ public abstract class Enchantment {
         map.put("worlds_list", new ArrayList<>(DEFAULT_WORLDS_LIST));
         map.put("allowed_worlds_list", true);
         map.put("name", id);
+        map.put("computation_caching.enabled", false);
+        map.put("computation_caching.caching_time", 72000);
+        map.put("computation_caching.strict_mode", true);
         initConfigEntries(map);
 
         chat = new Chat(replaceStr(config.getString("chat_prefix")));
@@ -221,11 +245,11 @@ public abstract class Enchantment {
     }
 
     /**
-     * Gets types of item that may fit this enchantment.
+     * Returns types of item that may fit this enchantment.
      * @return enchantment's target item types
      */
-    public EnchantmentTarget[] getItemTarget() {
-        return itemTarget;
+    public EnchantmentTarget[] getItemTargets() {
+        return itemTargets;
     }
 
     /**
@@ -283,7 +307,14 @@ public abstract class Enchantment {
      * @param itemStack the stack of items
      * @return true if yes
      */
-    public abstract boolean canEnchantItem(ItemStack itemStack);
+    public boolean canEnchantItem(ItemStack itemStack){
+        for(EnchantmentTarget t : getItemTargets()){
+            if(t.includes(itemStack)){
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * This method is called after this enchantment is registered successfully.
@@ -304,7 +335,7 @@ public abstract class Enchantment {
         return new HashCodeBuilder(17, 21)
                 .append(this.id)
                 .append(this.author)
-                .append(this.itemTarget)
+                .append(this.itemTargets)
                 .append(this.proposer)
                 .append(this.maxLevel)
                 .append(this.description).build();

@@ -12,7 +12,6 @@ import org.anhcraft.spaciouslib.utils.PlayerUtils;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
@@ -69,10 +68,5 @@ public class Freeze extends Enchantment {
         map.put("chance", "{level}*12");
         map.put("duration", "{level}*50");
         initConfigEntries(map);
-    }
-
-    @Override
-    public boolean canEnchantItem(ItemStack itemStack) {
-        return true;
     }
 }
