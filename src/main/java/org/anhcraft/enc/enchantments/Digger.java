@@ -41,7 +41,6 @@ public class Digger extends Enchantment {
                         b.breakNaturally(report.getItemStack());
                     }
                 }
-                report.setPrevented(true);
             }
         });
     }
