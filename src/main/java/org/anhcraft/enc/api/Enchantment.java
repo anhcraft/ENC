@@ -91,7 +91,6 @@ public abstract class Enchantment {
     void initConfig(File configFile){
         this.configFile = configFile;
         new FileManager(configFile).create();
-        reloadConfig();
     }
 
     /**
@@ -204,6 +203,7 @@ public abstract class Enchantment {
             config.load(configFile);
         } catch(IOException | InvalidConfigurationException e) {
             e.printStackTrace();
+            return;
         }
         HashMap<String, Object> map = new HashMap<>();
         map.put("enabled", true);

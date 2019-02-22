@@ -6,7 +6,6 @@ import org.anhcraft.enc.utils.FilePaths;
 import org.anhcraft.enc.utils.RomanNumber;
 import org.anhcraft.spaciouslib.utils.Chat;
 import org.anhcraft.spaciouslib.utils.ExceptionThrower;
-import org.anhcraft.spaciouslib.utils.InitialisationValidator;
 import org.anhcraft.spaciouslib.utils.InventoryUtils;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -24,7 +23,6 @@ import java.util.stream.Collectors;
  * The Enchantment API.
  */
 public class EnchantmentAPI {
-    private static final InitialisationValidator INIT_LOCK = new InitialisationValidator();
     private static final ConcurrentHashMap<String, Enchantment> ENCHANT_MAP = new ConcurrentHashMap<>();
 
     /**
@@ -39,6 +37,7 @@ public class EnchantmentAPI {
         ENCHANT_MAP.put(id, enchant);
         enchant.initConfig(new File(FilePaths.ENCHANTMENT_FOLDER, enchant.getId()+".yml"));
         enchant.onRegistered();
+        enchant.reloadConfig();
     }
 
     /**
