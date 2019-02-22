@@ -4,8 +4,10 @@ import org.anhcraft.enc.ENC;
 import org.anhcraft.enc.api.ActionReport;
 import org.anhcraft.enc.api.Enchantment;
 import org.anhcraft.enc.api.listeners.AsyncJumpListener;
+import org.anhcraft.enc.utils.ReplaceUtils;
 import org.anhcraft.enc.utils.UnitUtils;
 import org.anhcraft.spaciouslib.protocol.BlockBreakAnimation;
+import org.anhcraft.spaciouslib.utils.CommonUtils;
 import org.anhcraft.spaciouslib.utils.GameVersion;
 import org.anhcraft.spaciouslib.utils.LocationUtils;
 import org.anhcraft.spaciouslib.utils.RandomUtils;
@@ -23,8 +25,10 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.util.noise.SimplexOctaveGenerator;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Collapse extends Enchantment implements Listener {
+    private static final List<Material> MATERIAL_LIST = new ArrayList<>();
     private static final Map<Location, Long> DAMAGED_BLOCKS = new HashMap<>();
     private static final List<Integer> FALLING_BLOCKS = new ArrayList<>();
 
@@ -42,6 +46,7 @@ public class Collapse extends Enchantment implements Listener {
                     return;
                 }
                 List<Location> breakBlocks = new ArrayList<>();
+                boolean allowedMaterialList = getConfig().getBoolean("allowed_material_list");
                 boolean falling = getConfig().getBoolean("block_falling");
                 boolean physics = getConfig().getBoolean("block_physics");
                 boolean sound = getConfig().getBoolean("sound");
@@ -63,6 +68,9 @@ public class Collapse extends Enchantment implements Listener {
                     for(int f = 0; f < y; f++) {
                         // the block being damaged or broken
                         Location cloc = xloc.clone().subtract(0, f, 0);
+                        if(allowedMaterialList != MATERIAL_LIST.contains(cloc.getBlock().getType())){
+                            continue;
+                        }
                         long currentTime = System.currentTimeMillis();
                         if(DAMAGED_BLOCKS.containsKey(cloc)){
                             long lastTime = DAMAGED_BLOCKS.get(cloc);
@@ -130,7 +138,27 @@ public class Collapse extends Enchantment implements Listener {
         map.put("block_physics", true);
         map.put("block_falling", true);
         map.put("sound", true);
+        map.put("material_list", new String[]{
+                "$solid",
+                "-bedrock",
+                "-barrier"});
+        map.put("allowed_material_list", true);
         initConfigEntries(map);
+    }
+
+    @Override
+    public void onConfigReloaded(){
+        MATERIAL_LIST.clear();
+        HashMap<String, List<String>> groups = new HashMap<>();
+        groups.put("all", CommonUtils.toList(Material.values()).stream()
+                .map(Material::name)
+                .collect(Collectors.toList()));
+        groups.put("solid", CommonUtils.toList(Material.values()).stream()
+                .filter(Material::isSolid)
+                .map(Material::name)
+                .collect(Collectors.toList()));
+        MATERIAL_LIST.addAll(ReplaceUtils.replaceVariables(getConfig().getStringList("material_list"),
+                groups, false).stream().map(Material::valueOf).collect(Collectors.toList()));
     }
 
     @EventHandler
