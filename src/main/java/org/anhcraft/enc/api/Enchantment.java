@@ -223,6 +223,7 @@ public abstract class Enchantment {
         groups.put("all", Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList()));
         worldList.addAll(ReplaceUtils.replaceVariables(config.getStringList("worlds_list"),
                 groups, true));
+        onConfigReloaded();
     }
 
     /**
@@ -320,6 +321,11 @@ public abstract class Enchantment {
      * This method is called after this enchantment is registered successfully.
      */
     public void onRegistered(){}
+
+    /**
+     * This method is called whenever the configuration is reloaded.
+     */
+    public void onConfigReloaded(){}
 
     @Override
     public boolean equals(Object object){
