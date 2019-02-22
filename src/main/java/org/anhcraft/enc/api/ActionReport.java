@@ -1,16 +1,18 @@
 package org.anhcraft.enc.api;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * Represents an action report.<br>
  * The report is sent to an event listener to provide information about previous action.
  */
 public class ActionReport {
-    private Player player;
+    private UUID player;
     private ItemStack itemStack;
     private HashMap<Enchantment, Integer> enchantmentMap;
     private boolean prevented;
@@ -23,7 +25,7 @@ public class ActionReport {
      * @param prevented whether the action is going to be prevented
      */
     public ActionReport(Player player, ItemStack itemStack, HashMap<Enchantment, Integer> enchantmentMap, boolean prevented) {
-        this.player = player;
+        this.player = player.getUniqueId();
         this.itemStack = itemStack;
         this.enchantmentMap = enchantmentMap;
         this.prevented = prevented;
@@ -34,7 +36,7 @@ public class ActionReport {
      * @return player
      */
     public Player getPlayer() {
-        return player;
+        return Bukkit.getPlayer(player);
     }
 
     /**
