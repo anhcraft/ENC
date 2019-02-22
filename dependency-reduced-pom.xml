@@ -4,7 +4,7 @@
   <groupId>org.anhcraft</groupId>
   <artifactId>ENC</artifactId>
   <name>ENC</name>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
   <description>Brings more enchantments to your servers</description>
   <build>
     <defaultGoal>clean package</defaultGoal>
