@@ -1,6 +1,6 @@
 name: ENC
 version: ${project.version}
-main: org.anhcraft.enc.ENC
+main: dev.anhcraft.enc.ENC
 api-version: 1.13
 depend: [SpaciousLib]
 softdepend: [KeepMyLife,Essentials,WorldGuard,WorldEdit]
