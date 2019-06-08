@@ -3,44 +3,30 @@ package dev.anhcraft.enc.commands;
 import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.EnchantmentAPI;
-import dev.anhcraft.enc.api.gem.Gem;
 import dev.anhcraft.enc.api.gem.GemAPI;
 import dev.anhcraft.enc.api.gem.GemItem;
-import org.anhcraft.spaciouslib.utils.Group;
+import kotlin.Pair;
 
 import java.util.Arrays;
 
 class ArgHandler {
-    static Enchantment onlyEnchant(String[] args, int from){
-        if(ENC.getGeneralConfig().getBoolean("commands.use_enchantment_by_id")){
-            return EnchantmentAPI.getEnchantmentById(args[args.length-1]);
-        } else {
-            return EnchantmentAPI.getEnchantmentByName(String.join(" ", Arrays.copyOfRange(args, from, args.length)));
-        }
+    static Enchantment onlyEnchant(String s){
+        if(ENC.getGeneralConfig().getBoolean("commands.use_enchantment_by_id")) return EnchantmentAPI.getEnchantmentById(s);
+        else return EnchantmentAPI.getEnchantmentByName(s);
     }
 
-    static Group<Enchantment, Integer> enchantAndLevel(String[] args, int from){
-        if(ENC.getGeneralConfig().getBoolean("commands.use_enchantment_by_id")){
-            return new Group<>(EnchantmentAPI.getEnchantmentById(args[args.length-2]),
-                    Integer.parseInt(args[args.length-1]));
-        } else {
-            return new Group<>(EnchantmentAPI.getEnchantmentByName(String.join(" ", Arrays.copyOfRange(args, from, args.length-1))), Integer.parseInt(args[args.length-1]));
-        }
+    static Pair<Enchantment, Integer> enchantAndLevel(String[] args){
+        if(ENC.getGeneralConfig().getBoolean("commands.use_enchantment_by_id")) return new Pair<>(EnchantmentAPI.getEnchantmentById(args[args.length-2]), Integer.parseInt(args[args.length-1]));
+        else return new Pair<>(EnchantmentAPI.getEnchantmentByName(String.join(" ", Arrays.copyOfRange(args, 0, args.length-1))), Integer.parseInt(args[args.length-1]));
     }
 
-    static Gem onlyGem(String[] args, int from){
-        if(ENC.getGeneralConfig().getBoolean("commands.use_gem_by_id")){
-            return GemAPI.getGemById(args[args.length-1]);
+    static GemItem gemAndRate(String[] args){
+        if(ENC.getGeneralConfig().getBoolean("commands.use_gem_by_id")) {
+            var g = GemAPI.getGemById(args[args.length-3]);
+            return g == null ? null : new GemItem(g, Double.parseDouble(args[args.length-2]), Double.parseDouble(args[args.length-1]));
         } else {
-            return GemAPI.getGemByName(String.join(" ", Arrays.copyOfRange(args, from, args.length)));
-        }
-    }
-
-    static GemItem gemAndRate(String[] args, int from){
-        if(ENC.getGeneralConfig().getBoolean("commands.use_gem_by_id")){
-            return new GemItem(GemAPI.getGemById(args[args.length-3]), Double.parseDouble(args[args.length-2]), Double.parseDouble(args[args.length-1]));
-        } else {
-            return new GemItem(GemAPI.getGemByName(String.join(" ", Arrays.copyOfRange(args, from, args.length-2))), Double.parseDouble(args[args.length-2]), Double.parseDouble(args[args.length-1]));
+            var g = GemAPI.getGemByName(String.join(" ", Arrays.copyOfRange(args, 0, args.length-2)));
+            return g == null ? null : new GemItem(g, Double.parseDouble(args[args.length-2]), Double.parseDouble(args[args.length-1]));
         }
     }
 }
