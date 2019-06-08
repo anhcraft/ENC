@@ -1,19 +1,21 @@
 package dev.anhcraft.enc.api.gem;
 
+import dev.anhcraft.craftkit.common.utils.ChatUtil;
+import dev.anhcraft.craftkit.utils.ItemUtil;
 import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.Enchantment;
-import dev.anhcraft.enc.utils.ChatUtils;
+import dev.anhcraft.enc.utils.FormatUtil;
 import dev.anhcraft.enc.utils.RomanNumber;
-import org.anhcraft.spaciouslib.utils.Chat;
-import org.anhcraft.spaciouslib.utils.ExceptionThrower;
-import org.anhcraft.spaciouslib.utils.InventoryUtils;
+import dev.anhcraft.jvmkit.utils.Condition;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -21,17 +23,18 @@ import java.util.stream.Collectors;
  * The Gem API.
  */
 public class GemAPI {
-    private static final ConcurrentHashMap<String, Gem> GEM_MAP = new ConcurrentHashMap<>();
+    private static final Map<String, Gem> GEM_MAP = new ConcurrentHashMap<>();
     
     /**
      * Registers the given gem.
      * @param gem the gem
      */
-    public static void registerGem(Gem gem) {
-        String id = gem.getId().toUpperCase();
-        ExceptionThrower.ifTrue(GEM_MAP.containsKey(id), new Exception("Gem is already registered: Id must be unique"));
-        ExceptionThrower.ifFalse(GEM_MAP.values().stream().noneMatch(r ->
-                r.getName().equals(gem.getName())), new Exception("Gem is already registered: Name must be unique"));
+    public static void registerGem(@NotNull Gem gem) {
+        Condition.argNotNull("gem", gem);
+        var id = gem.getId().toUpperCase();
+        Condition.check(!GEM_MAP.containsKey(id), "Gem is already registered: Id must be unique");
+        Condition.check(GEM_MAP.values().stream().noneMatch(r ->
+                r.getName().equals(gem.getName())), "Gem is already registered: Name must be unique");
         GEM_MAP.put(id, gem);
     }
 
@@ -39,9 +42,10 @@ public class GemAPI {
      * Unregisters the given gem.
      * @param gem the gem
      */
-    public static void unregisterGem(Gem gem) {
-        String id = gem.getId().toUpperCase();
-        ExceptionThrower.ifFalse(GEM_MAP.containsKey(id), new Exception("Enchantment is not registered yet"));
+    public static void unregisterGem(@NotNull Gem gem) {
+        Condition.argNotNull("gem", gem);
+        var id = gem.getId().toUpperCase();
+        Condition.check(GEM_MAP.containsKey(id), "Enchantment is not registered");
         GEM_MAP.remove(id);
     }
 
@@ -50,7 +54,8 @@ public class GemAPI {
      * @param gem the gem
      * @return true if yes
      */
-    public static boolean isGemRegistered(Gem gem) {
+    public static boolean isGemRegistered(@NotNull Gem gem) {
+        Condition.argNotNull("gem", gem);
         return GEM_MAP.containsValue(gem);
     }
 
@@ -59,7 +64,9 @@ public class GemAPI {
      * @param gemId gem's id
      * @return the gem
      */
-    public static Gem getGemById(String gemId){
+    @Nullable
+    public static Gem getGemById(@NotNull String gemId){
+        Condition.argNotNull("gemId", gemId);
         return GEM_MAP.get(gemId.toUpperCase());
     }
 
@@ -68,7 +75,9 @@ public class GemAPI {
      * @param gemName gem's name
      * @return the gem
      */
-    public static Gem getGemByName(String gemName){
+    @Nullable
+    public static Gem getGemByName(@NotNull String gemName){
+        Condition.argNotNull("gemName", gemName);
         return GEM_MAP.values().stream().filter(gem ->
                 gem.getName().equals(gemName)).findFirst().orElse(null);
     }
@@ -78,7 +87,9 @@ public class GemAPI {
      * @param enchantment the enchantment
      * @return list of matched gems
      */
-    public static List<Gem> getGemsByEnchantment(Enchantment enchantment){
+    @NotNull
+    public static List<Gem> getGemsByEnchantment(@NotNull Enchantment enchantment){
+        Condition.argNotNull("enchantment", enchantment);
         return GEM_MAP.values().stream().filter(gem -> gem.getEnchantment()
                 .equals(enchantment)).collect(Collectors.toList());
     }
@@ -112,13 +123,13 @@ public class GemAPI {
      * @param itemStack the stack of items
      * @return true if yes
      */
-    public static boolean isGemItem(ItemStack itemStack){
-        if(!InventoryUtils.isNull(itemStack)) {
-            ItemMeta m = itemStack.getItemMeta();
+    public static boolean isGemItem(@Nullable ItemStack itemStack){
+        if(!ItemUtil.isNull(itemStack)) {
+            var m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                Pattern regex = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.full_general_regex"));
+                var regex = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.full_general_regex"));
                 return m.getLore().stream().anyMatch(s ->
-                        regex.matcher(ChatUtils.reverseColorCode(s)).matches());
+                        regex.matcher(FormatUtil.reverseColorCode(s)).matches());
             }
         }
         return false;
@@ -130,12 +141,13 @@ public class GemAPI {
      * @param gem the gem
      * @return true if yes
      */
-    public static boolean isGemItem(ItemStack itemStack, Gem gem){
-        if(!InventoryUtils.isNull(itemStack)) {
-            ItemMeta m = itemStack.getItemMeta();
+    public static boolean isGemItem(@Nullable ItemStack itemStack, @NotNull Gem gem){
+        if(!ItemUtil.isNull(itemStack)) {
+            Condition.argNotNull("gem", gem);
+            var m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                Pattern regex = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.full_individual_regex").replace("{gem_name}", gem.getName()));
-                return m.getLore().stream().anyMatch(s -> regex.matcher(ChatUtils.reverseColorCode(s)).find());
+                var regex = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.full_individual_regex").replace("{gem_name}", gem.getName()));
+                return m.getLore().stream().anyMatch(s -> regex.matcher(FormatUtil.reverseColorCode(s)).find());
             }
         }
         return false;
@@ -146,37 +158,33 @@ public class GemAPI {
      * @param itemStack the stack of items
      * @return the gem item
      */
-    public static GemItem searchGem(ItemStack itemStack){
-        if(!InventoryUtils.isNull(itemStack)) {
-            ItemMeta m = itemStack.getItemMeta();
+    public static GemItem searchGem(@Nullable ItemStack itemStack){
+        if(!ItemUtil.isNull(itemStack)) {
+            var m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                Pattern regex1 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.full_general_regex"));
-                Pattern regex2 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.name_regex"));
-                Pattern regex3 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.success_rate_regex"));
-                Pattern regex4 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.protection_rate_regex"));
-                boolean b = false;
+                var regex1 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.full_general_regex"));
+                var regex2 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.name_regex"));
+                var regex3 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.success_rate_regex"));
+                var regex4 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.protection_rate_regex"));
+                var b = false;
                 String name = null;
                 double sr = 0, pr = 0;
-                for(String l : m.getLore()) {
-                    l = ChatUtils.reverseColorCode(l);
-                    if(regex1.matcher(l).matches()) {
-                        b = true;
-                    }
-                    Matcher nameMatcher = regex2.matcher(l);
-                    if(nameMatcher.find()) {
-                        name = nameMatcher.group();
-                    }
-                    Matcher srMatcher = regex3.matcher(l);
-                    if(srMatcher.find()){
-                        sr = Double.parseDouble(srMatcher.group());
-                    }
-                    Matcher prMatcher = regex4.matcher(l);
-                    if(prMatcher.find()){
-                        pr = Double.parseDouble(prMatcher.group());
-                    }
+                for(var l : m.getLore()) {
+                    l = FormatUtil.reverseColorCode(l);
+                    if(regex1.matcher(l).matches()) b = true;
+
+                    var nameMatcher = regex2.matcher(l);
+                    if(nameMatcher.find()) name = nameMatcher.group();
+
+                    var srMatcher = regex3.matcher(l);
+                    if(srMatcher.find())  sr = Double.parseDouble(srMatcher.group());
+
+                    var prMatcher = regex4.matcher(l);
+                    if(prMatcher.find()) pr = Double.parseDouble(prMatcher.group());
                 }
-                if(b){
-                    return new GemItem(getGemByName(name), sr, pr);
+                if(b && name != null) {
+                    var g = getGemByName(name);
+                    if(g != null) return new GemItem(g, sr, pr);
                 }
             }
         }
@@ -188,17 +196,20 @@ public class GemAPI {
      * @param itemStack stack of items
      * @param gemItem the gem
      */
-    public static void assignGem(ItemStack itemStack, GemItem gemItem) {
-        if(!InventoryUtils.isNull(itemStack)) {
-            ItemMeta m = itemStack.getItemMeta();
-            List<String> lore = Chat.color(ENC.getGeneralConfig().getStringList("gem.lore_patterns.full_raw"))
+    public static void assignGem(@Nullable ItemStack itemStack, @NotNull GemItem gemItem) {
+        if(!ItemUtil.isNull(itemStack)) {
+            Condition.argNotNull("gemItem", gemItem);
+            var m = itemStack.getItemMeta();
+            var lore = ChatUtil.formatColorCodes(ENC.getGeneralConfig()
+                    .getStringList("gem.lore_patterns.full_raw"))
                 .stream()
                 .map(s -> s.replace("{gem_name}", gemItem.getGem().getName())
-                    .replace("{coloured_gem_name}", Chat.color(gemItem.getGem().getName()))
+                    .replace("{coloured_gem_name}", ChatUtil.formatColorCodes(gemItem.getGem().getName()))
                     .replace("{enchantment_name}", gemItem.getGem().getEnchantment().getName())
-                    .replace("{coloured_enchantment_name}", Chat.color(gemItem.getGem().getEnchantment().getName()))
+                    .replace("{coloured_enchantment_name}", ChatUtil.formatColorCodes(gemItem.getGem().getEnchantment().getName()))
                     .replace("{level}", Integer.toString(gemItem.getGem().getEnchantmentLevel()))
-                    .replace("{roman_level}", RomanNumber.toRoman(gemItem.getGem().getEnchantmentLevel()))
+                    .replace("{roman_level}", Objects.requireNonNull(
+                            RomanNumber.toRoman(gemItem.getGem().getEnchantmentLevel())))
                     .replace("{success_rate}", Double.toString(gemItem.getSuccessRate()))
                     .replace("{protection_rate}", Double.toString(gemItem.getProtectionRate()))
                     .replace("{min_success_rate}", Double.toString(gemItem.getGem().getMinSuccessRate()))
@@ -207,11 +218,11 @@ public class GemAPI {
                     .replace("{max_protection_rate}", Double.toString(gemItem.getGem().getMaxProtectionRate())))
                 .collect(Collectors.toList());
             if(m.hasLore()) {
-                Pattern regex1 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.name_regex"));
-                Pattern regex2 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.success_rate_regex"));
-                Pattern regex3 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.protection_rate_regex"));
+                var regex1 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.name_regex"));
+                var regex2 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.success_rate_regex"));
+                var regex3 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.protection_rate_regex"));
                 lore.addAll(m.getLore().stream().filter(s -> {
-                    s = ChatUtils.reverseColorCode(s);
+                    s = FormatUtil.reverseColorCode(s);
                     return !regex1.matcher(s).find() && !regex2.matcher(s).find() && !regex3.matcher(s).find();
                 }).collect(Collectors.toList()));
             }
@@ -224,15 +235,15 @@ public class GemAPI {
      * Detaches the gem from the given stack of items.
      * @param itemStack stack of items
      */
-    public static void detachGem(ItemStack itemStack){
-        if(!InventoryUtils.isNull(itemStack)) {
-            ItemMeta m = itemStack.getItemMeta();
+    public static void detachGem(@Nullable ItemStack itemStack){
+        if(!ItemUtil.isNull(itemStack)) {
+            var m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                Pattern regex1 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.name_regex"));
-                Pattern regex2 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.success_rate_regex"));
-                Pattern regex3 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.protection_rate_regex"));
-                List<String> lore = m.getLore().stream().filter(s -> {
-                    s = ChatUtils.reverseColorCode(s);
+                var regex1 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.name_regex"));
+                var regex2 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.success_rate_regex"));
+                var regex3 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.protection_rate_regex"));
+                var lore = m.getLore().stream().filter(s -> {
+                    s = FormatUtil.reverseColorCode(s);
                     return !regex1.matcher(s).find() && !regex2.matcher(s).find() && !regex3.matcher(s).find();
                 }).collect(Collectors.toList());
                 m.setLore(lore);

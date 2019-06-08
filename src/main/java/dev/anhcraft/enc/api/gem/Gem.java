@@ -2,9 +2,10 @@ package dev.anhcraft.enc.api.gem;
 
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.EnchantmentAPI;
-import org.anhcraft.spaciouslib.builders.EqualsBuilder;
-import org.anhcraft.spaciouslib.builders.HashCodeBuilder;
-import org.anhcraft.spaciouslib.utils.ExceptionThrower;
+import org.jetbrains.annotations.NotNull;
+import dev.anhcraft.jvmkit.utils.Condition;
+
+import java.util.Objects;
 
 /**
  * Represents a gem.
@@ -32,9 +33,11 @@ public class Gem {
      * @param maxProtectionRate the maximum protection rate
      * @param dropRate the drop rate
      */
-    public Gem(String id, String name, String enchantmentId, int enchantmentLevel, double minSuccessRate, double maxSuccessRate, double minProtectionRate, double maxProtectionRate, double dropRate) {
-        ExceptionThrower.ifFalse(id.matches("^[\\w]+$"), new Exception("the gem id must only contain A-Z, 0-9 and underscore"));
-        ExceptionThrower.ifTrue(enchantmentId == null, new Exception("enchantment id must not be null"));
+    public Gem(@NotNull String id, @NotNull String name, @NotNull String enchantmentId, int enchantmentLevel, double minSuccessRate, double maxSuccessRate, double minProtectionRate, double maxProtectionRate, double dropRate) {
+        Condition.argNotNull("id", id);
+        Condition.argNotNull("name", name);
+        Condition.argNotNull("enchantmentId", enchantmentId);
+        Condition.check(id.matches("^[\\w]+$"), "the gem id must only contain A-Z, 0-9 and underscore");
         this.id = id;
         this.name = name;
         this.enchantmentId = enchantmentId;
@@ -127,27 +130,23 @@ public class Gem {
     }
 
     @Override
-    public boolean equals(Object object){
-        if(object != null && object.getClass() == this.getClass()){
-            Gem r = (Gem) object;
-            return new EqualsBuilder()
-                    .append(r.id, this.id)
-                    .append(r.name, this.name)
-                    .build();
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Gem gem = (Gem) o;
+        return enchantmentLevel == gem.enchantmentLevel &&
+                Double.compare(gem.minSuccessRate, minSuccessRate) == 0 &&
+                Double.compare(gem.maxSuccessRate, maxSuccessRate) == 0 &&
+                Double.compare(gem.minProtectionRate, minProtectionRate) == 0 &&
+                Double.compare(gem.maxProtectionRate, maxProtectionRate) == 0 &&
+                Double.compare(gem.dropRate, dropRate) == 0 &&
+                id.equals(gem.id) &&
+                name.equals(gem.name) &&
+                enchantmentId.equals(gem.enchantmentId);
     }
 
     @Override
-    public int hashCode(){
-        return new HashCodeBuilder(17, 23)
-                .append(this.id)
-                .append(this.name)
-                .append(this.enchantmentId)
-                .append(this.enchantmentLevel)
-                .append(this.minSuccessRate)
-                .append(this.maxSuccessRate)
-                .append(this.minProtectionRate)
-                .append(this.maxProtectionRate).build();
+    public int hashCode() {
+        return Objects.hash(id, enchantmentId);
     }
 }

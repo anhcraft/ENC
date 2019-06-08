@@ -1,7 +1,7 @@
 package dev.anhcraft.enc.api.listeners;
 
 import dev.anhcraft.enc.api.ActionReport;
-import org.anhcraft.spaciouslib.inventory.EquipSlot;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -21,7 +21,7 @@ public abstract class SyncDeathDropListener implements IListener {
     }
 
     @Override
-    public EquipSlot getItemSlot(){
+    public EquipmentSlot getItemSlot(){
         return null;
     }
 }

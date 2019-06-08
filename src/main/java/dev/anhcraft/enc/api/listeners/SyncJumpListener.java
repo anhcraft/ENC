@@ -1,7 +1,7 @@
 package dev.anhcraft.enc.api.listeners;
 
 import dev.anhcraft.enc.api.ActionReport;
-import org.anhcraft.spaciouslib.inventory.EquipSlot;
+import org.bukkit.inventory.EquipmentSlot;
 
 /**
  * The listener of jumping events.
@@ -20,8 +20,8 @@ public abstract class SyncJumpListener implements IListener {
     }
 
     @Override
-    public EquipSlot getItemSlot(){
-        return EquipSlot.FEET;
+    public EquipmentSlot getItemSlot(){
+        return EquipmentSlot.FEET;
     }
 }
 

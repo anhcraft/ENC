@@ -1,8 +1,8 @@
 package dev.anhcraft.enc.api.listeners;
 
 import dev.anhcraft.enc.api.ActionReport;
-import org.anhcraft.spaciouslib.inventory.EquipSlot;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.inventory.EquipmentSlot;
 
 /**
  * The listener of attack events.
@@ -22,7 +22,7 @@ public abstract class SyncAttackListener implements IListener {
     }
 
     @Override
-    public EquipSlot getItemSlot(){
-        return EquipSlot.MAINHAND;
+    public EquipmentSlot getItemSlot(){
+        return EquipmentSlot.HAND;
     }
 }

@@ -1,15 +1,15 @@
 package dev.anhcraft.enc.api;
 
-import net.objecthunter.exp4j.ExpressionBuilder;
-import org.anhcraft.algorithmlib.array.searching.ArrayBinarySearch;
+import dev.anhcraft.craftkit.kits.chat.Chat;
 import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.listeners.IListener;
-import dev.anhcraft.enc.utils.ChatUtils;
-import dev.anhcraft.enc.utils.ReplaceUtils;
-import org.anhcraft.spaciouslib.builders.EqualsBuilder;
-import org.anhcraft.spaciouslib.builders.HashCodeBuilder;
-import org.anhcraft.spaciouslib.io.FileManager;
-import org.anhcraft.spaciouslib.utils.*;
+import dev.anhcraft.enc.utils.FormatUtil;
+import dev.anhcraft.enc.utils.ReplaceUtil;
+import dev.anhcraft.enc.utils.ScriptUtil;
+import dev.anhcraft.jvmkit.utils.ArrayUtil;
+import dev.anhcraft.jvmkit.utils.Condition;
+import kotlin.Pair;
+import net.objecthunter.exp4j.ExpressionBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -17,6 +17,8 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +32,7 @@ import java.util.stream.Collectors;
  */
 public abstract class Enchantment {
     private static final ExpressionParser EXPRESSION_PARSER = ExpressionParser.valueOf(ENC.getGeneralConfig().getString("plugin.expression_parser").toUpperCase());
-    private static final List<String> DEFAULT_WORLDS_LIST = CommonUtils.toList(new String[]{"$all"});
+    private static final List<String> DEFAULT_WORLDS_LIST = ArrayUtil.toList(new String[]{"$all"});
 
     private String id;
     private String[] description;
@@ -43,25 +45,27 @@ public abstract class Enchantment {
     private final YamlConfiguration config = new YamlConfiguration();
     private final List<IListener> eventListeners = new ArrayList<>();
     private final List<String> worldList = new ArrayList<>();
-    private final HashMap<String, Group<Double, Long>> COMPUTATION_CACHING = new HashMap<>();
+    private final Map<String, Pair<Double, Long>> computation_caching = new HashMap<>();
 
     /**
      * Creates an instance of enchantment.
      * @param id the enchantment id (A-Z, 0-9 and underscore only, ignored case sensitive)
      * @param description the description
      * @param author the author
-     * @param proposer the proposer (can be null)
+     * @param proposer the proposer
      * @param maxLevel the maximum level that a player can enchant up to
      * @param targets item types that may fit the enchantment
      */
-    public Enchantment(String id, String[] description, String author, String proposer, int maxLevel, EnchantmentTarget... targets) {
-        ExceptionThrower.ifFalse(id.matches("^[\\w]+$"), new Exception("enchantment id must not empty and can only contain A-Z, 0-9 and underscore"));
+    public Enchantment(@NotNull String id, @Nullable String[] description, @NotNull String author, @Nullable String proposer, int maxLevel, @NotNull EnchantmentTarget... targets) {
+        Condition.argNotNull("id", id);
+        Condition.argNotNull("author", author);
+        Condition.check(id.matches("^[\\w]+$"), "enchantment id must not empty and can only contain A-Z, 0-9 and underscore");
         this.id = id;
-        this.description = Arrays.copyOf(description, description.length);
+        this.description = description == null ? new String[0] : Arrays.copyOf(description, description.length);
         this.author = author;
         this.proposer = proposer;
         this.maxLevel = Math.max(maxLevel, 1);
-        this.itemTargets = ArrayBinarySearch.search(targets, EnchantmentTarget.ALL) >= 0 ? new EnchantmentTarget[]{EnchantmentTarget.ALL} : targets; // optimize the targets
+        this.itemTargets = ArrayUtil.binarySearch(targets, EnchantmentTarget.ALL) >= 0 ? new EnchantmentTarget[]{EnchantmentTarget.ALL} : targets; // optimize the targets
     }
 
     private String replaceStr(String str){
@@ -75,22 +79,25 @@ public abstract class Enchantment {
      * A configuration entry is only set in case of absent. Otherwise the current value is still be kept.<br>
      * File saving is automatic if there is at least one new entry.
      */
-    public <V> void initConfigEntries(Map<String, V> map){
+    public <V> void initConfigEntries(@NotNull Map<String, V> map){
+        Condition.argNotNull("map", map);
         int i = 0;
-        for(Map.Entry<String, V> entry : map.entrySet()) {
+        for(var entry : map.entrySet()) {
             if(!config.isSet(entry.getKey())) {
                 config.set(entry.getKey(), entry.getValue());
                 i++;
             }
         }
-        if(i > 0){
-            saveConfig();
-        }
+        if(i > 0) saveConfig();
     }
 
     void initConfig(File configFile){
         this.configFile = configFile;
-        new FileManager(configFile).create();
+        try {
+            configFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -122,6 +129,7 @@ public abstract class Enchantment {
      * If you are trying to set new entries, it is recommended to use the method {@link Enchantment#initConfigEntries(Map)}.
      * @return enchantment's configuration
      */
+    @NotNull
     public ConfigurationSection getConfig() {
         return config;
     }
@@ -133,55 +141,50 @@ public abstract class Enchantment {
      * @param report the action report
      * @return the computed value
      */
-    public double computeConfigValue(String key, ActionReport report) {
+    public double computeConfigValue(@NotNull String key, @NotNull ActionReport report) {
+        Condition.argNotNull("key", key);
+        Condition.argNotNull("report", report);
         if(config.getBoolean("computation_caching.enabled")){
-            Group<Double, Long> ent = COMPUTATION_CACHING.get(key);
+            Pair<Double, Long> ent = computation_caching.get(key);
             if(ent != null){
-                if(System.currentTimeMillis()-ent.getB() <= config.getLong("computation_caching.caching_time")){
-                    return ent.getA();
-                }
+                if(System.currentTimeMillis()-ent.getSecond() <= config.getLong("computation_caching.caching_time"))
+                    return ent.getFirst();
             }
         }
-        double v = -1;
-        Object value = config.get(key);
-        boolean ignored = false;
+        var v = -1.0;
+        var value = config.get(key);
+        var ignored = false;
         if(value instanceof String){
-            String str = (String) value;
-            Pattern levelCheck = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.level.full_regex"));
-            Pattern levelGet = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.level.value_regex"));
+            var str = (String) value;
+            var levelCheck = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.level.full_regex"));
+            var levelGet = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.level.value_regex"));
             Matcher levelCheck_;
             // find all {level} placeholder
             while((levelCheck_ = levelCheck.matcher(str)).find()){
                 // when get a {level} placeholder, check its is {level} or {level:<ENCHANTMENT_ID>}
                 Matcher levelGet_ = levelGet.matcher(levelCheck_.group());
                 // if {level:<ENCHANTMENT_ID>}
-                if(levelGet_.find()){
-                    str = levelCheck_.replaceFirst(Integer.toString(report.getEnchantmentMap()
+                if(levelGet_.find()) str = levelCheck_.replaceFirst(Integer.toString(report.getEnchantmentMap()
                             .get(EnchantmentAPI.getEnchantmentById(levelGet_.group()))));
-                } else { // or {level}
-                    str = levelCheck_.replaceFirst(Integer.toString(report.getEnchantmentMap().get(this)));
-                }
+                else str = levelCheck_.replaceFirst(Integer.toString(report.getEnchantmentMap().get(this))); // or {level}
                 ignored = true;
             }
 
-            Pattern maxLevelCheck = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.max_level.full_regex"));
-            Pattern maxLevelGet = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.max_level.value_regex"));
+            var maxLevelCheck = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.max_level.full_regex"));
+            var maxLevelGet = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.max_level.value_regex"));
             Matcher maxLevelCheck_;
             // find all {max_level} placeholder
             while((maxLevelCheck_ = maxLevelCheck.matcher(str)).find()){
                 // when get a {max_level} placeholder, check its is {max_level} or {max_level:<ENCHANTMENT_ID>}
-                Matcher maxLevelGet_ = maxLevelGet.matcher(maxLevelCheck_.group());
+                var maxLevelGet_ = maxLevelGet.matcher(maxLevelCheck_.group());
                 // if {max_level:<ENCHANTMENT_ID>}
-                if(maxLevelGet_.find()){
-                    str = maxLevelCheck_.replaceFirst(Integer.toString(EnchantmentAPI.getEnchantmentById(maxLevelGet_.group()).maxLevel));
-                } else { // or {max_level}
-                    str = maxLevelCheck_.replaceFirst(Integer.toString(maxLevel));
-                }
+                if(maxLevelGet_.find()) str = maxLevelCheck_.replaceFirst(Integer.toString(EnchantmentAPI.getEnchantmentById(maxLevelGet_.group()).maxLevel));
+                else str = maxLevelCheck_.replaceFirst(Integer.toString(maxLevel)); // or {max_level}
             }
 
             switch(EXPRESSION_PARSER){
                 case JAVASCRIPT:
-                    v = MathUtils.eval(str);
+                    v = ScriptUtil.eval(str);
                     break;
                 case EXP4J:
                     v = new ExpressionBuilder(str).build().evaluate();
@@ -189,9 +192,8 @@ public abstract class Enchantment {
             }
         }
         if(config.getBoolean("computation_caching.enabled") &&
-                (!config.getBoolean("computation_caching.strict_mode") || !ignored)){
-            COMPUTATION_CACHING.put(key, new Group<>(v, System.currentTimeMillis()));
-        }
+                (!config.getBoolean("computation_caching.strict_mode") || !ignored))
+            computation_caching.put(key, new Pair<>(v, System.currentTimeMillis()));
         return v;
     }
 
@@ -205,7 +207,7 @@ public abstract class Enchantment {
             e.printStackTrace();
             return;
         }
-        HashMap<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("enabled", true);
         map.put("chat_prefix", "&5#{lowercase_enchant_id} > &f");
         map.put("worlds_list", new ArrayList<>(DEFAULT_WORLDS_LIST));
@@ -217,12 +219,11 @@ public abstract class Enchantment {
         initConfigEntries(map);
 
         chat = new Chat(replaceStr(config.getString("chat_prefix")));
-        ExceptionThrower.ifFalse(getName().indexOf(ChatUtils.SECTION_SIGN) == -1, new Exception("enchantment name can not contain section signs due to unexpected bugs, please use ampersands instead"));
+        Condition.check(getName().indexOf(FormatUtil.SECTION_SIGN) == -1, "enchantment name can not contain section signs due to unexpected bugs, please use ampersands instead");
         worldList.clear();
-        HashMap<String, List<String>> groups = new HashMap<>();
+        Map<String, List<String>> groups = new HashMap<>();
         groups.put("all", Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList()));
-        worldList.addAll(ReplaceUtils.replaceVariables(config.getStringList("worlds_list"),
-                groups, true));
+        worldList.addAll(ReplaceUtil.replaceVariables(config.getStringList("worlds_list"), groups, true));
         onConfigReloaded();
     }
 
@@ -249,6 +250,7 @@ public abstract class Enchantment {
      * Returns types of item that may fit this enchantment.
      * @return enchantment's target item types
      */
+    @NotNull
     public EnchantmentTarget[] getItemTargets() {
         return itemTargets;
     }
@@ -265,6 +267,7 @@ public abstract class Enchantment {
      * Gets the name of the proposer.
      * @return enchantment's proposer (maybe null if there is not a proposer)
      */
+    @Nullable
     public String getProposer() {
         return proposer;
     }
@@ -282,8 +285,8 @@ public abstract class Enchantment {
      * @param world world's name
      * @return true if yes
      */
-    public boolean isAllowedWorld(String world) {
-        return config.getBoolean("allowed_worlds_list") == worldList.contains(world);
+    public boolean isAllowedWorld(@Nullable String world) {
+        return world != null && config.getBoolean("allowed_worlds_list") == worldList.contains(world);
     }
 
     /**
@@ -308,10 +311,10 @@ public abstract class Enchantment {
      * @param itemStack the stack of items
      * @return true if yes
      */
-    public boolean canEnchantItem(ItemStack itemStack){
-        for(EnchantmentTarget t : getItemTargets()){
-            if(t.includes(itemStack)){
-                return true;
+    public boolean canEnchantItem(@Nullable ItemStack itemStack){
+        if(itemStack != null) {
+            for (EnchantmentTarget t : getItemTargets()) {
+                if (t.includes(itemStack)) return true;
             }
         }
         return false;
@@ -328,22 +331,26 @@ public abstract class Enchantment {
     public void onConfigReloaded(){}
 
     @Override
-    public boolean equals(Object object){
-        if(object != null && object.getClass() == this.getClass()){
-            Enchantment e = (Enchantment) object;
-            return new EqualsBuilder().append(e.id, this.id).build();
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Enchantment that = (Enchantment) o;
+        return maxLevel == that.maxLevel &&
+                id.equals(that.id) &&
+                Arrays.equals(description, that.description) &&
+                Objects.equals(author, that.author) &&
+                Objects.equals(proposer, that.proposer) &&
+                Arrays.equals(itemTargets, that.itemTargets) &&
+                Objects.equals(configFile, that.configFile) &&
+                Objects.equals(chat, that.chat) &&
+                config.equals(that.config) &&
+                eventListeners.equals(that.eventListeners) &&
+                worldList.equals(that.worldList) &&
+                computation_caching.equals(that.computation_caching);
     }
 
     @Override
-    public int hashCode(){
-        return new HashCodeBuilder(17, 21)
-                .append(this.id)
-                .append(this.author)
-                .append(this.itemTargets)
-                .append(this.proposer)
-                .append(this.maxLevel)
-                .append(this.description).build();
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

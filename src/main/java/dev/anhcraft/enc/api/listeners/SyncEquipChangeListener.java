@@ -5,16 +5,17 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 /**
- * The listener of equip events.
+ * The listener of equip change events.
  */
-public abstract class SyncEquipListener implements IListener {
+public abstract class SyncEquipChangeListener implements IListener {
     /**
-     * This method is called when a player equips an armor.
+     * This method is called when a player changes his equipment.
      * @param report the report
-     * @param armor the armor
+     * @param oldArmor the old armor
+     * @param newArmor the new armor
      * @param slot the slot
      */
-    public abstract void onEquip(ActionReport report, ItemStack armor, EquipmentSlot slot);
+    public abstract void onEquip(ActionReport report, ItemStack oldArmor, ItemStack newArmor, EquipmentSlot slot);
 
     @Override
     public boolean canPrevent(){

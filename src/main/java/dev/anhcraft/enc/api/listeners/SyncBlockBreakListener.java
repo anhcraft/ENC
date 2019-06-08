@@ -1,8 +1,8 @@
 package dev.anhcraft.enc.api.listeners;
 
 import dev.anhcraft.enc.api.ActionReport;
-import org.anhcraft.spaciouslib.inventory.EquipSlot;
 import org.bukkit.block.Block;
+import org.bukkit.inventory.EquipmentSlot;
 
 /**
  * The listener of block-breaking events.
@@ -21,8 +21,8 @@ public abstract class SyncBlockBreakListener implements IListener {
     }
 
     @Override
-    public EquipSlot getItemSlot(){
-        return EquipSlot.MAINHAND;
+    public EquipmentSlot getItemSlot(){
+        return EquipmentSlot.HAND;
     }
 }
 

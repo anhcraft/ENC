@@ -1,10 +1,12 @@
 package dev.anhcraft.enc.api;
 
+import dev.anhcraft.jvmkit.utils.Condition;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -14,7 +16,7 @@ import java.util.UUID;
 public class ActionReport {
     private UUID player;
     private ItemStack itemStack;
-    private HashMap<Enchantment, Integer> enchantmentMap;
+    private Map<Enchantment, Integer> enchantmentMap;
     private boolean prevented;
 
     /**
@@ -24,7 +26,10 @@ public class ActionReport {
      * @param enchantmentMap all available enchantments in the checked stack
      * @param prevented whether the action is going to be prevented
      */
-    public ActionReport(Player player, ItemStack itemStack, HashMap<Enchantment, Integer> enchantmentMap, boolean prevented) {
+    public ActionReport(@NotNull Player player, @NotNull ItemStack itemStack, @NotNull  Map<Enchantment, Integer> enchantmentMap, boolean prevented) {
+        Condition.argNotNull("player", player);
+        Condition.argNotNull("itemStack", itemStack);
+        Condition.argNotNull("enchantmentMap", enchantmentMap);
         this.player = player.getUniqueId();
         this.itemStack = itemStack;
         this.enchantmentMap = enchantmentMap;
@@ -35,6 +40,7 @@ public class ActionReport {
      * Gets the player who did the action.
      * @return player
      */
+    @NotNull
     public Player getPlayer() {
         return Bukkit.getPlayer(player);
     }
@@ -51,7 +57,7 @@ public class ActionReport {
      * Gets all available enchantments in the checked stack.
      * @return a map of available enchantments which includes their names and their levels
      */
-    public HashMap<Enchantment, Integer> getEnchantmentMap() {
+    public Map<Enchantment, Integer> getEnchantmentMap() {
         return enchantmentMap;
     }
 

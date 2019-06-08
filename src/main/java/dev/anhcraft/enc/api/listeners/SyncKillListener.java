@@ -1,8 +1,8 @@
 package dev.anhcraft.enc.api.listeners;
 
 import dev.anhcraft.enc.api.ActionReport;
-import org.anhcraft.spaciouslib.inventory.EquipSlot;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -25,8 +25,8 @@ public abstract class SyncKillListener implements IListener {
     }
 
     @Override
-    public EquipSlot getItemSlot(){
-        return EquipSlot.MAINHAND;
+    public EquipmentSlot getItemSlot(){
+        return EquipmentSlot.HAND;
     }
 }
 
