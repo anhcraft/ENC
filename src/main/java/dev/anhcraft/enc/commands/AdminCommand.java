@@ -12,21 +12,22 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-@CommandAlias("enca|encadmin")
+@CommandAlias("enca|encadmin|/enc")
 public class AdminCommand extends BaseCommand {
     @Default
     @CatchUnknown
     public void root(CommandSender sender) {
         ENC.getPluginChat()
-                .message(sender, "/enca: show all commands for admin")
-                .message(sender, "/enca enchant list: list all available enchantments")
-                .message(sender, "/enca enchant add <id/name> <level>: add an enchantment")
-                .message(sender, "/enca enchant remove <id/name>: remove an enchantment")
-                .message(sender, "/enca enchant removeall: remove all enchantments")
-                .message(sender, "/enca gem list: lists all available gems")
-                .message(sender, "/enca gem assign <id/name> <successRate> <protectionRate>: assigns the item in your hand to be a gem")
-                .message(sender, "/enca gem detach: detaches the gem from the item in your hand")
-                .message(sender, "/enca reload: reload the plugin");
+                .message(sender, "//enc: show all commands for admin")
+                .message(sender, "//enc enchant list: list all available enchantments")
+                .message(sender, "//enc enchant add <id/name> <level>: add an enchantment")
+                .message(sender, "//enc enchant remove <id/name>: remove an enchantment")
+                .message(sender, "//enc enchant removeall: remove all enchantments")
+                .message(sender, "//enc gem list: lists all available gems")
+                .message(sender, "//enc gem assign <id/name> <successRate> <protectionRate>: assigns the item in your hand to be a gem")
+                .message(sender, "//enc gem detach: detaches the gem from the item in your hand")
+                .message(sender, "//enc reload: reload the plugin")
+                .message(sender, "Aliases: /enca, /encadmin");
     }
 
     @Subcommand("enchant list")
