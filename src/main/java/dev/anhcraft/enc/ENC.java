@@ -1,31 +1,40 @@
 package dev.anhcraft.enc;
 
+import co.aikar.commands.PaperCommandManager;
 import co.aikar.taskchain.BukkitTaskChainFactory;
 import co.aikar.taskchain.TaskChainFactory;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import dev.anhcraft.craftkit.common.utils.SpigetApiUtil;
+import dev.anhcraft.craftkit.kits.chat.Chat;
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.EnchantmentAPI;
 import dev.anhcraft.enc.api.gem.Gem;
 import dev.anhcraft.enc.api.gem.GemAPI;
 import dev.anhcraft.enc.commands.AdminCommand;
-import dev.anhcraft.enc.commands.UserCommand;
+import dev.anhcraft.enc.commands.PlayerCommand;
 import dev.anhcraft.enc.enchantments.*;
 import dev.anhcraft.enc.listeners.*;
 import dev.anhcraft.enc.listeners.gem.GemDropListener;
 import dev.anhcraft.enc.listeners.gem.GemMergeListener;
-import dev.anhcraft.enc.utils.FilePaths;
-import org.anhcraft.spaciouslib.io.DirectoryManager;
-import org.anhcraft.spaciouslib.io.FileManager;
-import org.anhcraft.spaciouslib.utils.Chat;
-import org.anhcraft.spaciouslib.utils.IOUtils;
+import dev.anhcraft.jvmkit.utils.FileUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 public final class ENC extends JavaPlugin {
+    private static final File ROOT_FOLDER = new File("plugins/ENC/");
+    private static final File LOCALE_FOLDER = new File(ROOT_FOLDER, "locale/");
+    public static final File ENCHANTMENT_FOLDER = new File(ROOT_FOLDER, "enchantment/");
+    private static final File GENERAL_CONFIG_FILE = new File(ROOT_FOLDER, "general.yml");
+    private static final File OLD_GENERAL_CONFIG_FILE = new File(ROOT_FOLDER, "general.old.yml");
+    private static final File GEM_CONFIG_FILE = new File(ROOT_FOLDER, "gems.yml");
     private static final YamlConfiguration localeConfig = new YamlConfiguration();
     private static final YamlConfiguration generalConfig = new YamlConfiguration();
     private static final YamlConfiguration gemConfig = new YamlConfiguration();
@@ -55,19 +64,17 @@ public final class ENC extends JavaPlugin {
         return taskChainFactory;
     }
 
-    private void updateConfig() {
+    private void updateGeneralCof() {
         int currentVersion = systemConfig.getAsJsonPrimitive("config_version").getAsInt();
         if(generalConfig.getInt("config_version", 0) < currentVersion){
             try {
                 getLogger().warning("BE WARNED THAT YOUR CONFIGURATION IS OUTDATED!");
                 getLogger().info("We are going to update your current configuration!");
                 getLogger().info(">> Creating the backup for the old one...");
-                new FileManager(FilePaths.OLD_GENERAL_CONFIG_FILE).create().write(
-                        new FileManager(FilePaths.GENERAL_CONFIG_FILE).read());
+                FileUtil.copy(GENERAL_CONFIG_FILE, OLD_GENERAL_CONFIG_FILE);
                 getLogger().info(">> Updating the configuration to be latest...");
-                new FileManager(FilePaths.GENERAL_CONFIG_FILE).write(IOUtils.toByteArray(
-                        getResource("general.yml")));
-                generalConfig.load(FilePaths.GENERAL_CONFIG_FILE);
+                FileUtil.write(GENERAL_CONFIG_FILE, getResource("general.yml"));
+                generalConfig.load(GENERAL_CONFIG_FILE);
                 getLogger().info("Updated successfully!");
             } catch(Exception e) {
                 getLogger().warning("Failed to upgrade the configuration!");
@@ -78,23 +85,47 @@ public final class ENC extends JavaPlugin {
         }
     }
 
+    private void updateLocaleConf(File localeFile){
+        var mainLocale = YamlConfiguration.loadConfiguration(new InputStreamReader(getClass().getResourceAsStream("/locale/en-us.yml")));
+        var needSave = false;
+        for(String s : mainLocale.getKeys(true)){
+            if(!localeConfig.isSet(s)) {
+                localeConfig.set(s, mainLocale.get(s));
+                needSave = true;
+            }
+        }
+        if(needSave) {
+            try {
+                localeConfig.save(localeFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void reloadPlugin() throws Exception {
         // init files and directories
-        new DirectoryManager(FilePaths.ROOT_FOLDER).mkdir();
-        new DirectoryManager(FilePaths.LOCALE_FOLDER).mkdir();
-        new DirectoryManager(FilePaths.ENCHANTMENT_FOLDER).mkdir();
-        new FileManager(FilePaths.GENERAL_CONFIG_FILE).initFile(IOUtils.toByteArray(getResource("general.yml")));
-        new FileManager(FilePaths.GEM_CONFIG_FILE).initFile(IOUtils.toByteArray(getResource("gems.yml")));
+        ROOT_FOLDER.mkdir();
+        LOCALE_FOLDER.mkdir();
+        ENCHANTMENT_FOLDER.mkdir();
+        FileUtil.init(GENERAL_CONFIG_FILE, getResource("general.yml"));
+        FileUtil.init(GEM_CONFIG_FILE, getResource("gems.yml"));
+
         // load main configs
-        systemConfig = new Gson().fromJson(IOUtils.toString(getResource("system.json")), JsonObject.class);
-        generalConfig.load(FilePaths.GENERAL_CONFIG_FILE);
-        // update the general config
-        updateConfig();
+        systemConfig = new Gson().fromJson(
+                new String(getResource("system.json").readAllBytes(), StandardCharsets.UTF_8), JsonObject.class);
+        generalConfig.load(GENERAL_CONFIG_FILE);
+        // update general config
+        updateGeneralCof();
+
         // load other configs
-        gemConfig.load(FilePaths.GEM_CONFIG_FILE);
-        File localeFile = new File(FilePaths.LOCALE_FOLDER, generalConfig.getString("plugin.locale_file"));
-        new FileManager(localeFile).initFile(IOUtils.toByteArray(getClass().getResourceAsStream("/locale/"+generalConfig.getString("plugin.locale_file"))));
+        gemConfig.load(GEM_CONFIG_FILE);
+        var localeFile = new File(LOCALE_FOLDER, generalConfig.getString("plugin.locale_file"));
+        FileUtil.init(localeFile, getClass().getResourceAsStream("/locale/"+generalConfig.getString("plugin.locale_file")));
         localeConfig.load(localeFile);
+        // update locale config
+        updateLocaleConf(localeFile);
+
         // init chat
         chat = new Chat(generalConfig.getString("plugin.prefix"));
         // reload enchantment config
@@ -139,6 +170,8 @@ public final class ENC extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new KillListener(), this);
         getServer().getPluginManager().registerEvents(new JumpListener(), this);
         getServer().getPluginManager().registerEvents(new EquipListener(), this);
+        getServer().getPluginManager().registerEvents(new UnequipListener(), this);
+        getServer().getPluginManager().registerEvents(new EquipChangeListener(), this);
         getServer().getPluginManager().registerEvents(new BlockBreakListener(), this);
         getServer().getPluginManager().registerEvents(new GemMergeListener(), this);
         getServer().getPluginManager().registerEvents(new GemDropListener(), this);
@@ -146,8 +179,9 @@ public final class ENC extends JavaPlugin {
     }
 
     private void registerCommand() {
-        new AdminCommand().run();
-        new UserCommand().run();
+        var cm = new PaperCommandManager(this);
+        cm.registerCommand(new PlayerCommand());
+        cm.registerCommand(new AdminCommand());
     }
 
     @Override
@@ -161,15 +195,25 @@ public final class ENC extends JavaPlugin {
             e.printStackTrace();
         }
         // integrations
-        if(KMLReady = getServer().getPluginManager().isPluginEnabled("KeepMyLife")){
-            chat.sendConsole("&aHooked to KeepMyLife successfully!");
-        }
+        if(KMLReady = getServer().getPluginManager().isPluginEnabled("KeepMyLife"))
+            chat.messageConsole("&aHooked to KeepMyLife successfully!");
         // register stuffs
         registerListeners();
         registerEnchants();
         registerCommand();
 
-        chat.sendConsole("&eDonate me if you like this plugin <3");
-        chat.sendConsole("&ehttps://paypal.me/anhcraft");
+        chat.messageConsole("&eDonate me if you like this plugin <3");
+        chat.messageConsole("&ehttps://paypal.me/anhcraft");
+
+        if(generalConfig.getBoolean("plugin.allow_check_update")){
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    var expect = SpigetApiUtil.getResourceLatestVersion("64871").chars().sum();
+                    var current = getDescription().getVersion().chars().sum();
+                    if(current < expect) chat.messageConsole("&cENC is outdated! Please consider updating xD");
+                }
+            }.runTaskLater(this, 60);
+        }
     }
 }
