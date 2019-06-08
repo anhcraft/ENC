@@ -10,6 +10,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class Poison extends Enchantment {
     public Poison() {
@@ -20,13 +21,11 @@ public class Poison extends Enchantment {
         getEventListeners().add(new AsyncAttackListener() {
             @Override
             public void onAttack(ActionReport report, LivingEntity entity, double damage) {
-                if(report.isPrevented()){
-                    return;
-                }
-                double chance = computeConfigValue("chance", report)/100d;
+                if(report.isPrevented()) return;
+                var chance = computeConfigValue("chance", report)/100d;
                 if(Math.random() <= chance){
-                    int level = (int) computeConfigValue("effect_level", report);
-                    int duration = (int) computeConfigValue("effect_duration", report);
+                    var level = (int) computeConfigValue("effect_level", report);
+                    var duration = (int) computeConfigValue("effect_duration", report);
                     ENC.getTaskChainFactory().newChain().sync(() ->
                             entity.addPotionEffect(new PotionEffect(PotionEffectType.POISON, duration, level))
                     ).execute();
@@ -37,7 +36,7 @@ public class Poison extends Enchantment {
 
     @Override
     public void onRegistered(){
-        HashMap<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("chance", "{level}*3.5");
         map.put("effect_level", "ceil({level}*0.5)");
         map.put("effect_duration", "{level}*30+20");

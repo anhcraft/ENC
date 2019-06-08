@@ -1,9 +1,9 @@
 package dev.anhcraft.enc.enchantments;
 
+import dev.anhcraft.craftkit.cb_common.lang.enumeration.NMSVersion;
 import dev.anhcraft.enc.api.ActionReport;
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.listeners.SyncKillListener;
-import org.anhcraft.spaciouslib.utils.GameVersion;
 import org.bukkit.Material;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
@@ -12,8 +12,8 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 
 public class Chef extends Enchantment {
-    private static final Material PORK = GameVersion.is1_13Above() ? Material.COOKED_PORKCHOP : Material.valueOf("GRILLED_PORK");
-    private static final Material COOKED_FISH = GameVersion.is1_13Above() ? null : Material.valueOf("COOKED_FISH");
+    private static final Material PORK = NMSVersion.getNMSVersion().isNewerOrSame(NMSVersion.v1_13_R1) ? Material.valueOf("COOKED_PORKCHOP") : Material.GRILLED_PORK;
+    private static final Material COOKED_FISH = NMSVersion.getNMSVersion().isNewerOrSame(NMSVersion.v1_13_R1) ? null : Material.COOKED_FISH;
 
     public Chef() {
         super("Chef", new String[]{
@@ -24,8 +24,8 @@ public class Chef extends Enchantment {
         getEventListeners().add(new SyncKillListener() {
             @Override
             public void onKill(ActionReport report, LivingEntity entity, List<ItemStack> drops) {
-                for(ItemStack drop : drops) {
-                    String mt = drop.getType().toString();
+                for(var drop : drops) {
+                    var mt = drop.getType().toString();
                     switch(mt) {
                         case "PORKCHOP":
                         case "PORK":
@@ -40,10 +40,10 @@ public class Chef extends Enchantment {
                             drop.setType(Material.COOKED_CHICKEN);
                             break;
                         case "COD":
-                            drop.setType(Material.COOKED_COD);
+                            drop.setType(Material.valueOf("COOKED_COD"));
                             break;
                         case "SALMON":
-                            drop.setType(Material.COOKED_SALMON);
+                            drop.setType(Material.valueOf("COOKED_SALMON"));
                             break;
                         case "RAW_FISH":
                             drop.setType(COOKED_FISH);

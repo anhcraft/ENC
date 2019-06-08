@@ -1,18 +1,18 @@
 package dev.anhcraft.enc.listeners;
 
-import dev.anhcraft.craftkit.events.ArmorEquipEvent;
+import dev.anhcraft.craftkit.events.ArmorUnequipEvent;
 import dev.anhcraft.craftkit.utils.ItemUtil;
 import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.ActionReport;
 import dev.anhcraft.enc.api.EnchantmentAPI;
-import dev.anhcraft.enc.api.listeners.AsyncEquipListener;
-import dev.anhcraft.enc.api.listeners.SyncEquipListener;
+import dev.anhcraft.enc.api.listeners.AsyncUnquipListener;
+import dev.anhcraft.enc.api.listeners.SyncUnquipListener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-public class EquipListener implements Listener {
+public class UnequipListener implements Listener {
     @EventHandler(ignoreCancelled = true)
-    public void equip(ArmorEquipEvent event){
+    public void unequip(ArmorUnequipEvent event){
         var player = event.getPlayer();
         var armor = event.getArmor();
         var slot = event.getSlot();
@@ -24,16 +24,17 @@ public class EquipListener implements Listener {
             var listenerChain = ENC.getTaskChainFactory().newChain();
             for(var e : enchants.entrySet()) {
                 var enchantment = e.getKey();
-                if(!enchantment.isEnabled() || !enchantment.isAllowedWorld(player.getWorld().getName())) continue;
+                if(!enchantment.isEnabled() ||
+                        !enchantment.isAllowedWorld(player.getWorld().getName())) continue;
                 enchantment.getEventListeners().stream()
-                        .filter(eventListener -> eventListener instanceof SyncEquipListener)
+                        .filter(eventListener -> eventListener instanceof SyncUnquipListener)
                         .forEach(eventListener -> {
-                            if(eventListener instanceof AsyncEquipListener) {
-                                listenerChain.async(() -> ((AsyncEquipListener) eventListener)
-                                        .onEquip(report, armor, slot));
+                            if(eventListener instanceof AsyncUnquipListener) {
+                                listenerChain.async(() -> ((AsyncUnquipListener) eventListener)
+                                        .onUnequip(report, armor, slot));
                             } else{
-                                listenerChain.sync(() -> ((SyncEquipListener) eventListener)
-                                        .onEquip(report, armor, slot));
+                                listenerChain.sync(() -> ((SyncUnquipListener) eventListener)
+                                        .onUnequip(report, armor, slot));
                             }
                         });
             }

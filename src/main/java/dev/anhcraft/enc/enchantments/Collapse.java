@@ -1,27 +1,25 @@
 package dev.anhcraft.enc.enchantments;
 
+import dev.anhcraft.craftkit.utils.BlockUtil;
+import dev.anhcraft.craftkit.utils.LocationUtil;
 import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.ActionReport;
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.listeners.AsyncJumpListener;
-import dev.anhcraft.enc.utils.ReplaceUtils;
-import dev.anhcraft.enc.utils.UnitUtils;
-import org.anhcraft.spaciouslib.protocol.BlockBreakAnimation;
-import org.anhcraft.spaciouslib.utils.CommonUtils;
-import org.anhcraft.spaciouslib.utils.GameVersion;
-import org.anhcraft.spaciouslib.utils.LocationUtils;
-import org.anhcraft.spaciouslib.utils.RandomUtils;
+import dev.anhcraft.enc.utils.ReplaceUtil;
+import dev.anhcraft.enc.utils.UnitUtil;
+import dev.anhcraft.jvmkit.utils.ArrayUtil;
+import dev.anhcraft.jvmkit.utils.RandomUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.material.MaterialData;
 import org.bukkit.util.noise.SimplexOctaveGenerator;
 
 import java.util.*;
@@ -42,42 +40,36 @@ public class Collapse extends Enchantment implements Listener {
         getEventListeners().add(new AsyncJumpListener() {
             @Override
             public void onJump(ActionReport report, boolean onSpot) {
-                if(!onSpot){
-                    return;
-                }
-                List<Location> breakBlocks = new ArrayList<>();
-                boolean allowedMaterialList = getConfig().getBoolean("allowed_material_list");
-                boolean falling = getConfig().getBoolean("block_falling");
-                boolean physics = getConfig().getBoolean("block_physics");
-                boolean sound = getConfig().getBoolean("sound");
-                int r = RandomUtils.randomInt(
+                if(!onSpot) return;
+                List<Block> breakBlocks = new ArrayList<>();
+                var allowedMaterialList = getConfig().getBoolean("allowed_material_list");
+                var falling = getConfig().getBoolean("block_falling");
+                var physics = getConfig().getBoolean("block_physics");
+                var sound = getConfig().getBoolean("sound");
+                var r = RandomUtil.randomInt(
                         (int) computeConfigValue("min_affected_radius", report),
                         (int) computeConfigValue("max_affected_radius", report));
-                double min_h = computeConfigValue("min_affected_depth", report);
-                double max_h = computeConfigValue("max_affected_depth", report);
-                double del_h = max_h-min_h;
-                long timeout = (long) UnitUtils.tick2ms(computeConfigValue("timeout", report));
+                var min_h = computeConfigValue("min_affected_depth", report);
+                var max_h = computeConfigValue("max_affected_depth", report);
+                var del_h = max_h-min_h;
+                var timeout = (long) UnitUtil.tick2ms(computeConfigValue("timeout", report));
 
-                SimplexOctaveGenerator gen = new SimplexOctaveGenerator(report.getPlayer().getWorld().getSeed(), 5);
-                Location loc = report.getPlayer().getLocation().getBlock().getLocation();
-                Location[] locs = LocationUtils.getNearbyLocations(loc, r, 0, r);
+                var gen = new SimplexOctaveGenerator(report.getPlayer().getWorld().getSeed(), 5);
+                var loc = report.getPlayer().getLocation();
+                var locs = LocationUtil.getNearbyLocations(loc, r, 0, r);
                 for(Location xloc : locs){
                     // use noise to calculate the depth
-                    double y = (gen.noise(xloc.getX(), xloc.getZ(),
+                    var y = (gen.noise(xloc.getX(), xloc.getZ(),
                             0, 0, 0.01, 0.08, true)+1)/2d * del_h + min_h;
-                    for(int f = 0; f < y; f++) {
+                    for(var f = 0; f < y; f++) {
                         // the block being damaged or broken
-                        Location cloc = xloc.clone().subtract(0, f, 0);
-                        if(allowedMaterialList != MATERIAL_LIST.contains(cloc.getBlock().getType())){
-                            continue;
-                        }
-                        long currentTime = System.currentTimeMillis();
+                        var cloc = xloc.clone().subtract(0, f, 0);
+                        if(allowedMaterialList != MATERIAL_LIST.contains(cloc.getBlock().getType())) continue;
+                        var currentTime = System.currentTimeMillis();
                         if(DAMAGED_BLOCKS.containsKey(cloc)){
-                            long lastTime = DAMAGED_BLOCKS.get(cloc);
+                            var lastTime = DAMAGED_BLOCKS.get(cloc);
                             // if not time out yet, this block is going to be broken
-                            if(currentTime-lastTime <= timeout) {
-                                breakBlocks.add(cloc);
-                            }
+                            if(currentTime-lastTime <= timeout) breakBlocks.add(cloc.getBlock());
                             // clean old data
                             DAMAGED_BLOCKS.remove(cloc);
                         } else {
@@ -88,39 +80,26 @@ public class Collapse extends Enchantment implements Listener {
 
                 // reverse the order to put lowest blocks at first
                 Collections.reverse(breakBlocks);
+                List<Player> viewers = report.getPlayer().getWorld().getNearbyEntities(loc, 30, 30, 30)
+                        .stream().filter(entity -> entity instanceof Player)
+                        .map(entity -> (Player) entity).collect(Collectors.toList());
                 ENC.getTaskChainFactory().newChain()
-                        .async(() -> breakBlocks.forEach(block1 -> BlockBreakAnimation.create(block1.hashCode(), block1, 1).sendNearby(block1, 50))).delay(10)
-                        .async(() -> breakBlocks.forEach(block1 -> BlockBreakAnimation.create(block1.hashCode(), block1, 3).sendNearby(block1, 50))).delay(10)
-                        .async(() -> breakBlocks.forEach(block1 -> BlockBreakAnimation.create(block1.hashCode(), block1, 5).sendNearby(block1, 50))).delay(10)
-                        .async(() -> breakBlocks.forEach(block1 -> BlockBreakAnimation.create(block1.hashCode(), block1, 7).sendNearby(block1, 50))).delay(10)
-                        .async(() -> breakBlocks.forEach(block1 -> BlockBreakAnimation.create(block1.hashCode(), block1, 9).sendNearby(block1, 50))).delay(10)
+                        .async(() -> breakBlocks.forEach(block1 -> BlockUtil.createBreakAnimation(block1.hashCode(), block1, 1, viewers))).delay(10)
+                        .async(() -> breakBlocks.forEach(block1 -> BlockUtil.createBreakAnimation(block1.hashCode(), block1, 3, viewers))).delay(10)
+                        .async(() -> breakBlocks.forEach(block1 -> BlockUtil.createBreakAnimation(block1.hashCode(), block1, 5, viewers))).delay(10)
+                        .async(() -> breakBlocks.forEach(block1 -> BlockUtil.createBreakAnimation(block1.hashCode(), block1, 7, viewers))).delay(10)
+                        .async(() -> breakBlocks.forEach(block1 -> BlockUtil.createBreakAnimation(block1.hashCode(), block1, 9, viewers))).delay(10)
                         .sync(() -> {
-                            if(GameVersion.is1_13Above()) {
-                                breakBlocks.forEach(block1 -> {
-                                    Block b = block1.getBlock();
-                                    if(falling) {
-                                        FallingBlock fb = block1.getWorld().spawnFallingBlock(block1,
-                                                b.getBlockData());
-                                        fb.setDropItem(false);
-                                        FALLING_BLOCKS.add(fb.getEntityId());
-                                    }
-                                    b.setType(Material.AIR, physics);
-                                });
-                            } else {
-                                breakBlocks.forEach(block1 -> {
-                                    Block b = block1.getBlock();
-                                    if(falling) {
-                                        FallingBlock fb = block1.getWorld().spawnFallingBlock(block1,
-                                                new MaterialData(b.getType()));
-                                        fb.setDropItem(false);
-                                        FALLING_BLOCKS.add(fb.getEntityId());
-                                    }
-                                    b.setType(Material.AIR, physics);
-                                });
-                            }
-                            if(sound && !breakBlocks.isEmpty()) {
-                                report.getPlayer().playSound(report.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 3f, 1f);
-                            }
+                            breakBlocks.forEach(block1 -> {
+                                if(falling) {
+                                    var fb = block1.getWorld().spawnFallingBlock(block1.getLocation(),
+                                            block1.getType(), block1.getData());
+                                    fb.setDropItem(false);
+                                    FALLING_BLOCKS.add(fb.getEntityId());
+                                }
+                                block1.setType(Material.AIR, physics);
+                            });
+                            if(sound && !breakBlocks.isEmpty()) report.getPlayer().playSound(report.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 3f, 1f);
                         })
                         .execute();
             }
@@ -129,7 +108,7 @@ public class Collapse extends Enchantment implements Listener {
 
     @Override
     public void onRegistered(){
-        HashMap<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("min_affected_radius", "2");
         map.put("max_affected_radius", "{level}*2+2");
         map.put("min_affected_depth", "{level}");
@@ -150,14 +129,14 @@ public class Collapse extends Enchantment implements Listener {
     public void onConfigReloaded(){
         MATERIAL_LIST.clear();
         HashMap<String, List<String>> groups = new HashMap<>();
-        groups.put("all", CommonUtils.toList(Material.values()).stream()
+        groups.put("all", ArrayUtil.toList(Material.values()).stream()
                 .map(Material::name)
                 .collect(Collectors.toList()));
-        groups.put("solid", CommonUtils.toList(Material.values()).stream()
+        groups.put("solid", ArrayUtil.toList(Material.values()).stream()
                 .filter(Material::isSolid)
                 .map(Material::name)
                 .collect(Collectors.toList()));
-        MATERIAL_LIST.addAll(ReplaceUtils.replaceVariables(getConfig().getStringList("material_list"),
+        MATERIAL_LIST.addAll(ReplaceUtil.replaceVariables(getConfig().getStringList("material_list"),
                 groups, false).stream().map(Material::valueOf).collect(Collectors.toList()));
     }
 

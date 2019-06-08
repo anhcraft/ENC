@@ -10,6 +10,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class Dizziness extends Enchantment {
     public Dizziness() {
@@ -20,15 +21,11 @@ public class Dizziness extends Enchantment {
         getEventListeners().add(new AsyncAttackListener() {
             @Override
             public void onAttack(ActionReport report, LivingEntity entity, double damage) {
-                if(report.isPrevented()){
-                    return;
-                }
-                double chance = computeConfigValue("chance", report)/100d;
-                if(Math.random() > chance) {
-                    return;
-                }
-                int level = (int) computeConfigValue("effect_level", report);
-                int duration = (int) computeConfigValue("effect_duration", report);
+                if(report.isPrevented()) return;
+                var chance = computeConfigValue("chance", report)/100d;
+                if(Math.random() > chance) return;
+                var level = (int) computeConfigValue("effect_level", report);
+                var duration = (int) computeConfigValue("effect_duration", report);
                 ENC.getTaskChainFactory().newChain().sync(() ->
                         entity.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, duration, level))
                 ).execute();
@@ -38,7 +35,7 @@ public class Dizziness extends Enchantment {
 
     @Override
     public void onRegistered(){
-        HashMap<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("chance", "{level}*3.5");
         map.put("effect_level", "ceil({level}*0.4)");
         map.put("effect_duration", "{level}*10+30");

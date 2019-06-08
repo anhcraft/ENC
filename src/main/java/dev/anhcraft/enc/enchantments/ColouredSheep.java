@@ -3,7 +3,7 @@ package dev.anhcraft.enc.enchantments;
 import dev.anhcraft.enc.api.ActionReport;
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.listeners.SyncAttackListener;
-import org.anhcraft.spaciouslib.utils.RandomUtils;
+import dev.anhcraft.jvmkit.utils.RandomUtil;
 import org.bukkit.DyeColor;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
@@ -20,10 +20,8 @@ public class ColouredSheep extends Enchantment {
             @Override
             public void onAttack(ActionReport report, LivingEntity entity, double damage) {
                 if(entity instanceof Sheep){
-                    Sheep s = (Sheep) entity;
-                    if(!s.isSheared()){
-                        s.setColor(RandomUtils.pickRandom(DyeColor.values()));
-                    }
+                    var s = (Sheep) entity;
+                    if(!s.isSheared())  s.setColor(DyeColor.values()[RandomUtil.randomInt(0, DyeColor.values().length-1)]);
                 }
             }
         });

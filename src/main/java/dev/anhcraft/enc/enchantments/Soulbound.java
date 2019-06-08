@@ -7,6 +7,7 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class Soulbound extends Enchantment {
     public Soulbound() {
@@ -18,20 +19,16 @@ public class Soulbound extends Enchantment {
         getEventListeners().add(new SyncDeathDropListener() {
             @Override
             public void onDrop(ActionReport report, ItemStack itemStack) {
-                if(report.isPrevented()){
-                    return;
-                }
-                double chance = computeConfigValue("chance", report)/100d;
-                if(Math.random() <= chance){
-                    report.setPrevented(true);
-                }
+                if(report.isPrevented()) return;
+                var chance = computeConfigValue("chance", report)/100d;
+                if(Math.random() <= chance) report.setPrevented(true);
             }
         });
     }
 
     @Override
     public void onRegistered(){
-        HashMap<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("chance", "{level}*20");
         initConfigEntries(map);
     }

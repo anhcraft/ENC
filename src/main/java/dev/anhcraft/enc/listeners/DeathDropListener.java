@@ -1,47 +1,38 @@
 package dev.anhcraft.enc.listeners;
 
 import co.aikar.taskchain.TaskChain;
+import dev.anhcraft.craftkit.utils.ItemUtil;
 import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.ActionReport;
-import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.EnchantmentAPI;
 import dev.anhcraft.enc.api.listeners.AsyncDeathDropListener;
 import dev.anhcraft.enc.api.listeners.SyncDeathDropListener;
-import org.anhcraft.keepmylife.events.PlayerKeepItemEvent;
-import org.anhcraft.spaciouslib.builders.ArrayBuilder;
-import org.anhcraft.spaciouslib.utils.InventoryUtils;
-import org.bukkit.Location;
+import dev.anhcraft.jvmkit.utils.CollectionUtil;
+import dev.anhcraft.keepmylife.api.events.KeepItemEvent;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
 public class DeathDropListener {
     public static class KeepMyLife implements Listener {
-        @EventHandler(priority = EventPriority.MONITOR)
-        public void keep(PlayerKeepItemEvent event){
-            Player owner = event.getPlayer();
-            int i = 0;
-            for(Iterator<ItemStack> it = event.getDropItems().iterator(); it.hasNext();) {
-                ItemStack item = it.next();
-                HashMap<Enchantment, Integer> enchants = EnchantmentAPI.listEnchantments(item);
-                if(enchants.isEmpty()) {
-                    continue;
-                }
-                ActionReport report = new ActionReport(owner, item, enchants, false);
+        @EventHandler
+        public void keep(KeepItemEvent event){
+            var owner = event.getPlayer();
+            var i = 0;
+            for(var it = event.getDropItems().iterator(); it.hasNext();) {
+                var item = it.next();
+                var enchants = EnchantmentAPI.listEnchantments(item);
+                if(enchants.isEmpty()) continue;
+                var report = new ActionReport(owner, item, enchants, false);
                 TaskChain<Boolean> listenerChain = ENC.getTaskChainFactory().newChain();
-                for(Map.Entry<Enchantment, Integer> e : enchants.entrySet()) {
-                    Enchantment enchantment = e.getKey();
-                    if(!enchantment.isEnabled() || !enchantment.isAllowedWorld(owner.getWorld().getName())) {
-                        continue;
-                    }
+                for(var e : enchants.entrySet()) {
+                    var enchantment = e.getKey();
+                    if(!enchantment.isEnabled() || !enchantment.isAllowedWorld(owner.getWorld().getName())) continue;
                     enchantment.getEventListeners().stream()
                             .filter(eventListener -> eventListener instanceof SyncDeathDropListener)
                             .forEach(eventListener -> {
@@ -65,26 +56,24 @@ public class DeathDropListener {
     }
 
     public static class Default implements Listener {
-        @EventHandler(priority = EventPriority.MONITOR)
+        @EventHandler
         public void death(PlayerDeathEvent event){
-            if(event.getKeepInventory()) {
-                return;
-            }
-            Player owner = event.getEntity();
-            Location location = owner.getLocation();
-            ArrayBuilder keptItems = new ArrayBuilder(ItemStack.class);
-            // we should use getInventory#getContents() instead of event#getDrops() to get correct item order
-            for(ItemStack item : owner.getInventory().getContents()){
-                if(InventoryUtils.isNull(item)){
-                    keptItems.append(new ItemStack(Material.AIR, 1));
+            if(event.getKeepInventory()) return;
+            var owner = event.getEntity();
+            var location = owner.getLocation();
+            // use linked list to keep the item order
+            List<ItemStack> keptItems = new LinkedList<>();
+            for(var item : owner.getInventory().getContents()){
+                if(ItemUtil.isNull(item)){
+                    keptItems.add(new ItemStack(Material.AIR, 1));
                     continue;
                 }
-                HashMap<Enchantment, Integer> enchants = EnchantmentAPI.listEnchantments(item);
+                var enchants = EnchantmentAPI.listEnchantments(item);
                 if(!enchants.isEmpty()){
-                    ActionReport report = new ActionReport(owner, item, enchants, false);
+                    var report = new ActionReport(owner, item, enchants, false);
                     TaskChain<Boolean> listenerChain = ENC.getTaskChainFactory().newChain();
-                    for(Map.Entry<Enchantment, Integer> e : enchants.entrySet()) {
-                        Enchantment enchantment = e.getKey();
+                    for(var e : enchants.entrySet()) {
+                        var enchantment = e.getKey();
                         if(enchantment.isEnabled() && enchantment.isAllowedWorld(owner.getWorld().getName())) {
                             enchantment.getEventListeners().stream()
                                 .filter(eventListener -> eventListener instanceof SyncDeathDropListener)
@@ -101,14 +90,14 @@ public class DeathDropListener {
                     }
                     listenerChain.execute();
                     if(report.isPrevented()){
-                        keptItems.append(item);
+                        keptItems.add(item);
                         continue;
                     }
                 }
                 location.getWorld().dropItemNaturally(location, item);
-                keptItems.append(new ItemStack(Material.AIR, 1));
+                keptItems.add(new ItemStack(Material.AIR, 1));
             }
-            owner.getInventory().setContents((ItemStack[]) keptItems.build());
+            owner.getInventory().setContents(CollectionUtil.toArray(keptItems, ItemStack.class));
             owner.updateInventory();
             event.setKeepInventory(true);
         }
