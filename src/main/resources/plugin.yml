@@ -1,8 +1,8 @@
 name: ENC
 version: ${project.version}
 main: dev.anhcraft.enc.ENC
-api-version: 1.13
-depend: [SpaciousLib]
+api-version: "1.13"
+depend: [CraftKit]
 softdepend: [KeepMyLife,Essentials,WorldGuard,WorldEdit]
 authors: [anhcraft]
-description: Brings more enchantments to your servers
+description: ${project.description}

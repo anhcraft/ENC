@@ -1,5 +1,5 @@
 gem1: # gem's id
-  name: "&aColouredSheep Gem" # gem's name, can contain colour codes
+  name: "&aColouredSheep Gem" # gem's name
   enchantment:
     id: ColouredSheep # the id of enchantment, case-insensitive
     level: 1 # the level of enchantment, must start from 1

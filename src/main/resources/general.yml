@@ -10,19 +10,22 @@
 
 # Plugin settings
 plugin:
-  # The prefix of plugin's chat messages
-  prefix: "&f/&5ENC&f/ "
+  # Chat prefix
+  prefix: "&5#enc &f"
 
   # Customize your locale for messages and texts
   # Write the name of your wanted localization file here (checks it in the folder /locale/)
   # Available: en-us.yml, vi-vn.yml
   locale_file: en-us.yml
 
-  # What is the type of math expression parser to use?
+  # What type of math expression parser should ENC use?
   # Available: JAVASCRIPT, EXP4J
   # [!] WARNING:
-  # If you switch to another parser, make sure to recheck all math expressions in configuration files
+  # If you switch to another parser, make sure to recheck all math expressions in your configuration files
   expression_parser: EXP4J
+
+  # Do you allow this plugin for checking update?
+  allow_check_update: true
 
 
 # Command settings
@@ -101,7 +104,7 @@ gem:
     # Placeholders: {gem_name}, {coloured_gem_name}, {success_rate}, {protection_rate}, {min_success_rate}, {max_success_rate}, {min_protection_rate}, {max_protection_rate}, {enchantment_name}, {coloured_enchantment_name}, {level}, {roman_level}
     # [!] WARNING:
     # - Required placeholders are {gem_name}/{coloured_gem_name}, {success_rate} and {protection_rate}
-    # - If you modify this option, make sure to change the patterns below
+    # - If you modify this option, also change the patterns below
     full_raw:
     - "&1&a◆ {coloured_gem_name} | {coloured_enchantment_name} {roman_level}"
     - "&1&f- Success rate: &e{success_rate}%"
@@ -131,10 +134,11 @@ gem:
       enabled: true
 
       # Does this way require permission?
+      # Permission: enc.gem_merge.swap_items
       need_permission: false
 
       # If the players attempts to override an existing enchantment,
-      # Whether we prevent the action if the existing one has a higher level?
+      # should we prevent the action if that one has a higher level?
       strict_override: true
 
       # How many swap times we need to do?
@@ -154,6 +158,7 @@ gem:
       enabled: false
 
       # Does this way require permission?
+      # Permission: enc.gem_drop.kill_mobs
       need_permission: false
 
       # Non-drop rate (in percent, 0 <= n <= 100)
@@ -163,9 +168,9 @@ gem:
       # Groups: $entities, $monsters, $animals
       # [✓] TIP:
       # - Puts '$' at the beginning to include a group
-      # - Puts '-' at the beginning to exclude something from the previous selection
-      # - Puts '-$' at the beginning to exclude a group from the previous selection
-      # - Sees all entity types here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html#enum.constant.summary
+      # - Puts '-' at the beginning to exclude something
+      # - Puts '-$' at the beginning to exclude a group
+      # - See all entity types here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html#enum.constant.summary
       # [!] WARNING:
       # Groups should be put at first
       entity_types:
@@ -176,8 +181,8 @@ gem:
       # Groups: $all
       # [✓] TIP:
       # - Puts '$' at the beginning to include a group
-      # - Puts '-' at the beginning to exclude something from previous selection
-      # - Puts '-$' at the beginning to exclude a group from the previous selection
+      # - Puts '-' at the beginning to exclude something
+      # - Puts '-$' at the beginning to exclude a group
       # [!] WARNING:
       # Groups should be put at first
       worlds:
