@@ -2,6 +2,8 @@
   <dictionary name="DuyAnh">
     <words>
       <w>cooldown</w>
+      <w>unequip</w>
+      <w>unequips</w>
     </words>
   </dictionary>
 </component>
