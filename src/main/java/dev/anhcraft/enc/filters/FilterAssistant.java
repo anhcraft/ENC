@@ -1,13 +1,13 @@
 package dev.anhcraft.enc.filters;
 
-import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import dev.anhcraft.enc.filters.entity.NPCFilter;
 import dev.anhcraft.enc.filters.entity.ShopkeeperFilter;
 import org.bukkit.entity.Entity;
 
 public class FilterAssistant {
-    private static final Multimap<Class<?>, ObjectFilter<?>> FILTERS = new HashMultimap<>();
+    private static final Multimap<Class, ObjectFilter> FILTERS = ArrayListMultimap.create();
 
     static {
         FILTERS.put(Entity.class, new NPCFilter());
