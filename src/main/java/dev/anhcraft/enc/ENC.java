@@ -5,6 +5,7 @@ import co.aikar.taskchain.BukkitTaskChainFactory;
 import co.aikar.taskchain.TaskChainFactory;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import de.slikey.effectlib.EffectManager;
 import dev.anhcraft.craftkit.common.utils.SpigetApiUtil;
 import dev.anhcraft.craftkit.kits.chat.Chat;
 import dev.anhcraft.enc.api.Enchantment;
@@ -42,6 +43,7 @@ public final class ENC extends JavaPlugin {
     private static Chat chat;
     private static ENC instance;
     private static TaskChainFactory taskChainFactory;
+    private static EffectManager effectManager;
     private static boolean KMLReady;
 
     public static YamlConfiguration getLocaleConfig() {
@@ -62,6 +64,10 @@ public final class ENC extends JavaPlugin {
 
     public static TaskChainFactory getTaskChainFactory(){
         return taskChainFactory;
+    }
+
+    public static EffectManager getEffectManager() {
+        return effectManager;
     }
 
     private void updateGeneralCof() {
@@ -191,6 +197,7 @@ public final class ENC extends JavaPlugin {
     public void onEnable() {
         instance = this;
         taskChainFactory = BukkitTaskChainFactory.create(this);
+        effectManager = new EffectManager(this);
         // init plugin
         try {
             reloadPlugin();
