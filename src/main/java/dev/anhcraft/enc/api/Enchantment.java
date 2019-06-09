@@ -13,7 +13,6 @@ import net.objecthunter.exp4j.ExpressionBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.inventory.ItemStack;
@@ -42,7 +41,7 @@ public abstract class Enchantment {
     private EnchantmentTarget[] itemTargets;
     private File configFile;
     private Chat chat;
-    private final YamlConfiguration config = new YamlConfiguration();
+    private YamlConfiguration config = new YamlConfiguration();
     private final List<IListener> eventListeners = new ArrayList<>();
     private final List<String> worldList = new ArrayList<>();
     private final Map<String, Pair<Double, Long>> computation_caching = new HashMap<>();
@@ -201,12 +200,8 @@ public abstract class Enchantment {
      * Reloads the configuration of this enchantment.
      */
     public void reloadConfig() {
-        try {
-            config.load(configFile);
-        } catch(IOException | InvalidConfigurationException e) {
-            e.printStackTrace();
-            return;
-        }
+        config = YamlConfiguration.loadConfiguration(configFile);
+
         Map<String, Object> map = new HashMap<>();
         map.put("enabled", true);
         map.put("chat_prefix", "&5#{lowercase_enchant_id} > &f");
@@ -230,7 +225,7 @@ public abstract class Enchantment {
     /**
      * Saves the configuration of this enchantment.
      */
-    public void saveConfig() {
+    public synchronized void saveConfig() {
         try {
             config.save(configFile);
         } catch(IOException e) {
