@@ -12,13 +12,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class InteractListener implements Listener {
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler
     public void interact(PlayerInteractEvent event){
         var item = event.getItem();
         if(!ItemUtil.isNull(item)) {
             var enchants = EnchantmentAPI.listEnchantments(item);
             if(enchants.isEmpty()) return;
-            var report = new ActionReport(event.getPlayer(), item, enchants, false);
+            var report = new ActionReport(event.getPlayer(), item, enchants, event.isCancelled());
             TaskChain<Boolean> listenerChain = ENC.getTaskChainFactory().newChain();
             for(var e : enchants.entrySet()) {
                 var enchantment = e.getKey();
