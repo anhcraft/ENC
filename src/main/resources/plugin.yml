@@ -2,7 +2,7 @@ name: ENC
 version: ${project.version}
 main: dev.anhcraft.enc.ENC
 api-version: "1.13"
-depend: [CraftKit]
+depend: [CraftKit,EffectLib]
 softdepend: [KeepMyLife,Essentials,WorldGuard,WorldEdit]
 authors: [anhcraft]
 description: ${project.description}
