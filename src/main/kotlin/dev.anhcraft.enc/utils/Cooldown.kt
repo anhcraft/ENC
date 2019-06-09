@@ -16,15 +16,15 @@ class Cooldown {
         return this
     }
 
-    fun elapsedTime(): Double {
-        return (System.currentTimeMillis() - lastTime) / 1000.0
+    fun elapsedTicks(): Double {
+        return UnitUtil.ms2tick((System.currentTimeMillis() - lastTime).toDouble())
     }
 
-    fun isTimeout(seconds: Double): Boolean {
-        return elapsedTime() > seconds
+    fun isTimeout(ticks: Double): Boolean {
+        return elapsedTicks() > ticks
     }
 
-    fun timeLeft(seconds: Double): Double {
-        return seconds - elapsedTime()
+    fun timeLeft(ticks: Double): Double {
+        return ticks - elapsedTicks()
     }
 }
