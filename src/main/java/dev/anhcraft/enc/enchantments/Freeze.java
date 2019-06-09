@@ -54,7 +54,7 @@ public class Freeze extends Enchantment {
     }
 
     @Override
-    public void onRegistered(){
+    public void onConfigReloaded(){
         Map<String, Object> map = new HashMap<>();
         map.put("chance", "{level}*12");
         map.put("duration", "{level}*50");

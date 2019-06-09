@@ -27,7 +27,7 @@ public class Soulbound extends Enchantment {
     }
 
     @Override
-    public void onRegistered(){
+    public void onConfigReloaded(){
         Map<String, Object> map = new HashMap<>();
         map.put("chance", "{level}*20");
         initConfigEntries(map);

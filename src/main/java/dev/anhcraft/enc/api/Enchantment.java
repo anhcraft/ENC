@@ -321,7 +321,8 @@ public abstract class Enchantment {
     }
 
     /**
-     * This method is called after this enchantment is registered successfully.
+     * This method is called after this enchantment is registered successfully.<br>
+     * Do not use this method to register custom configuration entries, use {@link #onConfigReloaded()} instead.
      */
     public void onRegistered(){}
 

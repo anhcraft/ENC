@@ -107,7 +107,7 @@ public class Collapse extends Enchantment implements Listener {
     }
 
     @Override
-    public void onRegistered(){
+    public void onConfigReloaded(){
         Map<String, Object> map = new HashMap<>();
         map.put("min_affected_radius", "2");
         map.put("max_affected_radius", "{level}*2+2");
@@ -123,10 +123,7 @@ public class Collapse extends Enchantment implements Listener {
                 "-barrier"});
         map.put("allowed_material_list", true);
         initConfigEntries(map);
-    }
 
-    @Override
-    public void onConfigReloaded(){
         MATERIAL_LIST.clear();
         HashMap<String, List<String>> groups = new HashMap<>();
         groups.put("all", ArrayUtil.toList(Material.values()).stream()

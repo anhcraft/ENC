@@ -35,7 +35,7 @@ public class Starvation extends Enchantment {
     }
 
     @Override
-    public void onRegistered(){
+    public void onConfigReloaded(){
         Map<String, Object> map = new HashMap<>();
         map.put("chance", "{level}*1.5+20");
         map.put("effect_level", "ceil({level}*0.3)");

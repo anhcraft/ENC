@@ -35,7 +35,7 @@ public class Slowness extends Enchantment {
     }
 
     @Override
-    public void onRegistered(){
+    public void onConfigReloaded(){
         Map<String, Object> map = new HashMap<>();
         map.put("chance", "{level}*3.7");
         map.put("effect_level", "ceil({level}*0.5)");

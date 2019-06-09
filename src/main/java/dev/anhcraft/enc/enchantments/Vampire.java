@@ -33,7 +33,7 @@ public class Vampire extends Enchantment {
     }
 
     @Override
-    public void onRegistered(){
+    public void onConfigReloaded(){
         Map<String, Object> map = new HashMap<>();
         map.put("chance", "{level}*5+15");
         map.put("low_health", "7+{level}*0.5");

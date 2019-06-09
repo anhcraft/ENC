@@ -34,7 +34,7 @@ public class Blindness extends Enchantment {
     }
 
     @Override
-    public void onRegistered(){
+    public void onConfigReloaded(){
         Map<String, Object> map = new HashMap<>();
         map.put("chance", "{level}*3.2");
         map.put("effect_level", "1");

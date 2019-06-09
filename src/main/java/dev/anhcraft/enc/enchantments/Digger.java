@@ -41,7 +41,7 @@ public class Digger extends Enchantment {
     }
 
     @Override
-    public void onRegistered(){
+    public void onConfigReloaded(){
         Map<String, Object> map = new HashMap<>();
         map.put("radius", "{level}");
         map.put("must_same_type", false);
@@ -51,10 +51,7 @@ public class Digger extends Enchantment {
                 "-barrier"});
         map.put("allowed_material_list", true);
         initConfigEntries(map);
-    }
 
-    @Override
-    public void onConfigReloaded(){
         MATERIAL_LIST.clear();
         HashMap<String, List<String>> groups = new HashMap<>();
         groups.put("all", ArrayUtil.toList(Material.values()).stream()

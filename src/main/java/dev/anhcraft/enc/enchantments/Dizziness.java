@@ -34,7 +34,7 @@ public class Dizziness extends Enchantment {
     }
 
     @Override
-    public void onRegistered(){
+    public void onConfigReloaded(){
         Map<String, Object> map = new HashMap<>();
         map.put("chance", "{level}*3.5");
         map.put("effect_level", "ceil({level}*0.4)");
