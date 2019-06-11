@@ -21,6 +21,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Spray extends Enchantment {
     @RequiredCleaner
@@ -36,7 +37,7 @@ public class Spray extends Enchantment {
             public void onInteract(ActionReport report, Player player, Action action, EquipmentSlot hand, Block block) {
                 // do not prevent here since players could interact with air and the report world say the event was cancelled
                 var loc = player.getEyeLocation();
-                if(hand == EquipmentSlot.OFF_HAND ||
+                if(Objects.equals(EquipmentSlot.OFF_HAND, hand) ||
                         (action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR)) return;
 
                 var level = (int) computeConfigValue("effect_level", report);
