@@ -33,7 +33,7 @@ public class Collapse extends Enchantment implements Listener {
 
     public Collapse() {
         super("Collapse", new String[]{
-                "Jumps on spot twice may cause blocks around to be collapsed"
+                "Jumping on the spot twice causes nearby blocks to be collapsed"
         }, "anhcraft", null, 3, EnchantmentTarget.ARMOR_FEET);
 
         Bukkit.getPluginManager().registerEvents(this, ENC.getInstance());
