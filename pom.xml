@@ -6,7 +6,7 @@
 
     <groupId>dev.anhcraft</groupId>
     <artifactId>enc</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
     <packaging>jar</packaging>
 
     <name>ENC</name>
@@ -45,8 +45,6 @@
                 <version>3.8.1</version>
                 <configuration>
                     <release>11</release>
-                    <source>11</source>
-                    <target>11</target>
                     <compilerArgs>
                         <arg>-Xlint:-requires-transitive-automatic</arg>
                     </compilerArgs>
@@ -162,7 +160,7 @@
         <dependency>
             <groupId>dev.anhcraft</groupId>
             <artifactId>craftkit.spigot</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
+            <version>1.0.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
