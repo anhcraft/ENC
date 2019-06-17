@@ -170,6 +170,7 @@ public final class ENC extends JavaPlugin {
         EnchantmentAPI.registerEnchantment(new Digger());
         EnchantmentAPI.registerEnchantment(new Starvation());
         EnchantmentAPI.registerEnchantment(new Spray());
+        EnchantmentAPI.registerEnchantment(new Illuminati());
     }
 
     private void registerListeners() {
