@@ -1,15 +1,12 @@
 package dev.anhcraft.enc.enchantments;
 
 import dev.anhcraft.craftkit.cb_common.lang.enumeration.NMSVersion;
-import dev.anhcraft.enc.api.ActionReport;
 import dev.anhcraft.enc.api.Enchantment;
+import dev.anhcraft.enc.api.ItemReport;
 import dev.anhcraft.enc.api.listeners.SyncKillListener;
 import org.bukkit.Material;
 import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.List;
+import org.bukkit.event.entity.EntityDeathEvent;
 
 public class Chef extends Enchantment {
     private static final Material PORK = NMSVersion.getNMSVersion().isNewerOrSame(NMSVersion.v1_13_R1) ? Material.valueOf("COOKED_PORKCHOP") : Material.GRILLED_PORK;
@@ -20,11 +17,10 @@ public class Chef extends Enchantment {
                 "Kills entities and cooks all dropped food"
         }, "anhcraft", null, 1, EnchantmentTarget.ALL);
 
-        // we will make modification so that we must use the sync event
         getEventListeners().add(new SyncKillListener() {
             @Override
-            public void onKill(ActionReport report, LivingEntity entity, List<ItemStack> drops) {
-                for(var drop : drops) {
+            public void onKill(ItemReport mainHand, EntityDeathEvent event) {
+                for(var drop : event.getDrops()) {
                     var mt = drop.getType().toString();
                     switch(mt) {
                         case "PORKCHOP":

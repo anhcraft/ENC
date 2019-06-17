@@ -1,10 +1,9 @@
 package dev.anhcraft.enc.listeners;
 
-import co.aikar.taskchain.TaskChain;
 import dev.anhcraft.craftkit.utils.ItemUtil;
 import dev.anhcraft.enc.ENC;
-import dev.anhcraft.enc.api.ActionReport;
 import dev.anhcraft.enc.api.EnchantmentAPI;
+import dev.anhcraft.enc.api.ItemReport;
 import dev.anhcraft.enc.api.listeners.AsyncDeathDropListener;
 import dev.anhcraft.enc.api.listeners.SyncDeathDropListener;
 import dev.anhcraft.jvmkit.utils.CollectionUtil;
@@ -17,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DeathDropListener {
     public static class KeepMyLife implements Listener {
@@ -28,25 +28,25 @@ public class DeathDropListener {
                 var item = it.next();
                 var enchants = EnchantmentAPI.listEnchantments(item);
                 if(enchants.isEmpty()) continue;
-                var report = new ActionReport(owner, item, enchants, false);
-                TaskChain<Boolean> listenerChain = ENC.getTaskChainFactory().newChain();
-                for(var e : enchants.entrySet()) {
-                    var enchantment = e.getKey();
-                    if(!enchantment.isEnabled() || !enchantment.isAllowedWorld(owner.getWorld().getName())) continue;
-                    enchantment.getEventListeners().stream()
+                var report = new ItemReport(owner, item, enchants);
+                var keep = new AtomicBoolean(false);
+                var listenerChain = ENC.getTaskChainFactory().newChain();
+                enchants.forEach((ench, value) -> {
+                    if (!ench.isEnabled() || !ench.isAllowedWorld(owner.getWorld().getName())) return;
+                    ench.getEventListeners().stream()
                             .filter(eventListener -> eventListener instanceof SyncDeathDropListener)
                             .forEach(eventListener -> {
                                 if(eventListener instanceof AsyncDeathDropListener) {
                                     listenerChain.async(() -> ((AsyncDeathDropListener) eventListener)
-                                            .onDrop(report, item));
+                                            .onDrop(report, keep));
                                 } else {
                                     listenerChain.sync(() -> ((SyncDeathDropListener) eventListener)
-                                            .onDrop(report, item));
+                                            .onDrop(report, keep));
                                 }
                             });
-                }
+                });
                 listenerChain.execute();
-                if(report.isPrevented()){
+                if(keep.get()){
                     event.getKeepItems().set(i, item);
                     it.remove();
                 }
@@ -70,26 +70,25 @@ public class DeathDropListener {
                 }
                 var enchants = EnchantmentAPI.listEnchantments(item);
                 if(!enchants.isEmpty()){
-                    var report = new ActionReport(owner, item, enchants, false);
-                    TaskChain<Boolean> listenerChain = ENC.getTaskChainFactory().newChain();
-                    for(var e : enchants.entrySet()) {
-                        var enchantment = e.getKey();
-                        if(enchantment.isEnabled() && enchantment.isAllowedWorld(owner.getWorld().getName())) {
-                            enchantment.getEventListeners().stream()
+                    var report = new ItemReport(owner, item, enchants);
+                    var keep = new AtomicBoolean(false);
+                    var listenerChain = ENC.getTaskChainFactory().newChain();
+                    enchants.forEach((ench, value) -> {
+                        if (!ench.isEnabled() || !ench.isAllowedWorld(owner.getWorld().getName())) return;
+                        ench.getEventListeners().stream()
                                 .filter(eventListener -> eventListener instanceof SyncDeathDropListener)
                                 .forEach(eventListener -> {
                                     if(eventListener instanceof AsyncDeathDropListener) {
                                         listenerChain.async(() -> ((AsyncDeathDropListener) eventListener)
-                                                .onDrop(report, item));
-                                    } else{
+                                                .onDrop(report, keep));
+                                    } else {
                                         listenerChain.sync(() -> ((SyncDeathDropListener) eventListener)
-                                                .onDrop(report, item));
+                                                .onDrop(report, keep));
                                     }
                                 });
-                        }
-                    }
+                    });
                     listenerChain.execute();
-                    if(report.isPrevented()){
+                    if(keep.get()){
                         keptItems.add(item);
                         continue;
                     }

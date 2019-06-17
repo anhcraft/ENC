@@ -1,27 +1,16 @@
 package dev.anhcraft.enc.api.listeners;
 
-import dev.anhcraft.enc.api.ActionReport;
-import org.bukkit.inventory.EquipmentSlot;
+import dev.anhcraft.craftkit.events.PlayerJumpEvent;
+import dev.anhcraft.enc.api.ItemReport;
 
 /**
- * The listener of jumping events.
+ * The listener of {@link PlayerJumpEvent}.
  */
 public abstract class SyncJumpListener implements IListener {
     /**
-     * This method is called when a player jumps.
-     * @param report the report
-     * @param onSpot whether the player jumps on spot
+     * This method is called when a player jumps and his boot contains the enchantment.
+     * @param foot the report of the item on this foot
+     * @param event the event which was fired
      */
-    public abstract void onJump(ActionReport report, boolean onSpot);
-
-    @Override
-    public boolean canPrevent(){
-        return false;
-    }
-
-    @Override
-    public EquipmentSlot getItemSlot(){
-        return EquipmentSlot.FEET;
-    }
+    public abstract void onJump(ItemReport foot, PlayerJumpEvent event);
 }
-

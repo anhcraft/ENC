@@ -1,14 +1,17 @@
 package dev.anhcraft.enc.enchantments;
 
+import dev.anhcraft.craftkit.common.lang.annotation.RequiredCleaner;
 import dev.anhcraft.craftkit.utils.BlockUtil;
-import dev.anhcraft.enc.api.ActionReport;
 import dev.anhcraft.enc.api.Enchantment;
-import dev.anhcraft.enc.api.listeners.SyncBlockBreakListener;
+import dev.anhcraft.enc.api.ItemReport;
+import dev.anhcraft.enc.api.listeners.SyncBreakBlockListener;
+import dev.anhcraft.enc.utils.Cooldown;
 import dev.anhcraft.enc.utils.ReplaceUtil;
 import dev.anhcraft.jvmkit.utils.ArrayUtil;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +20,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Digger extends Enchantment {
+    @RequiredCleaner
+    private static final Map<Player, Cooldown> MAP = new HashMap<>();
     private static final List<Material> MATERIAL_LIST = new ArrayList<>();
 
     public Digger() {
@@ -24,24 +29,27 @@ public class Digger extends Enchantment {
                 "Breaks multiple blocks at once"
         }, "anhcraft", null, 3, EnchantmentTarget.TOOL);
 
-        getEventListeners().add(new SyncBlockBreakListener() {
+        getEventListeners().add(new SyncBreakBlockListener() {
             @Override
-            public void onBreakBlock(ActionReport report, Block block) {
-                if(report.isPrevented()) return;
+            public void onBreakBlock(ItemReport mainHand, BlockBreakEvent event) {
+                if(event.isCancelled()) return;
+                var cooldown = computeConfigValue("cooldown", mainHand);
+                if(!handleCooldown(MAP, event.getPlayer(), cooldown)) return;
+
                 var sameType = getConfig().getBoolean("must_same_type");
                 var allowedMaterialList = getConfig().getBoolean("allowed_material_list");
-                var r = (int) computeConfigValue("radius", report);
-                var blocks = BlockUtil.getNearbyBlocks(block.getLocation(), r, r, r);
+                var r = (int) computeConfigValue("radius", mainHand);
+                var blocks = BlockUtil.getNearbyBlocks(event.getBlock().getLocation(), r, r, r);
                 for(var b : blocks){
-                    if(sameType && !b.getType().equals(block.getType())) continue;
-                    if(allowedMaterialList == MATERIAL_LIST.contains(b.getType())) b.breakNaturally(report.getItemStack());
+                    if(sameType && !b.getType().equals(event.getBlock().getType())) continue;
+                    if(allowedMaterialList == MATERIAL_LIST.contains(b.getType())) b.breakNaturally(mainHand.getItem());
                 }
             }
         });
     }
 
     @Override
-    public void onConfigReloaded(){
+    public void onInitConfig(){
         Map<String, Object> map = new HashMap<>();
         map.put("radius", "{level}");
         map.put("must_same_type", false);
@@ -50,6 +58,7 @@ public class Digger extends Enchantment {
                 "-bedrock",
                 "-barrier"});
         map.put("allowed_material_list", true);
+        map.put("cooldown", "{level}*15+30");
         initConfigEntries(map);
 
         MATERIAL_LIST.clear();

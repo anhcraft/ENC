@@ -3,13 +3,14 @@ package dev.anhcraft.enc.enchantments;
 import dev.anhcraft.craftkit.common.lang.annotation.RequiredCleaner;
 import dev.anhcraft.craftkit.utils.PlayerUtil;
 import dev.anhcraft.enc.ENC;
-import dev.anhcraft.enc.api.ActionReport;
 import dev.anhcraft.enc.api.Enchantment;
+import dev.anhcraft.enc.api.ItemReport;
 import dev.anhcraft.enc.api.listeners.AsyncAttackListener;
 import dev.anhcraft.enc.utils.UnitUtil;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
@@ -40,21 +41,21 @@ public class Freeze extends Enchantment {
 
         getEventListeners().add(new AsyncAttackListener() {
             @Override
-            public void onAttack(ActionReport report, LivingEntity entity, double damage) {
-                if(report.isPrevented() || !(entity instanceof Player)) return;
+            public void onAttack(ItemReport mainHand, EntityDamageByEntityEvent event, LivingEntity entity) {
+                if(event.isCancelled() || !(entity instanceof Player)) return;
                 var pent = (Player) entity;
                 if(DATA.containsKey(pent)) return;
-                var chance = computeConfigValue("chance", report)/100d;
+                var chance = computeConfigValue("chance", mainHand)/100d;
                 if(Math.random() > chance) return;
                 PlayerUtil.freeze(pent);
-                var duration = (long) UnitUtil.tick2ms(computeConfigValue("duration", report));
+                var duration = (long) UnitUtil.tick2ms(computeConfigValue("duration", mainHand));
                 DATA.put(pent, System.currentTimeMillis()+duration);
             }
         });
     }
 
     @Override
-    public void onConfigReloaded(){
+    public void onInitConfig(){
         Map<String, Object> map = new HashMap<>();
         map.put("chance", "{level}*12");
         map.put("duration", "{level}*50");

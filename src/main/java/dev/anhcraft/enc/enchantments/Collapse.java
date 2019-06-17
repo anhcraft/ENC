@@ -1,10 +1,11 @@
 package dev.anhcraft.enc.enchantments;
 
+import dev.anhcraft.craftkit.events.PlayerJumpEvent;
 import dev.anhcraft.craftkit.utils.BlockUtil;
 import dev.anhcraft.craftkit.utils.LocationUtil;
 import dev.anhcraft.enc.ENC;
-import dev.anhcraft.enc.api.ActionReport;
 import dev.anhcraft.enc.api.Enchantment;
+import dev.anhcraft.enc.api.ItemReport;
 import dev.anhcraft.enc.api.listeners.AsyncJumpListener;
 import dev.anhcraft.enc.utils.ReplaceUtil;
 import dev.anhcraft.enc.utils.UnitUtil;
@@ -39,23 +40,23 @@ public class Collapse extends Enchantment implements Listener {
 
         getEventListeners().add(new AsyncJumpListener() {
             @Override
-            public void onJump(ActionReport report, boolean onSpot) {
-                if(!onSpot) return;
+            public void onJump(ItemReport foot, PlayerJumpEvent event) {
+                if(!event.isOnSpot()) return;
                 List<Block> breakBlocks = new ArrayList<>();
                 var allowedMaterialList = getConfig().getBoolean("allowed_material_list");
                 var falling = getConfig().getBoolean("block_falling");
                 var physics = getConfig().getBoolean("block_physics");
                 var sound = getConfig().getBoolean("sound");
                 var r = RandomUtil.randomInt(
-                        (int) computeConfigValue("min_affected_radius", report),
-                        (int) computeConfigValue("max_affected_radius", report));
-                var min_h = computeConfigValue("min_affected_depth", report);
-                var max_h = computeConfigValue("max_affected_depth", report);
+                        (int) computeConfigValue("min_affected_radius", foot),
+                        (int) computeConfigValue("max_affected_radius", foot));
+                var min_h = computeConfigValue("min_affected_depth", foot);
+                var max_h = computeConfigValue("max_affected_depth", foot);
                 var del_h = max_h-min_h;
-                var timeout = (long) UnitUtil.tick2ms(computeConfigValue("timeout", report));
+                var timeout = (long) UnitUtil.tick2ms(computeConfigValue("timeout", foot));
 
-                var gen = new SimplexOctaveGenerator(report.getPlayer().getWorld().getSeed(), 5);
-                var loc = report.getPlayer().getLocation();
+                var gen = new SimplexOctaveGenerator(foot.getPlayer().getWorld().getSeed(), 5);
+                var loc = foot.getPlayer().getLocation();
                 var locs = LocationUtil.getNearbyLocations(loc, r, 0, r);
                 for(Location xloc : locs){
                     // use noise to calculate the depth
@@ -80,7 +81,7 @@ public class Collapse extends Enchantment implements Listener {
 
                 // reverse the order to put lowest blocks at first
                 Collections.reverse(breakBlocks);
-                List<Player> viewers = report.getPlayer().getWorld().getNearbyEntities(loc, 30, 30, 30)
+                List<Player> viewers = foot.getPlayer().getWorld().getNearbyEntities(loc, 30, 30, 30)
                         .stream().filter(entity -> entity instanceof Player)
                         .map(entity -> (Player) entity).collect(Collectors.toList());
                 ENC.getTaskChainFactory().newChain()
@@ -99,7 +100,7 @@ public class Collapse extends Enchantment implements Listener {
                                 }
                                 block1.setType(Material.AIR, physics);
                             });
-                            if(sound && !breakBlocks.isEmpty()) report.getPlayer().playSound(report.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 3f, 1f);
+                            if(sound && !breakBlocks.isEmpty()) foot.getPlayer().playSound(foot.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 3f, 1f);
                         })
                         .execute();
             }
@@ -107,7 +108,7 @@ public class Collapse extends Enchantment implements Listener {
     }
 
     @Override
-    public void onConfigReloaded(){
+    public void onInitConfig(){
         Map<String, Object> map = new HashMap<>();
         map.put("min_affected_radius", "2");
         map.put("max_affected_radius", "{level}*2+2");
@@ -139,8 +140,6 @@ public class Collapse extends Enchantment implements Listener {
 
     @EventHandler
     public void fall(EntityChangeBlockEvent event){
-        if(FALLING_BLOCKS.contains(event.getEntity().getEntityId())){
-            event.setCancelled(true);
-        }
+        if(FALLING_BLOCKS.contains(event.getEntity().getEntityId())) event.setCancelled(true);
     }
 }

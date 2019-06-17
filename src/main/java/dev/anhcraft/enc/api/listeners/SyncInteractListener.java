@@ -1,32 +1,16 @@
 package dev.anhcraft.enc.api.listeners;
 
-import dev.anhcraft.enc.api.ActionReport;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.inventory.EquipmentSlot;
+import dev.anhcraft.enc.api.ItemReport;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 /**
- * The listener of interacting event.
+ * The listener of {@link PlayerInteractEvent}.
  */
 public abstract class SyncInteractListener implements IListener {
     /**
-     * This method is called when a player interacts something with his item.
-     * @param report the report
-     * @param player the player
-     * @param action type of the action
-     * @param hand the hand which he held the item
-     * @param block the block which related to this event (may be null)
+     * This method is called when a player interacts something with his item and the item has the enchantment.
+     * @param report the report of the item
+     * @param event the event which was fired
      */
-    public abstract void onInteract(ActionReport report, Player player, Action action, EquipmentSlot hand, Block block);
-
-    @Override
-    public boolean canPrevent(){
-        return true;
-    }
-
-    @Override
-    public EquipmentSlot getItemSlot(){
-        return null;
-    }
+    public abstract void onInteract(ItemReport report, PlayerInteractEvent event);
 }

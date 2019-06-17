@@ -1,32 +1,16 @@
 package dev.anhcraft.enc.api.listeners;
 
-import dev.anhcraft.enc.api.ActionReport;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.List;
+import dev.anhcraft.enc.api.ItemReport;
+import org.bukkit.event.entity.EntityDeathEvent;
 
 /**
  * The listener of kill events.
  */
 public abstract class SyncKillListener implements IListener {
     /**
-     * This method is called when a player kills an entity.
-     * @param report the report
-     * @param entity the entity
-     * @param drops stacks of items which will drop when the entity dies
+     * This method is called when a player kills another entity with his item and the item has the enchantment.
+     * @param mainHand the report of the item in his main hand
+     * @param event the event which was fired
      */
-    public abstract void onKill(ActionReport report, LivingEntity entity, List<ItemStack> drops);
-
-    @Override
-    public boolean canPrevent(){
-        return false;
-    }
-
-    @Override
-    public EquipmentSlot getItemSlot(){
-        return EquipmentSlot.HAND;
-    }
+    public abstract void onKill(ItemReport mainHand, EntityDeathEvent event);
 }
-

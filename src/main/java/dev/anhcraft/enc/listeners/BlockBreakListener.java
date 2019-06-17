@@ -1,44 +1,39 @@
 package dev.anhcraft.enc.listeners;
 
-import co.aikar.taskchain.TaskChain;
 import dev.anhcraft.craftkit.utils.ItemUtil;
 import dev.anhcraft.enc.ENC;
-import dev.anhcraft.enc.api.ActionReport;
 import dev.anhcraft.enc.api.EnchantmentAPI;
-import dev.anhcraft.enc.api.listeners.AsyncBlockBreakListener;
-import dev.anhcraft.enc.api.listeners.SyncBlockBreakListener;
+import dev.anhcraft.enc.api.ItemReport;
+import dev.anhcraft.enc.api.listeners.AsyncBreakBlockListener;
+import dev.anhcraft.enc.api.listeners.SyncBreakBlockListener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
 public class BlockBreakListener implements Listener {
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler
     public void blockBreak(BlockBreakEvent event){
         var player = event.getPlayer();
-        var block = event.getBlock();
         var item = player.getInventory().getItemInMainHand();
-        if(!ItemUtil.isNull(item)) {
-            var enchants = EnchantmentAPI.listEnchantments(item);
-            if(enchants.isEmpty()) return;
-            var report = new ActionReport(player, item, enchants, false);
-            TaskChain<Boolean> listenerChain = ENC.getTaskChainFactory().newChain();
-            for(var e : enchants.entrySet()) {
-                var enchantment = e.getKey();
-                if(!enchantment.isEnabled() || !enchantment.isAllowedWorld(player.getWorld().getName())) continue;
-                enchantment.getEventListeners().stream()
-                        .filter(eventListener -> eventListener instanceof SyncBlockBreakListener)
-                        .forEach(eventListener -> {
-                            if(eventListener instanceof AsyncBlockBreakListener) {
-                                listenerChain.async(() -> ((AsyncBlockBreakListener) eventListener)
-                                        .onBreakBlock(report, block));
-                            } else{
-                                listenerChain.sync(() -> ((SyncBlockBreakListener) eventListener)
-                                        .onBreakBlock(report, block));
-                            }
-                        });
-            }
-            listenerChain.execute();
-            event.setCancelled(report.isPrevented());
-        }
+        if(ItemUtil.isNull(item)) return;
+        var enchants = EnchantmentAPI.listEnchantments(item);
+        if(enchants.isEmpty()) return;
+        var report = new ItemReport(player, item, enchants);
+        var listenerChain = ENC.getTaskChainFactory().newChain();
+        enchants.forEach((ench, value) -> {
+            if(!ench.isEnabled() || !ench.isAllowedWorld(player.getWorld().getName())) return;
+            ench.getEventListeners().stream()
+                    .filter(eventListener -> eventListener instanceof SyncBreakBlockListener)
+                    .forEach(eventListener -> {
+                        if(eventListener instanceof AsyncBreakBlockListener) {
+                            listenerChain.async(() -> ((AsyncBreakBlockListener) eventListener)
+                                    .onBreakBlock(report, event));
+                        } else{
+                            listenerChain.sync(() -> ((SyncBreakBlockListener) eventListener)
+                                    .onBreakBlock(report, event));
+                        }
+                    });
+        });
+        listenerChain.execute();
     }
 }

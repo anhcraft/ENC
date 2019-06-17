@@ -2,19 +2,18 @@ package dev.anhcraft.enc.enchantments;
 
 import dev.anhcraft.craftkit.common.lang.annotation.RequiredCleaner;
 import dev.anhcraft.enc.ENC;
-import dev.anhcraft.enc.api.ActionReport;
 import dev.anhcraft.enc.api.Enchantment;
+import dev.anhcraft.enc.api.ItemReport;
 import dev.anhcraft.enc.api.listeners.AsyncInteractListener;
 import dev.anhcraft.enc.filters.FilterAssistant;
 import dev.anhcraft.enc.utils.Cooldown;
-import dev.anhcraft.enc.utils.UnitUtil;
 import org.bukkit.Particle;
-import org.bukkit.block.Block;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -34,11 +33,12 @@ public class Spray extends Enchantment {
 
         getEventListeners().add(new AsyncInteractListener() {
             @Override
-            public void onInteract(ActionReport report, Player player, Action action, EquipmentSlot hand, Block block) {
-                // do not prevent here since players could interact with air and the report world say the event was cancelled
+            public void onInteract(ItemReport report, PlayerInteractEvent event) {
+                var player = report.getPlayer();
                 var loc = player.getEyeLocation();
-                if(Objects.equals(EquipmentSlot.OFF_HAND, hand) ||
-                        (action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR)) return;
+                if(Objects.equals(EquipmentSlot.OFF_HAND, event.getHand()) ||
+                        (event.getAction() != Action.RIGHT_CLICK_BLOCK
+                                && event.getAction() != Action.RIGHT_CLICK_AIR)) return;
 
                 var level = (int) computeConfigValue("effect_level", report);
                 var duration = (int) computeConfigValue("effect_duration", report);
@@ -46,16 +46,7 @@ public class Spray extends Enchantment {
                 var damage = computeConfigValue("damage", report);
                 var distance = computeConfigValue("distance", report);
 
-                var cooldownTimer = MAP.get(player);
-                if(cooldownTimer == null) MAP.put(player, new Cooldown());
-                else {
-                    if(cooldownTimer.isTimeout(cooldown)) cooldownTimer.reset();
-                    else {
-                        getChat().message(player, "[Cooldown] Remaining time: "+
-                                UnitUtil.tick2s(cooldownTimer.elapsedTicks()) +"s");
-                        return;
-                    }
-                }
+                if(!handleCooldown(MAP, player, cooldown)) return;
 
                 for (var g = 1; g < distance; g++) {
                     var target = loc.clone().add(loc.getDirection().normalize().multiply(g));
@@ -79,7 +70,7 @@ public class Spray extends Enchantment {
     }
 
     @Override
-    public void onConfigReloaded(){
+    public void onInitConfig(){
         Map<String, Object> map = new HashMap<>();
         map.put("cooldown", "{level}*10+20");
         map.put("effect_level", "ceil({level}*0.75)");

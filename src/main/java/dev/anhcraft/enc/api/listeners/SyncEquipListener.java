@@ -1,29 +1,16 @@
 package dev.anhcraft.enc.api.listeners;
 
-import dev.anhcraft.enc.api.ActionReport;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
+import dev.anhcraft.craftkit.events.ArmorEquipEvent;
+import dev.anhcraft.enc.api.ItemReport;
 
 /**
- * The listener of equip events.
+ * The listener of {@link ArmorEquipEvent}.
  */
 public abstract class SyncEquipListener implements IListener {
     /**
-     * This method is called when a player equips an armor.
-     * @param report the report
-     * @param armor the armor
-     * @param slot the slot
+     * This method is called when a player equips an armor which has the enchantment.
+     * @param equip the report of the equipment
+     * @param event the event which was fired
      */
-    public abstract void onEquip(ActionReport report, ItemStack armor, EquipmentSlot slot);
-
-    @Override
-    public boolean canPrevent(){
-        return false;
-    }
-
-    @Override
-    public EquipmentSlot getItemSlot(){
-        return null;
-    }
+    public abstract void onEquip(ItemReport equip, ArmorEquipEvent event);
 }
-

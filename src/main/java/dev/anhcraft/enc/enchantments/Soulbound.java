@@ -1,13 +1,13 @@
 package dev.anhcraft.enc.enchantments;
 
-import dev.anhcraft.enc.api.ActionReport;
 import dev.anhcraft.enc.api.Enchantment;
+import dev.anhcraft.enc.api.ItemReport;
 import dev.anhcraft.enc.api.listeners.SyncDeathDropListener;
 import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Soulbound extends Enchantment {
     public Soulbound() {
@@ -18,16 +18,16 @@ public class Soulbound extends Enchantment {
         // we will make modification so that we must use the sync event
         getEventListeners().add(new SyncDeathDropListener() {
             @Override
-            public void onDrop(ActionReport report, ItemStack itemStack) {
-                if(report.isPrevented()) return;
+            public void onDrop(ItemReport report, AtomicBoolean keep) {
+                if(!keep.get()) return;
                 var chance = computeConfigValue("chance", report)/100d;
-                if(Math.random() <= chance) report.setPrevented(true);
+                keep.set(Math.random() <= chance);
             }
         });
     }
 
     @Override
-    public void onConfigReloaded(){
+    public void onInitConfig(){
         Map<String, Object> map = new HashMap<>();
         map.put("chance", "{level}*20");
         initConfigEntries(map);

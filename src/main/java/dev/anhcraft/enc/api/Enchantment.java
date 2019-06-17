@@ -3,9 +3,8 @@ package dev.anhcraft.enc.api;
 import dev.anhcraft.craftkit.kits.chat.Chat;
 import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.listeners.IListener;
-import dev.anhcraft.enc.utils.FormatUtil;
-import dev.anhcraft.enc.utils.ReplaceUtil;
-import dev.anhcraft.enc.utils.ScriptUtil;
+import dev.anhcraft.enc.utils.*;
+import dev.anhcraft.jvmkit.lang.annotation.Beta;
 import dev.anhcraft.jvmkit.utils.ArrayUtil;
 import dev.anhcraft.jvmkit.utils.Condition;
 import kotlin.Pair;
@@ -15,6 +14,7 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -134,13 +134,12 @@ public abstract class Enchantment {
     }
 
     /**
-     * Computes the value of a configuration entry by its key.<br>
-     * By using the given action report, all placeholder will be replaced.
-     * @param key the key
-     * @param report the action report
+     * Computes the value of a configuration entry by using the information from the given {@link ItemReport}.
+     * @param key the key of the entry
+     * @param report the report of the item
      * @return the computed value
      */
-    public double computeConfigValue(@NotNull String key, @NotNull ActionReport report) {
+    public double computeConfigValue(@NotNull String key, @NotNull ItemReport report) {
         Condition.argNotNull("key", key);
         Condition.argNotNull("report", report);
         if(config.getBoolean("computation_caching.enabled")){
@@ -219,7 +218,7 @@ public abstract class Enchantment {
         Map<String, List<String>> groups = new HashMap<>();
         groups.put("all", Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList()));
         worldList.addAll(ReplaceUtil.replaceVariables(config.getStringList("worlds_list"), groups, true));
-        onConfigReloaded();
+        onInitConfig();
     }
 
     /**
@@ -317,14 +316,29 @@ public abstract class Enchantment {
 
     /**
      * This method is called after this enchantment is registered successfully.<br>
-     * Do not use this method to register custom configuration entries, use {@link #onConfigReloaded()} instead.
+     * Do not use this method to register custom configuration entries, use {@link #onInitConfig()} instead.
      */
     public void onRegistered(){}
 
     /**
      * This method is called whenever the configuration is reloaded.
      */
-    public void onConfigReloaded(){}
+    public void onInitConfig(){}
+
+    @Beta
+    protected boolean handleCooldown(Map<Player, Cooldown> map, Player player, double cooldown){
+        var cooldownTimer = map.get(player);
+        if(cooldownTimer == null) map.put(player, new Cooldown());
+        else {
+            if(cooldownTimer.isTimeout(cooldown)) cooldownTimer.reset();
+            else {
+                getChat().message(player, "Remaining cooldown time: "+
+                        UnitUtil.tick2s(cooldownTimer.elapsedTicks()) +"s");
+                return false;
+            }
+        }
+        return true;
+    }
 
     @Override
     public boolean equals(Object o) {
