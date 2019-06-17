@@ -5,8 +5,8 @@ import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.ItemReport;
 import dev.anhcraft.enc.api.listeners.AsyncInteractListener;
-import dev.anhcraft.enc.filters.FilterAssistant;
 import dev.anhcraft.enc.utils.Cooldown;
+import dev.anhcraft.enc.utils.FilterAssistant;
 import org.bukkit.Particle;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Entity;
@@ -55,7 +55,6 @@ public class Spray extends Enchantment {
                     ENC.getTaskChainFactory().newChain().sync(() -> {
                         for (var ent : entities) {
                             if (!(ent instanceof LivingEntity) ||
-                                    ent.equals(player) ||
                                     FilterAssistant.anyMatch(player, Entity.class))
                                 continue;
                             var le = (LivingEntity) ent;
