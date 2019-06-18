@@ -18,8 +18,8 @@ import java.util.Map;
 public class AntiGravity extends Enchantment {
     public AntiGravity() {
         super("AntiGravity", new String[]{
-                " You can jump higher"
-        }, "anhcraft", null, 4, EnchantmentTarget.ARMOR);
+                "You can jump higher"
+        }, "anhcraft", null, 5, EnchantmentTarget.ARMOR);
 
         getEventListeners().add(new SyncEquipListener() {
             @Override
