@@ -30,6 +30,7 @@ public class Digger extends Enchantment {
             @Override
             public void onBreakBlock(ItemReport mainHand, BlockBreakEvent event) {
                 if(event.isCancelled()) return;
+                event.setCancelled(true);
                 var cooldown = computeConfigValue("cooldown", mainHand);
                 if(!handleCooldown(MAP, event.getPlayer(), cooldown)) return;
 
