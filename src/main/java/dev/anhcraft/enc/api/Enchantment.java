@@ -335,7 +335,7 @@ public abstract class Enchantment {
             if(cooldownTimer.isTimeout(cooldown)) cooldownTimer.reset();
             else {
                 getChat().message(player, "Remaining cooldown time: "+
-                        UnitUtil.tick2s(cooldownTimer.elapsedTicks()) +"s");
+                        UnitUtil.tick2s(cooldown-cooldownTimer.elapsedTicks()) +"s");
                 return false;
             }
         }
