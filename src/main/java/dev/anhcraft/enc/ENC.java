@@ -9,7 +9,6 @@ import de.slikey.effectlib.EffectManager;
 import dev.anhcraft.craftkit.common.utils.SpigetApiUtil;
 import dev.anhcraft.craftkit.kits.chat.Chat;
 import dev.anhcraft.enc.api.Enchantment;
-import dev.anhcraft.enc.api.EnchantmentAPI;
 import dev.anhcraft.enc.api.gem.Gem;
 import dev.anhcraft.enc.api.gem.GemAPI;
 import dev.anhcraft.enc.commands.AdminCommand;
@@ -28,6 +27,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+
+import static dev.anhcraft.enc.api.EnchantmentAPI.getRegisteredEnchantments;
+import static dev.anhcraft.enc.api.EnchantmentAPI.registerEnchantment;
 
 public final class ENC extends JavaPlugin {
     private static final File ROOT_FOLDER = new File("plugins/ENC/");
@@ -135,7 +137,7 @@ public final class ENC extends JavaPlugin {
         // init chat
         chat = new Chat(generalConfig.getString("plugin.prefix"));
         // reload enchantment config
-        EnchantmentAPI.getRegisteredEnchantments().forEach(Enchantment::reloadConfig);
+        getRegisteredEnchantments().forEach(Enchantment::reloadConfig);
         // reload gem config
         GemAPI.getRegisteredGems().forEach(GemAPI::unregisterGem);
         gemConfig.getKeys(false).forEach(s -> {
@@ -156,22 +158,23 @@ public final class ENC extends JavaPlugin {
     }
 
     private void registerEnchants() {
-        EnchantmentAPI.registerEnchantment(new ColouredSheep());
-        EnchantmentAPI.registerEnchantment(new Wither());
-        EnchantmentAPI.registerEnchantment(new Chef());
-        EnchantmentAPI.registerEnchantment(new Freeze());
-        EnchantmentAPI.registerEnchantment(new Blindness());
-        EnchantmentAPI.registerEnchantment(new Poison());
-        EnchantmentAPI.registerEnchantment(new Soulbound());
-        EnchantmentAPI.registerEnchantment(new Dizziness());
-        EnchantmentAPI.registerEnchantment(new Slowness());
-        EnchantmentAPI.registerEnchantment(new Vampire());
-        EnchantmentAPI.registerEnchantment(new Collapse());
-        EnchantmentAPI.registerEnchantment(new Digger());
-        EnchantmentAPI.registerEnchantment(new Starvation());
-        EnchantmentAPI.registerEnchantment(new Spray());
-        EnchantmentAPI.registerEnchantment(new Illuminati());
-        EnchantmentAPI.registerEnchantment(new AntiGravity());
+        registerEnchantment(new ColouredSheep());
+        registerEnchantment(new Wither());
+        registerEnchantment(new Chef());
+        registerEnchantment(new Freeze());
+        registerEnchantment(new Blindness());
+        registerEnchantment(new Poison());
+        registerEnchantment(new Soulbound());
+        registerEnchantment(new Dizziness());
+        registerEnchantment(new Slowness());
+        registerEnchantment(new Vampire());
+        registerEnchantment(new Collapse());
+        registerEnchantment(new Digger());
+        registerEnchantment(new Starvation());
+        registerEnchantment(new Spray());
+        registerEnchantment(new Illuminati());
+        registerEnchantment(new AntiGravity());
+        registerEnchantment(new Antidote());
     }
 
     private void registerListeners() {
