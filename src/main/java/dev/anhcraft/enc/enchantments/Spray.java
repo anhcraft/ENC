@@ -6,10 +6,9 @@ import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.ItemReport;
 import dev.anhcraft.enc.api.listeners.AsyncInteractListener;
 import dev.anhcraft.enc.utils.Cooldown;
-import dev.anhcraft.enc.utils.FilterAssistant;
+import dev.anhcraft.enc.utils.EntityFilter;
 import org.bukkit.Particle;
 import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -50,13 +49,11 @@ public class Spray extends Enchantment {
 
                 for (var g = 1; g < distance; g++) {
                     var target = loc.clone().add(loc.getDirection().normalize().multiply(g));
-                    ENC.getEffectManager().display(Particle.WATER_DROP, target, 0, 0, 0, 0, 12, 3, null, null, (byte) 0, 50, target.getWorld().getPlayers());
-                    var entities = player.getWorld().getNearbyEntities(target, 3.5, 3.5, 3.5);
+                    ENC.getEffectManager().display(Particle.WATER_DROP, target, 0, 0, 0, 0, 6, 3, null, null, (byte) 0, 50, target.getWorld().getPlayers());
+                    var entities = player.getWorld().getNearbyEntities(target, 3, 3, 3);
                     ENC.getTaskChainFactory().newChain().sync(() -> {
                         for (var ent : entities) {
-                            if (!(ent instanceof LivingEntity) ||
-                                    FilterAssistant.anyMatch(player, Entity.class))
-                                continue;
+                            if (ent.equals(player) || !EntityFilter.check(ent)) continue;
                             var le = (LivingEntity) ent;
                             le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, duration, level));
                             le.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, duration, level));
