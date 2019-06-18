@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import de.slikey.effectlib.EffectManager;
 import dev.anhcraft.craftkit.common.utils.SpigetApiUtil;
 import dev.anhcraft.craftkit.kits.chat.Chat;
+import dev.anhcraft.craftkit.utils.ServerUtil;
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.gem.Gem;
 import dev.anhcraft.enc.api.gem.GemAPI;
@@ -20,6 +21,7 @@ import dev.anhcraft.enc.listeners.gem.GemMergeListener;
 import dev.anhcraft.jvmkit.utils.FileUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -60,11 +62,11 @@ public final class ENC extends JavaPlugin {
         return chat;
     }
 
-    public static ENC getInstance(){
+    public static ENC getInstance() {
         return instance;
     }
 
-    public static TaskChainFactory getTaskChainFactory(){
+    public static TaskChainFactory getTaskChainFactory() {
         return taskChainFactory;
     }
 
@@ -74,7 +76,7 @@ public final class ENC extends JavaPlugin {
 
     private void updateGeneralCof() {
         int currentVersion = systemConfig.getAsJsonPrimitive("config_version").getAsInt();
-        if(generalConfig.getInt("config_version", 0) < currentVersion){
+        if (generalConfig.getInt("config_version", 0) < currentVersion) {
             try {
                 getLogger().warning("BE WARNED THAT YOUR CONFIGURATION IS OUTDATED!");
                 getLogger().info("We are going to update your current configuration!");
@@ -84,7 +86,7 @@ public final class ENC extends JavaPlugin {
                 FileUtil.write(GENERAL_CONFIG_FILE, getResource("general.yml"));
                 generalConfig.load(GENERAL_CONFIG_FILE);
                 getLogger().info("Updated successfully!");
-            } catch(Exception e) {
+            } catch (Exception e) {
                 getLogger().warning("Failed to upgrade the configuration!");
                 getLogger().warning("For security reasons, the plugin will be disabled!");
                 e.printStackTrace();
@@ -93,16 +95,16 @@ public final class ENC extends JavaPlugin {
         }
     }
 
-    private void updateLocaleConf(File localeFile){
+    private void updateLocaleConf(File localeFile) {
         var mainLocale = YamlConfiguration.loadConfiguration(new InputStreamReader(getClass().getResourceAsStream("/locale/en-us.yml")));
         var needSave = false;
-        for(String s : mainLocale.getKeys(true)){
-            if(!localeConfig.isSet(s)) {
+        for (String s : mainLocale.getKeys(true)) {
+            if (!localeConfig.isSet(s)) {
                 localeConfig.set(s, mainLocale.get(s));
                 needSave = true;
             }
         }
-        if(needSave) {
+        if (needSave) {
             try {
                 localeConfig.save(localeFile);
             } catch (IOException e) {
@@ -129,7 +131,7 @@ public final class ENC extends JavaPlugin {
         // load other configs
         gemConfig.load(GEM_CONFIG_FILE);
         var localeFile = new File(LOCALE_FOLDER, generalConfig.getString("plugin.locale_file"));
-        FileUtil.init(localeFile, getClass().getResourceAsStream("/locale/"+generalConfig.getString("plugin.locale_file")));
+        FileUtil.init(localeFile, getClass().getResourceAsStream("/locale/" + generalConfig.getString("plugin.locale_file")));
         localeConfig.load(localeFile);
         // update locale config
         updateLocaleConf(localeFile);
@@ -176,6 +178,7 @@ public final class ENC extends JavaPlugin {
         registerEnchantment(new AntiGravity());
         registerEnchantment(new Antidote());
         registerEnchantment(new Pull());
+        registerEnchantment(new Morningstar());
     }
 
     private void registerListeners() {
@@ -208,11 +211,11 @@ public final class ENC extends JavaPlugin {
         // init plugin
         try {
             reloadPlugin();
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         // integrations
-        if(KMLReady = getServer().getPluginManager().isPluginEnabled("KeepMyLife"))
+        if (KMLReady = getServer().getPluginManager().isPluginEnabled("KeepMyLife"))
             chat.messageConsole("&aHooked to KeepMyLife successfully!");
         // register stuffs
         registerListeners();
@@ -222,15 +225,22 @@ public final class ENC extends JavaPlugin {
         chat.messageConsole("&eDonate me if you like this plugin <3");
         chat.messageConsole("&ehttps://paypal.me/anhcraft");
 
-        if(generalConfig.getBoolean("plugin.allow_check_update")){
+        if (generalConfig.getBoolean("plugin.allow_check_update")) {
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     var expect = SpigetApiUtil.getResourceLatestVersion("64871").chars().sum();
                     var current = getDescription().getVersion().chars().sum();
-                    if(current < expect) chat.messageConsole("&cENC is outdated! Please consider updating xD");
+                    if (current < expect) chat.messageConsole("&cENC is outdated! Please consider updating xD");
                 }
             }.runTaskLater(this, 60);
         }
+    }
+
+    @Override
+    public void onDisable() {
+        ServerUtil.getAllEntities().stream()
+                .filter(e -> e.hasMetadata("enc"))
+                .forEach(Entity::remove);
     }
 }
