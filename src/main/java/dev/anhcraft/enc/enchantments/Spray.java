@@ -34,18 +34,18 @@ public class Spray extends Enchantment {
             @Override
             public void onInteract(ItemReport report, PlayerInteractEvent event) {
                 var player = report.getPlayer();
-                var loc = player.getEyeLocation();
                 if(Objects.equals(EquipmentSlot.OFF_HAND, event.getHand()) ||
                         (event.getAction() != Action.RIGHT_CLICK_BLOCK
                                 && event.getAction() != Action.RIGHT_CLICK_AIR)) return;
 
+                var cooldown = computeConfigValue("cooldown", report);
+                if(!handleCooldown(MAP, player, cooldown)) return;
+
                 var level = (int) computeConfigValue("effect_level", report);
                 var duration = (int) computeConfigValue("effect_duration", report);
-                var cooldown = computeConfigValue("cooldown", report);
                 var damage = computeConfigValue("damage", report);
                 var distance = computeConfigValue("distance", report);
-
-                if(!handleCooldown(MAP, player, cooldown)) return;
+                var loc = player.getEyeLocation();
 
                 for (var g = 1; g < distance; g++) {
                     var target = loc.clone().add(loc.getDirection().normalize().multiply(g));

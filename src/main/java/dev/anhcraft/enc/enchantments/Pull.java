@@ -35,17 +35,17 @@ public class Pull extends Enchantment {
             @Override
             public void onInteract(ItemReport report, PlayerInteractEvent event) {
                 var player = report.getPlayer();
-                var loc = player.getEyeLocation();
                 if(Objects.equals(EquipmentSlot.OFF_HAND, event.getHand()) ||
                         (event.getAction() != Action.RIGHT_CLICK_BLOCK
                                 && event.getAction() != Action.RIGHT_CLICK_AIR)) return;
 
-                var amount = (int) computeConfigValue("amount", report);
                 var cooldown = computeConfigValue("cooldown", report);
+                if(!handleCooldown(MAP, player, cooldown)) return;
+
+                var amount = (int) computeConfigValue("amount", report);
                 var distance = computeConfigValue("distance", report);
                 var damage = computeConfigValue("damage", report);
-
-                if(!handleCooldown(MAP, player, cooldown)) return;
+                var loc = player.getEyeLocation();
 
                 player.playSound(player.getLocation(), SOUND, 3f, 1f);
                 for (var g = 1; g < distance; g++) {
