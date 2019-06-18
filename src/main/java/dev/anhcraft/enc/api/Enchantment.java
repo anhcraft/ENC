@@ -41,7 +41,7 @@ public abstract class Enchantment {
     private EnchantmentTarget[] itemTargets;
     private File configFile;
     private Chat chat;
-    private YamlConfiguration config = new YamlConfiguration();
+    private YamlConfiguration config;
     private final List<IListener> eventListeners = new ArrayList<>();
     private final List<String> worldList = new ArrayList<>();
     private final Map<String, Pair<Double, Long>> computation_caching = new HashMap<>();
@@ -83,6 +83,8 @@ public abstract class Enchantment {
         int i = 0;
         for(var entry : map.entrySet()) {
             if(!config.isSet(entry.getKey())) {
+                Condition.check(!entry.getValue().getClass().isArray(),
+                        "Do not use array, switch to List instead");
                 config.set(entry.getKey(), entry.getValue());
                 i++;
             }
@@ -90,7 +92,7 @@ public abstract class Enchantment {
         if(i > 0) saveConfig();
     }
 
-    void initConfig(File configFile){
+    void initConfigFile(File configFile){
         this.configFile = configFile;
         try {
             configFile.createNewFile();
@@ -142,10 +144,10 @@ public abstract class Enchantment {
     public double computeConfigValue(@NotNull String key, @NotNull ItemReport report) {
         Condition.argNotNull("key", key);
         Condition.argNotNull("report", report);
-        if(config.getBoolean("computation_caching.enabled")){
+        if(config.getBoolean("general.computation_caching.enabled")){
             Pair<Double, Long> ent = computation_caching.get(key);
             if(ent != null){
-                if(System.currentTimeMillis()-ent.getSecond() <= config.getLong("computation_caching.caching_time"))
+                if(System.currentTimeMillis()-ent.getSecond() <= config.getLong("general.computation_caching.caching_time"))
                     return ent.getFirst();
             }
         }
@@ -189,8 +191,8 @@ public abstract class Enchantment {
                     break;
             }
         }
-        if(config.getBoolean("computation_caching.enabled") &&
-                (!config.getBoolean("computation_caching.strict_mode") || !ignored))
+        if(config.getBoolean("general.computation_caching.enabled") &&
+                (!config.getBoolean("general.computation_caching.strict_mode") || !ignored))
             computation_caching.put(key, new Pair<>(v, System.currentTimeMillis()));
         return v;
     }
@@ -202,22 +204,22 @@ public abstract class Enchantment {
         config = YamlConfiguration.loadConfiguration(configFile);
 
         Map<String, Object> map = new HashMap<>();
-        map.put("enabled", true);
-        map.put("chat_prefix", "&5#{lowercase_enchant_id} > &f");
-        map.put("worlds_list", new ArrayList<>(DEFAULT_WORLDS_LIST));
-        map.put("allowed_worlds_list", true);
-        map.put("name", id);
-        map.put("computation_caching.enabled", false);
-        map.put("computation_caching.caching_time", 72000);
-        map.put("computation_caching.strict_mode", true);
+        map.put("general.enabled", true);
+        map.put("general.chat_prefix", "&5#{lowercase_enchant_id} > &f");
+        map.put("general.worlds_list", new ArrayList<>(DEFAULT_WORLDS_LIST));
+        map.put("general.allowed_worlds_list", true);
+        map.put("general.name", id);
+        map.put("general.computation_caching.enabled", false);
+        map.put("general.computation_caching.caching_time", 72000);
+        map.put("general.computation_caching.strict_mode", true);
         initConfigEntries(map);
 
-        chat = new Chat(replaceStr(config.getString("chat_prefix")));
+        chat = new Chat(replaceStr(config.getString("general.chat_prefix")));
         Condition.check(getName().indexOf(FormatUtil.SECTION_SIGN) == -1, "enchantment name can not contain section signs due to unexpected bugs, please use ampersands instead");
         worldList.clear();
         Map<String, List<String>> groups = new HashMap<>();
         groups.put("all", Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList()));
-        worldList.addAll(ReplaceUtil.replaceVariables(config.getStringList("worlds_list"), groups, true));
+        worldList.addAll(ReplaceUtil.replaceVariables(config.getStringList("general.worlds_list"), groups, true));
         onInitConfig();
     }
 
@@ -237,7 +239,7 @@ public abstract class Enchantment {
      * @return enchantment's name
      */
     public String getName() {
-        return config.getString("name");
+        return config.getString("general.name");
     }
 
     /**
@@ -271,7 +273,7 @@ public abstract class Enchantment {
      * @return true if yes
      */
     public boolean isEnabled() {
-        return config.getBoolean("enabled");
+        return config.getBoolean("general.enabled");
     }
 
     /**
@@ -280,7 +282,7 @@ public abstract class Enchantment {
      * @return true if yes
      */
     public boolean isAllowedWorld(@Nullable String world) {
-        return world != null && config.getBoolean("allowed_worlds_list") == worldList.contains(world);
+        return world != null && config.getBoolean("general.allowed_worlds_list") == worldList.contains(world);
     }
 
     /**

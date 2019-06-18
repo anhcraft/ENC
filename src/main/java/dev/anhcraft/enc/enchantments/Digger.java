@@ -13,10 +13,7 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Digger extends Enchantment {
@@ -53,10 +50,10 @@ public class Digger extends Enchantment {
         Map<String, Object> map = new HashMap<>();
         map.put("radius", "{level}");
         map.put("must_same_type", false);
-        map.put("material_list", new String[]{
+        map.put("material_list", Arrays.asList(
                 "$solid",
                 "-bedrock",
-                "-barrier"});
+                "-barrier"));
         map.put("allowed_material_list", true);
         map.put("cooldown", "{level}*15+30");
         initConfigEntries(map);

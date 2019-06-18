@@ -118,10 +118,10 @@ public class Collapse extends Enchantment implements Listener {
         map.put("block_physics", true);
         map.put("block_falling", true);
         map.put("sound", true);
-        map.put("material_list", new String[]{
+        map.put("material_list", Arrays.asList(
                 "$solid",
                 "-bedrock",
-                "-barrier"});
+                "-barrier"));
         map.put("allowed_material_list", true);
         initConfigEntries(map);
 

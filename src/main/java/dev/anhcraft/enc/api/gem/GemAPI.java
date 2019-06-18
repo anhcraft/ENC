@@ -158,6 +158,7 @@ public class GemAPI {
      * @param itemStack the stack of items
      * @return the gem item
      */
+    @Nullable
     public static GemItem searchGem(@Nullable ItemStack itemStack){
         if(!ItemUtil.isNull(itemStack)) {
             var m = itemStack.getItemMeta();
