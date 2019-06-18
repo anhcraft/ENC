@@ -29,7 +29,7 @@ public class Spray extends Enchantment {
     public Spray() {
         super("Spray", new String[]{
             "Spray forward and impede targets with negative effects"
-        }, "anhcraft", null, 5, EnchantmentTarget.WEAPON);
+        }, "anhcraft", null, 5, EnchantmentTarget.ALL);
 
         getEventListeners().add(new AsyncInteractListener() {
             @Override
