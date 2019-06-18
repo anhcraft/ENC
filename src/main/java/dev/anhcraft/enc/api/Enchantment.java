@@ -7,6 +7,7 @@ import dev.anhcraft.enc.utils.*;
 import dev.anhcraft.jvmkit.lang.annotation.Beta;
 import dev.anhcraft.jvmkit.utils.ArrayUtil;
 import dev.anhcraft.jvmkit.utils.Condition;
+import dev.anhcraft.jvmkit.utils.MathUtil;
 import kotlin.Pair;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import org.bukkit.Bukkit;
@@ -334,8 +335,7 @@ public abstract class Enchantment {
         else {
             if(cooldownTimer.isTimeout(cooldown)) cooldownTimer.reset();
             else {
-                getChat().message(player, "Remaining cooldown time: "+
-                        UnitUtil.tick2s(cooldown-cooldownTimer.elapsedTicks()) +"s");
+                getChat().message(player, "Remaining cooldown time: "+ MathUtil.round(UnitUtil.tick2s(cooldown-cooldownTimer.elapsedTicks()), 2) +"s");
                 return false;
             }
         }
