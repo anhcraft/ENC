@@ -175,6 +175,7 @@ public final class ENC extends JavaPlugin {
         registerEnchantment(new Illuminati());
         registerEnchantment(new AntiGravity());
         registerEnchantment(new Antidote());
+        registerEnchantment(new Pull());
     }
 
     private void registerListeners() {
