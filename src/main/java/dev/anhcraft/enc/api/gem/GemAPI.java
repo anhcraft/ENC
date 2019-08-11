@@ -203,7 +203,7 @@ public class GemAPI {
         if(!ItemUtil.isNull(itemStack)) {
             Condition.argNotNull("gemItem", gemItem);
             ItemMeta m = itemStack.getItemMeta();
-            int lore = ChatUtil.formatColorCodes(ENC.getGeneralConfig()
+            List<String> lore = ChatUtil.formatColorCodes(ENC.getGeneralConfig()
                     .getStringList("gem.lore_patterns.full_raw"))
                 .stream()
                 .map(s -> s.replace("{gem_name}", gemItem.getGem().getName())
@@ -221,9 +221,9 @@ public class GemAPI {
                     .replace("{max_protection_rate}", Double.toString(gemItem.getGem().getMaxProtectionRate())))
                 .collect(Collectors.toList());
             if(m.hasLore()) {
-                int regex1 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.name_regex"));
-                int regex2 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.success_rate_regex"));
-                int regex3 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.protection_rate_regex"));
+                Pattern regex1 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.name_regex"));
+                Pattern regex2 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.success_rate_regex"));
+                Pattern regex3 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.protection_rate_regex"));
                 lore.addAll(m.getLore().stream().filter(s -> {
                     s = FormatUtil.reverseColorCode(s);
                     return !regex1.matcher(s).find() && !regex2.matcher(s).find() && !regex3.matcher(s).find();
@@ -240,12 +240,12 @@ public class GemAPI {
      */
     public static void detachGem(@Nullable ItemStack itemStack){
         if(!ItemUtil.isNull(itemStack)) {
-            int m = itemStack.getItemMeta();
+            ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                int regex1 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.name_regex"));
-                int regex2 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.success_rate_regex"));
-                int regex3 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.protection_rate_regex"));
-                int lore = m.getLore().stream().filter(s -> {
+                Pattern regex1 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.name_regex"));
+                Pattern regex2 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.success_rate_regex"));
+                Pattern regex3 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.protection_rate_regex"));
+                List<String> lore = m.getLore().stream().filter(s -> {
                     s = FormatUtil.reverseColorCode(s);
                     return !regex1.matcher(s).find() && !regex2.matcher(s).find() && !regex3.matcher(s).find();
                 }).collect(Collectors.toList());

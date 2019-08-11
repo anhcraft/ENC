@@ -10,12 +10,12 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="enc" target="11" />
+      <module name="enc" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="enc" options="-Xlint:-requires-transitive-automatic" />
+      <module name="enc" options="" />
     </option>
   </component>
 </project>

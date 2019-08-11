@@ -8,6 +8,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 public class PlayerListener implements Listener {
     @EventHandler
     public void cleanPlayers(PlayerQuitEvent event){
-        PlayerMap.Companion.getInstances().forEach(e -> e.remove(event.getPlayer()));
+        PlayerMap.instances.forEach(e -> e.remove(event.getPlayer()));
     }
 }
