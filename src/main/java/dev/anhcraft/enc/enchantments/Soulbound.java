@@ -20,7 +20,7 @@ public class Soulbound extends Enchantment {
             @Override
             public void onDrop(ItemReport report, AtomicBoolean keep) {
                 if(!keep.get()) return;
-                var chance = computeConfigValue("chance", report)/100d;
+                double chance = computeConfigValue("chance", report)/100d;
                 keep.set(Math.random() <= chance);
             }
         });

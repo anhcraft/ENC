@@ -3,6 +3,7 @@ package dev.anhcraft.enc.commands;
 import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.EnchantmentAPI;
+import dev.anhcraft.enc.api.gem.Gem;
 import dev.anhcraft.enc.api.gem.GemAPI;
 import dev.anhcraft.enc.api.gem.GemItem;
 import kotlin.Pair;
@@ -22,10 +23,10 @@ class ArgHandler {
 
     static GemItem gemAndRate(String[] args){
         if(ENC.getGeneralConfig().getBoolean("commands.use_gem_by_id")) {
-            var g = GemAPI.getGemById(args[args.length-3]);
+            Gem g = GemAPI.getGemById(args[args.length-3]);
             return g == null ? null : new GemItem(g, Double.parseDouble(args[args.length-2]), Double.parseDouble(args[args.length-1]));
         } else {
-            var g = GemAPI.getGemByName(String.join(" ", Arrays.copyOfRange(args, 0, args.length-2)));
+            Gem g = GemAPI.getGemByName(String.join(" ", Arrays.copyOfRange(args, 0, args.length-2)));
             return g == null ? null : new GemItem(g, Double.parseDouble(args[args.length-2]), Double.parseDouble(args[args.length-1]));
         }
     }

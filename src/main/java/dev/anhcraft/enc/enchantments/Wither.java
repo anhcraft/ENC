@@ -23,10 +23,10 @@ public class Wither extends Enchantment {
             @Override
             public void onAttack(ItemReport mainHand, EntityDamageByEntityEvent event, LivingEntity entity) {
                 if(event.isCancelled()) return;
-                var chance = computeConfigValue("chance", mainHand)/100d;
+                double chance = computeConfigValue("chance", mainHand)/100d;
                 if(Math.random() <= chance) {
-                    var level = (int) computeConfigValue("effect_level", mainHand);
-                    var duration = (int) computeConfigValue("effect_duration", mainHand);
+                    int level = (int) computeConfigValue("effect_level", mainHand);
+                    int duration = (int) computeConfigValue("effect_duration", mainHand);
                     ENC.getTaskChainFactory().newChain().sync(() -> entity.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, duration, level))).execute();
                 }
             }

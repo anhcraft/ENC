@@ -1,14 +1,16 @@
 package dev.anhcraft.enc.enchantments;
 
-import dev.anhcraft.craftkit.common.lang.annotation.RequiredCleaner;
 import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.ItemReport;
 import dev.anhcraft.enc.api.listeners.AsyncInteractListener;
 import dev.anhcraft.enc.utils.Cooldown;
 import dev.anhcraft.enc.utils.EntityFilter;
+import dev.anhcraft.enc.utils.PlayerMap;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -17,13 +19,13 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 public class Spray extends Enchantment {
-    @RequiredCleaner
-    private static final Map<Player, Cooldown> MAP = new HashMap<>();
+    private final PlayerMap<Cooldown> MAP = new PlayerMap<>();
 
     public Spray() {
         super("Spray", new String[]{
@@ -33,28 +35,28 @@ public class Spray extends Enchantment {
         getEventListeners().add(new AsyncInteractListener() {
             @Override
             public void onInteract(ItemReport report, PlayerInteractEvent event) {
-                var player = report.getPlayer();
+                Player player = report.getPlayer();
                 if(Objects.equals(EquipmentSlot.OFF_HAND, event.getHand()) ||
                         (event.getAction() != Action.RIGHT_CLICK_BLOCK
                                 && event.getAction() != Action.RIGHT_CLICK_AIR)) return;
 
-                var cooldown = computeConfigValue("cooldown", report);
+                double cooldown = computeConfigValue("cooldown", report);
                 if(!handleCooldown(MAP, player, cooldown)) return;
 
-                var level = (int) computeConfigValue("effect_level", report);
-                var duration = (int) computeConfigValue("effect_duration", report);
-                var damage = computeConfigValue("damage", report);
-                var distance = computeConfigValue("distance", report);
-                var loc = player.getEyeLocation();
+                int level = (int) computeConfigValue("effect_level", report);
+                int duration = (int) computeConfigValue("effect_duration", report);
+                double damage = computeConfigValue("damage", report);
+                double distance = computeConfigValue("distance", report);
+                Location loc = player.getEyeLocation();
 
-                for (var g = 1; g < distance; g++) {
-                    var target = loc.clone().add(loc.getDirection().normalize().multiply(g));
+                for (int g = 1; g < distance; g++) {
+                    Location target = loc.clone().add(loc.getDirection().normalize().multiply(g));
                     ENC.getEffectManager().display(Particle.WATER_DROP, target, 0, 0, 0, 0, 6, 3, null, null, (byte) 0, 50, target.getWorld().getPlayers());
-                    var entities = player.getWorld().getNearbyEntities(target, 3, 3, 3);
+                    Collection<Entity> entities = player.getWorld().getNearbyEntities(target, 3, 3, 3);
                     ENC.getTaskChainFactory().newChain().sync(() -> {
-                        for (var ent : entities) {
+                        for (Entity ent : entities) {
                             if (ent.equals(player) || !EntityFilter.check(ent)) continue;
-                            var le = (LivingEntity) ent;
+                            LivingEntity le = (LivingEntity) ent;
                             le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, duration, level));
                             le.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, duration, level));
                             le.damage(damage, player);

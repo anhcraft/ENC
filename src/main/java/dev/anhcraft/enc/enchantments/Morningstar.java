@@ -1,7 +1,7 @@
 package dev.anhcraft.enc.enchantments;
 
+import co.aikar.taskchain.TaskChain;
 import dev.anhcraft.craftkit.cb_common.lang.enumeration.NMSVersion;
-import dev.anhcraft.craftkit.common.lang.annotation.RequiredCleaner;
 import dev.anhcraft.craftkit.utils.VectorUtil;
 import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.Enchantment;
@@ -9,7 +9,9 @@ import dev.anhcraft.enc.api.ItemReport;
 import dev.anhcraft.enc.api.listeners.AsyncInteractListener;
 import dev.anhcraft.enc.utils.Cooldown;
 import dev.anhcraft.enc.utils.EntityFilter;
+import dev.anhcraft.enc.utils.PlayerMap;
 import kotlin.Pair;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.ArmorStand;
@@ -27,8 +29,7 @@ import java.util.*;
 
 public class Morningstar extends Enchantment {
     private static final Material MATERIAL_PART = NMSVersion.getNMSVersion().isNewerOrSame(NMSVersion.v1_13_R1) ? Material.valueOf("OAK_BUTTON") : Material.WOOD_BUTTON;
-    @RequiredCleaner
-    private static final Map<Player, Cooldown> MAP = new HashMap<>();
+    private final PlayerMap<Cooldown> MAP = new PlayerMap<>();
 
     public Morningstar() {
         super("Morningstar", new String[]{
@@ -38,33 +39,33 @@ public class Morningstar extends Enchantment {
         getEventListeners().add(new AsyncInteractListener() {
             @Override
             public void onInteract(ItemReport report, PlayerInteractEvent event) {
-                var player = report.getPlayer();
+                Player player = report.getPlayer();
                 if(Objects.equals(EquipmentSlot.OFF_HAND, event.getHand()) ||
                         (event.getAction() != Action.RIGHT_CLICK_BLOCK
                                 && event.getAction() != Action.RIGHT_CLICK_AIR)) return;
 
-                var cooldown = computeConfigValue("cooldown", report);
+                double cooldown = computeConfigValue("cooldown", report);
                 if(!handleCooldown(MAP, player, cooldown)) return;
 
-                var p_loc = player.getLocation().add(0, 0.3, 0);
-                var ms_bd_damage = computeConfigValue("morningstar.body_damage", report);
-                var ms_hd_damage = computeConfigValue("morningstar.head_damage", report);
-                var ms_rtt_spd = computeConfigValue("morningstar.rotate_speed", report);
-                var ms_len = computeConfigValue("morningstar.length", report);
-                var ms_pt_os = computeConfigValue("morningstar.part_offset", report);
-                var ms_hd_os = computeConfigValue("morningstar.head_offset", report);
-                var ms_dg_os = computeConfigValue("morningstar.degree_offset", report);
-                var p_vec = player.getEyeLocation().getDirection().normalize();
-                var p_angle = new EulerAngle(p_vec.getX(), p_vec.getY(), p_vec.getZ());
+                Location p_loc = player.getLocation().add(0, 0.3, 0);
+                double ms_bd_damage = computeConfigValue("morningstar.body_damage", report);
+                double ms_hd_damage = computeConfigValue("morningstar.head_damage", report);
+                double ms_rtt_spd = computeConfigValue("morningstar.rotate_speed", report);
+                double ms_len = computeConfigValue("morningstar.length", report);
+                double ms_pt_os = computeConfigValue("morningstar.part_offset", report);
+                double ms_hd_os = computeConfigValue("morningstar.head_offset", report);
+                double ms_dg_os = computeConfigValue("morningstar.degree_offset", report);
+                Vector p_vec = player.getEyeLocation().getDirection().normalize();
+                EulerAngle p_angle = new EulerAngle(p_vec.getX(), p_vec.getY(), p_vec.getZ());
 
-                var task = ENC.getTaskChainFactory().newChain();
+                TaskChain<Object> task = ENC.getTaskChainFactory().newChain();
                 List<Pair<ArmorStand, Vector>> parts = new LinkedList<>();
 
                 task.sync(() -> {
                     // make the body
-                    for(var i = 0d; i < ms_len; i+= ms_pt_os){
+                    for(double i = 0d; i < ms_len; i+= ms_pt_os){
                         Vector pt_vec = p_vec.clone().multiply(i);
-                        var pt = player.getWorld().spawn(p_loc.clone().add(pt_vec), ArmorStand.class);
+                        ArmorStand pt = player.getWorld().spawn(p_loc.clone().add(pt_vec), ArmorStand.class);
                         pt.setMarker(true);
                         pt.setGravity(false);
                         pt.setVisible(false);
@@ -76,8 +77,8 @@ public class Morningstar extends Enchantment {
                         parts.add(new Pair<>(pt, pt_vec));
                     }
                     // make the head
-                    var h_vec = p_vec.clone().multiply(ms_len + ms_hd_os);
-                    var h = player.getWorld().spawn(p_loc.clone().add(h_vec), ArmorStand.class);
+                    Vector h_vec = p_vec.clone().multiply(ms_len + ms_hd_os);
+                    ArmorStand h = player.getWorld().spawn(p_loc.clone().add(h_vec), ArmorStand.class);
                     h.setMarker(true);
                     h.setGravity(false);
                     h.setVisible(false);
@@ -88,16 +89,16 @@ public class Morningstar extends Enchantment {
                     parts.add(new Pair<>(h, h_vec));
                 });
 
-                for(var r = 0d; r < 360; r += ms_dg_os){
-                    final var r_ = r;
+                for(double r = 0d; r < 360; r += ms_dg_os){
+                    final double r_ = r;
                     task.sync(() -> {
-                        for(var i = 0; i < parts.size(); i++){
-                            var ent = parts.get(i);
-                            var loc = p_loc.clone().add(VectorUtil.rotateAroundAxisY(
+                        for(int i = 0; i < parts.size(); i++){
+                            Pair<ArmorStand, Vector> ent = parts.get(i);
+                            Location loc = p_loc.clone().add(VectorUtil.rotateAroundAxisY(
                                     ent.getSecond(), r_));
                             ent.getFirst().teleport(loc);
-                            var dmg = (i == parts.size()-1) ? ms_hd_damage : ms_bd_damage;
-                            var rs = ((i == parts.size()-1) ? ms_hd_os : ms_pt_os)*2;
+                            double dmg = (i == parts.size()-1) ? ms_hd_damage : ms_bd_damage;
+                            double rs = ((i == parts.size()-1) ? ms_hd_os : ms_pt_os)*2;
                             ent.getFirst().getNearbyEntities(rs, rs, rs)
                                     .stream()
                                     .filter(EntityFilter::check)

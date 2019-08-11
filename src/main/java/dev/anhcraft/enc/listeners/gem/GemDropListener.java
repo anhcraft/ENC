@@ -62,16 +62,16 @@ public class GemDropListener implements Listener {
                 event.getEntity().getKiller() != null &&
                 KILL_MOBS_WORLDS.contains(event.getEntity().getWorld().getName()) &&
                 KILL_MOBS_ENTITIES.contains(event.getEntity().getType())) {
-            var killer = event.getEntity().getKiller();
+            Player killer = event.getEntity().getKiller();
             if(ENC.getGeneralConfig().getBoolean("gem.gem_drop.kill_mobs.need_permission")
                     && !killer.hasPermission("enc.gem_drop.kill_mobs")) return;
-            var gems = GemAPI.getRegisteredGems();
-            var rates = gems.stream().map(Gem::getDropRate).collect(Collectors.toList());
+            List<Gem> gems = GemAPI.getRegisteredGems();
+            List<Double> rates = gems.stream().map(Gem::getDropRate).collect(Collectors.toList());
             rates.add(ENC.getGeneralConfig().getDouble("gem.gem_drop.kill_mobs.no_drop_rate"));
             int in = RouletteSelect.chooseFromList(rates);
             if(in == gems.size()) return;
-            var gem = gems.get(in);
-            var itemStack = new ItemStack(Material.EMERALD, 1);
+            Gem gem = gems.get(in);
+            ItemStack itemStack = new ItemStack(Material.EMERALD, 1);
             GemAPI.assignGem(itemStack, new GemItem(gem));
             event.getDrops().add(itemStack);
         }

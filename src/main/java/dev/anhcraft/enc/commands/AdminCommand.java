@@ -7,9 +7,12 @@ import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.EnchantmentAPI;
 import dev.anhcraft.enc.api.gem.GemAPI;
+import dev.anhcraft.enc.api.gem.GemItem;
 import dev.anhcraft.jvmkit.lang.enumeration.RegEx;
+import kotlin.Pair;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 @CommandAlias("enca|encadmin|/enc")
@@ -51,12 +54,12 @@ public class AdminCommand extends BaseCommand {
                     String.format(ENC.getLocaleConfig().getString("arg_must_be_integer"), "level"));
             return;
         }
-        var item = player.getInventory().getItemInMainHand();
+        ItemStack item = player.getInventory().getItemInMainHand();
         if(ItemUtil.isNull(item)){
             ENC.getPluginChat().message(player, ENC.getLocaleConfig().getString("must_hold_item"));
             return;
         }
-        var enchantment = ArgHandler.enchantAndLevel(args);
+        Pair<Enchantment, Integer> enchantment = ArgHandler.enchantAndLevel(args);
         if(enchantment.getFirst() == null){
             ENC.getPluginChat().message(player, ENC.getLocaleConfig().getString("enchantment_not_found"));
             return;
@@ -85,7 +88,7 @@ public class AdminCommand extends BaseCommand {
     @Subcommand("enchant remove")
     @CommandPermission("enc.command.enchant.remove")
     public void removeEnchant(Player player, @Single String enchant){
-        var item = player.getInventory().getItemInMainHand();
+        ItemStack item = player.getInventory().getItemInMainHand();
         if(ItemUtil.isNull(item)){
             ENC.getPluginChat().message(player, ENC.getLocaleConfig().getString("must_hold_item"));
             return;
@@ -101,7 +104,7 @@ public class AdminCommand extends BaseCommand {
     @Subcommand("enchant removeall")
     @CommandPermission("enc.command.enchant.removeall")
     public void removeAllEnchant(Player player){
-        var item = player.getInventory().getItemInMainHand();
+        ItemStack item = player.getInventory().getItemInMainHand();
         if(ItemUtil.isNull(item)){
             ENC.getPluginChat().message(player, ENC.getLocaleConfig().getString("must_hold_item"));
             return;
@@ -136,12 +139,12 @@ public class AdminCommand extends BaseCommand {
                     String.format(ENC.getLocaleConfig().getString("arg_must_be_real_number"), "protectionRate"));
             return;
         }
-        var item = player.getInventory().getItemInMainHand();
+        ItemStack item = player.getInventory().getItemInMainHand();
         if(ItemUtil.isNull(item)){
             ENC.getPluginChat().message(player, ENC.getLocaleConfig().getString("must_hold_item"));
             return;
         }
-        var gem = ArgHandler.gemAndRate(args);
+        GemItem gem = ArgHandler.gemAndRate(args);
         if(gem == null){
             ENC.getPluginChat().message(player, ENC.getLocaleConfig().getString("gem_not_found"));
             return;
@@ -152,7 +155,7 @@ public class AdminCommand extends BaseCommand {
     @Subcommand("gem detach")
     @CommandPermission("enc.command.gem.detach")
     public void detachGem(Player player){
-        var item = player.getInventory().getItemInMainHand();
+        ItemStack item = player.getInventory().getItemInMainHand();
         if(ItemUtil.isNull(item)){
             ENC.getPluginChat().message(player, ENC.getLocaleConfig().getString("must_hold_item"));
             return;

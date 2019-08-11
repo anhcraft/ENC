@@ -1,6 +1,5 @@
 package dev.anhcraft.enc.enchantments;
 
-import dev.anhcraft.craftkit.common.lang.annotation.RequiredCleaner;
 import dev.anhcraft.craftkit.events.ArmorChangeEvent;
 import dev.anhcraft.craftkit.events.ArmorEquipEvent;
 import dev.anhcraft.craftkit.events.ArmorUnequipEvent;
@@ -10,8 +9,8 @@ import dev.anhcraft.enc.api.ItemReport;
 import dev.anhcraft.enc.api.listeners.SyncChangeEquipListener;
 import dev.anhcraft.enc.api.listeners.SyncEquipListener;
 import dev.anhcraft.enc.api.listeners.SyncUnequipListener;
+import dev.anhcraft.enc.utils.PlayerMap;
 import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -20,13 +19,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Antidote extends Enchantment {
-    @RequiredCleaner
-    private static final Map<Player, Integer> MAP = new HashMap<>();
+    private final PlayerMap<Integer> MAP = new PlayerMap<>();
     private static final List<String> AVAILABLE_EFFECTS = Arrays.stream(PotionEffectType.values())
             .filter(Objects::nonNull)
             .map(PotionEffectType::getName)
             .collect(Collectors.toList());
-    private static final List<PotionEffectType> BAD_EFFECTS = new ArrayList<>();
+    private final List<PotionEffectType> BAD_EFFECTS = new ArrayList<>();
 
     public Antidote() {
         super("Antidote", new String[]{
@@ -37,7 +35,7 @@ public class Antidote extends Enchantment {
             @Override
             public void run() {
                 MAP.forEach((player, n) -> {
-                    var list = player.getActivePotionEffects().stream()
+                    List<PotionEffectType> list = player.getActivePotionEffects().stream()
                             .map(PotionEffect::getType).collect(Collectors.toList());
                     list.retainAll(BAD_EFFECTS);
                     list.stream().limit(n).forEach(player::removePotionEffect);
@@ -89,7 +87,7 @@ public class Antidote extends Enchantment {
         initConfigEntries(map);
 
         BAD_EFFECTS.clear();
-        var effects = getConfig().getStringList("effect_list").stream()
+        List<String> effects = getConfig().getStringList("effect_list").stream()
                 .map(String::toUpperCase)
                 .collect(Collectors.toList());
         effects.retainAll(AVAILABLE_EFFECTS);

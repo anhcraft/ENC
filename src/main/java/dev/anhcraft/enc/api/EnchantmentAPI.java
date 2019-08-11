@@ -7,12 +7,14 @@ import dev.anhcraft.enc.utils.FormatUtil;
 import dev.anhcraft.enc.utils.RomanNumber;
 import dev.anhcraft.jvmkit.utils.Condition;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -28,7 +30,7 @@ public class EnchantmentAPI {
      */
     public static void registerEnchantment(@NotNull Enchantment enchant) {
         Condition.argNotNull("enchant", enchant);
-        var id = enchant.getId().toUpperCase();
+        String id = enchant.getId().toUpperCase();
         Condition.check(!ENCHANT_MAP.containsKey(id), "Enchantment is already registered");
         ENCHANT_MAP.put(id, enchant);
         enchant.initConfigFile(new File(ENC.ENCHANTMENT_FOLDER, enchant.getId()+".yml"));
@@ -42,7 +44,7 @@ public class EnchantmentAPI {
      */
     public static void unregisterEnchantment(@NotNull Enchantment enchant) {
         Condition.argNotNull("enchant", enchant);
-        var id = enchant.getId().toUpperCase();
+        String id = enchant.getId().toUpperCase();
         Condition.check(ENCHANT_MAP.containsKey(id), "Enchantment is not registered");
         ENCHANT_MAP.remove(id);
     }
@@ -134,9 +136,9 @@ public class EnchantmentAPI {
      */
     public static boolean isEnchanted(@Nullable ItemStack itemStack) {
         if(!ItemUtil.isNull(itemStack)) {
-            var m = itemStack.getItemMeta();
+            ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                var regex = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_general_regex"));
+                Pattern regex = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_general_regex"));
                 return m.getLore().stream().anyMatch(s -> regex.matcher(FormatUtil.reverseColorCode(s)).matches());
             }
         }
@@ -152,9 +154,9 @@ public class EnchantmentAPI {
     public static boolean isEnchanted(@Nullable ItemStack itemStack, @NotNull Enchantment enchant) {
         Condition.argNotNull("enchant", enchant);
         if(!ItemUtil.isNull(itemStack)) {
-            var m = itemStack.getItemMeta();
+            ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                var regex = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_individual_regex").replace("{name}", enchant.getName()));
+                Pattern regex = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_individual_regex").replace("{name}", enchant.getName()));
                 return m.getLore().stream().anyMatch(s -> regex.matcher(FormatUtil.reverseColorCode(s)).find());
             }
         }
@@ -169,20 +171,20 @@ public class EnchantmentAPI {
     @NotNull
     public static Map<Enchantment, Integer> listEnchantments(@Nullable ItemStack itemStack) {
         if(!ItemUtil.isNull(itemStack)) {
-            var m = itemStack.getItemMeta();
+            ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                var regex1 = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_general_regex"));
-                var regex2 = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.name_regex"));
-                var regex3 = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.level_regex"));
+                Pattern regex1 = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_general_regex"));
+                Pattern regex2 = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.name_regex"));
+                Pattern regex3 = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.level_regex"));
                 Map<Enchantment, Integer> map = new HashMap<>();
                 for(String l : m.getLore()) {
                     l = FormatUtil.reverseColorCode(l);
                     if(regex1.matcher(l).matches()) {
-                        var nameMatcher = regex2.matcher(l);
+                        Matcher nameMatcher = regex2.matcher(l);
                         if(nameMatcher.find()){
-                            var lvMatcher = regex3.matcher(l);
+                            Matcher lvMatcher = regex3.matcher(l);
                             if(lvMatcher.find()){
-                                var enc = getEnchantmentByName(nameMatcher.group());
+                                Enchantment enc = getEnchantmentByName(nameMatcher.group());
                                 if(enc != null) map.put(enc, RomanNumber.toDecimal(lvMatcher.group()));
                             }
                         }
@@ -203,14 +205,14 @@ public class EnchantmentAPI {
     public static int getEnchantmentLevel(@Nullable ItemStack itemStack, @NotNull Enchantment enchant) {
         Condition.argNotNull("enchant", enchant);
         if(!ItemUtil.isNull(itemStack)) {
-            var m = itemStack.getItemMeta();
+            ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                var regex1 = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_individual_regex").replace("{name}", enchant.getName()));
-                var regex2 = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.level_regex"));
-                for(var l : m.getLore()) {
+                Pattern regex1 = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_individual_regex").replace("{name}", enchant.getName()));
+                Pattern regex2 = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.level_regex"));
+                for(String l : m.getLore()) {
                     l = FormatUtil.reverseColorCode(l);
                     if(regex1.matcher(l).matches()) {
-                        var nameMatcher = regex2.matcher(l);
+                        Matcher nameMatcher = regex2.matcher(l);
                         if(nameMatcher.find()) return RomanNumber.toDecimal(nameMatcher.group());
                     }
                 }
@@ -228,7 +230,7 @@ public class EnchantmentAPI {
     public static void addEnchantment(@Nullable ItemStack itemStack, @NotNull Enchantment enchant, int level) {
         Condition.argNotNull("enchant", enchant);
         if(!ItemUtil.isNull(itemStack)) {
-            var m = itemStack.getItemMeta();
+            ItemMeta m = itemStack.getItemMeta();
             List<String> lore = new ArrayList<>();
             lore.add(ChatUtil.formatColorCodes(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_raw"))
                 .replace("{name}", enchant.getName())
@@ -236,7 +238,7 @@ public class EnchantmentAPI {
                 .replace("{level}", Integer.toString(level))
                 .replace("{roman_level}", Objects.requireNonNull(RomanNumber.toRoman(level))));
             if(m.hasLore()) {
-                var regex = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_individual_regex").replace("{name}", enchant.getName()));
+                Pattern regex = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_individual_regex").replace("{name}", enchant.getName()));
                 lore.addAll(m.getLore().stream().filter(s -> !regex.matcher(FormatUtil.reverseColorCode(s)).find()).collect(Collectors.toList()));
             }
             m.setLore(lore);
@@ -252,9 +254,9 @@ public class EnchantmentAPI {
     public static void removeEnchantment(@Nullable ItemStack itemStack, @NotNull Enchantment enchant) {
         Condition.argNotNull("enchant", enchant);
         if(!ItemUtil.isNull(itemStack)) {
-            var m = itemStack.getItemMeta();
+            ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                var regex = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_individual_regex").replace("{name}", enchant.getName()));
+                Pattern regex = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_individual_regex").replace("{name}", enchant.getName()));
                 m.setLore(m.getLore().stream().filter(s -> !regex.matcher(FormatUtil.reverseColorCode(s)).find()).collect(Collectors.toList()));
                 itemStack.setItemMeta(m);
             }
@@ -267,9 +269,9 @@ public class EnchantmentAPI {
      */
     public static void removeEnchantments(@Nullable ItemStack itemStack) {
         if(!ItemUtil.isNull(itemStack)) {
-            var m = itemStack.getItemMeta();
+            ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                var regex = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_general_regex"));
+                Pattern regex = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.lore_patterns.full_general_regex"));
                 m.setLore(m.getLore().stream().filter(s -> !regex.matcher(FormatUtil.reverseColorCode(s)).matches()).collect(Collectors.toList()));
                 itemStack.setItemMeta(m);
             }

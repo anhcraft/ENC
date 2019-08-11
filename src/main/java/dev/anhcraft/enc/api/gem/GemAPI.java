@@ -8,6 +8,7 @@ import dev.anhcraft.enc.utils.FormatUtil;
 import dev.anhcraft.enc.utils.RomanNumber;
 import dev.anhcraft.jvmkit.utils.Condition;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -31,7 +33,7 @@ public class GemAPI {
      */
     public static void registerGem(@NotNull Gem gem) {
         Condition.argNotNull("gem", gem);
-        var id = gem.getId().toUpperCase();
+        String id = gem.getId().toUpperCase();
         Condition.check(!GEM_MAP.containsKey(id), "Gem is already registered: Id must be unique");
         Condition.check(GEM_MAP.values().stream().noneMatch(r ->
                 r.getName().equals(gem.getName())), "Gem is already registered: Name must be unique");
@@ -44,7 +46,7 @@ public class GemAPI {
      */
     public static void unregisterGem(@NotNull Gem gem) {
         Condition.argNotNull("gem", gem);
-        var id = gem.getId().toUpperCase();
+        String id = gem.getId().toUpperCase();
         Condition.check(GEM_MAP.containsKey(id), "Enchantment is not registered");
         GEM_MAP.remove(id);
     }
@@ -125,9 +127,9 @@ public class GemAPI {
      */
     public static boolean isGemItem(@Nullable ItemStack itemStack){
         if(!ItemUtil.isNull(itemStack)) {
-            var m = itemStack.getItemMeta();
+            ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                var regex = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.full_general_regex"));
+                Pattern regex = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.full_general_regex"));
                 return m.getLore().stream().anyMatch(s ->
                         regex.matcher(FormatUtil.reverseColorCode(s)).matches());
             }
@@ -144,9 +146,9 @@ public class GemAPI {
     public static boolean isGemItem(@Nullable ItemStack itemStack, @NotNull Gem gem){
         if(!ItemUtil.isNull(itemStack)) {
             Condition.argNotNull("gem", gem);
-            var m = itemStack.getItemMeta();
+            ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                var regex = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.full_individual_regex").replace("{gem_name}", gem.getName()));
+                Pattern regex = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.full_individual_regex").replace("{gem_name}", gem.getName()));
                 return m.getLore().stream().anyMatch(s -> regex.matcher(FormatUtil.reverseColorCode(s)).find());
             }
         }
@@ -161,30 +163,30 @@ public class GemAPI {
     @Nullable
     public static GemItem searchGem(@Nullable ItemStack itemStack){
         if(!ItemUtil.isNull(itemStack)) {
-            var m = itemStack.getItemMeta();
+            ItemMeta m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                var regex1 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.full_general_regex"));
-                var regex2 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.name_regex"));
-                var regex3 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.success_rate_regex"));
-                var regex4 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.protection_rate_regex"));
-                var b = false;
+                Pattern regex1 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.full_general_regex"));
+                Pattern regex2 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.name_regex"));
+                Pattern regex3 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.success_rate_regex"));
+                Pattern regex4 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.protection_rate_regex"));
+                boolean b = false;
                 String name = null;
                 double sr = 0, pr = 0;
-                for(var l : m.getLore()) {
+                for(String l : m.getLore()) {
                     l = FormatUtil.reverseColorCode(l);
                     if(regex1.matcher(l).matches()) b = true;
 
-                    var nameMatcher = regex2.matcher(l);
+                    Matcher nameMatcher = regex2.matcher(l);
                     if(nameMatcher.find()) name = nameMatcher.group();
 
-                    var srMatcher = regex3.matcher(l);
+                    Matcher srMatcher = regex3.matcher(l);
                     if(srMatcher.find())  sr = Double.parseDouble(srMatcher.group());
 
-                    var prMatcher = regex4.matcher(l);
+                    Matcher prMatcher = regex4.matcher(l);
                     if(prMatcher.find()) pr = Double.parseDouble(prMatcher.group());
                 }
                 if(b && name != null) {
-                    var g = getGemByName(name);
+                    Gem g = getGemByName(name);
                     if(g != null) return new GemItem(g, sr, pr);
                 }
             }
@@ -200,8 +202,8 @@ public class GemAPI {
     public static void assignGem(@Nullable ItemStack itemStack, @NotNull GemItem gemItem) {
         if(!ItemUtil.isNull(itemStack)) {
             Condition.argNotNull("gemItem", gemItem);
-            var m = itemStack.getItemMeta();
-            var lore = ChatUtil.formatColorCodes(ENC.getGeneralConfig()
+            ItemMeta m = itemStack.getItemMeta();
+            int lore = ChatUtil.formatColorCodes(ENC.getGeneralConfig()
                     .getStringList("gem.lore_patterns.full_raw"))
                 .stream()
                 .map(s -> s.replace("{gem_name}", gemItem.getGem().getName())
@@ -219,9 +221,9 @@ public class GemAPI {
                     .replace("{max_protection_rate}", Double.toString(gemItem.getGem().getMaxProtectionRate())))
                 .collect(Collectors.toList());
             if(m.hasLore()) {
-                var regex1 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.name_regex"));
-                var regex2 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.success_rate_regex"));
-                var regex3 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.protection_rate_regex"));
+                int regex1 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.name_regex"));
+                int regex2 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.success_rate_regex"));
+                int regex3 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.protection_rate_regex"));
                 lore.addAll(m.getLore().stream().filter(s -> {
                     s = FormatUtil.reverseColorCode(s);
                     return !regex1.matcher(s).find() && !regex2.matcher(s).find() && !regex3.matcher(s).find();
@@ -238,12 +240,12 @@ public class GemAPI {
      */
     public static void detachGem(@Nullable ItemStack itemStack){
         if(!ItemUtil.isNull(itemStack)) {
-            var m = itemStack.getItemMeta();
+            int m = itemStack.getItemMeta();
             if(m.hasLore()) {
-                var regex1 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.name_regex"));
-                var regex2 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.success_rate_regex"));
-                var regex3 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.protection_rate_regex"));
-                var lore = m.getLore().stream().filter(s -> {
+                int regex1 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.name_regex"));
+                int regex2 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.success_rate_regex"));
+                int regex3 = Pattern.compile(ENC.getGeneralConfig().getString("gem.lore_patterns.protection_rate_regex"));
+                int lore = m.getLore().stream().filter(s -> {
                     s = FormatUtil.reverseColorCode(s);
                     return !regex1.matcher(s).find() && !regex2.matcher(s).find() && !regex3.matcher(s).find();
                 }).collect(Collectors.toList());

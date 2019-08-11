@@ -19,6 +19,7 @@ import dev.anhcraft.enc.listeners.*;
 import dev.anhcraft.enc.listeners.gem.GemDropListener;
 import dev.anhcraft.enc.listeners.gem.GemMergeListener;
 import dev.anhcraft.jvmkit.utils.FileUtil;
+import dev.anhcraft.jvmkit.utils.IOUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
@@ -27,6 +28,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
@@ -96,8 +98,8 @@ public final class ENC extends JavaPlugin {
     }
 
     private void updateLocaleConf(File localeFile) {
-        var mainLocale = YamlConfiguration.loadConfiguration(new InputStreamReader(getClass().getResourceAsStream("/locale/en-us.yml")));
-        var needSave = false;
+        YamlConfiguration mainLocale = YamlConfiguration.loadConfiguration(new InputStreamReader(getClass().getResourceAsStream("/locale/en-us.yml")));
+        boolean needSave = false;
         for (String s : mainLocale.getKeys(true)) {
             if (!localeConfig.isSet(s)) {
                 localeConfig.set(s, mainLocale.get(s));
@@ -113,7 +115,7 @@ public final class ENC extends JavaPlugin {
         }
     }
 
-    public void reloadPlugin() throws Exception {
+    public synchronized void reloadPlugin() throws Exception {
         // init files and directories
         ROOT_FOLDER.mkdir();
         LOCALE_FOLDER.mkdir();
@@ -122,16 +124,20 @@ public final class ENC extends JavaPlugin {
         FileUtil.init(GEM_CONFIG_FILE, getResource("gems.yml"));
 
         // load main configs
+        InputStream sci = getResource("system.json");
         systemConfig = new Gson().fromJson(
-                new String(getResource("system.json").readAllBytes(), StandardCharsets.UTF_8), JsonObject.class);
+                new String(IOUtil.toByteArray(sci, 2048), StandardCharsets.UTF_8), JsonObject.class);
+        sci.close();
         generalConfig.load(GENERAL_CONFIG_FILE);
         // update general config
         updateGeneralCof();
 
         // load other configs
         gemConfig.load(GEM_CONFIG_FILE);
-        var localeFile = new File(LOCALE_FOLDER, generalConfig.getString("plugin.locale_file"));
-        FileUtil.init(localeFile, getClass().getResourceAsStream("/locale/" + generalConfig.getString("plugin.locale_file")));
+        File localeFile = new File(LOCALE_FOLDER, generalConfig.getString("plugin.locale_file"));
+        InputStream lci = getClass().getResourceAsStream("/locale/" + generalConfig.getString("plugin.locale_file"));
+        FileUtil.init(localeFile, lci);
+        lci.close();
         localeConfig.load(localeFile);
         // update locale config
         updateLocaleConf(localeFile);
@@ -182,6 +188,7 @@ public final class ENC extends JavaPlugin {
     }
 
     private void registerListeners() {
+        getServer().getPluginManager().registerEvents(new PlayerListener(), this);
         getServer().getPluginManager().registerEvents(new AttackListener(), this);
         getServer().getPluginManager().registerEvents(new KillListener(), this);
         getServer().getPluginManager().registerEvents(new JumpListener(), this);
@@ -198,7 +205,7 @@ public final class ENC extends JavaPlugin {
     }
 
     private void registerCommand() {
-        var cm = new PaperCommandManager(this);
+        PaperCommandManager cm = new PaperCommandManager(this);
         cm.registerCommand(new PlayerCommand());
         cm.registerCommand(new AdminCommand());
     }
@@ -229,8 +236,8 @@ public final class ENC extends JavaPlugin {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    var expect = SpigetApiUtil.getResourceLatestVersion("64871").chars().sum();
-                    var current = getDescription().getVersion().chars().sum();
+                    int expect = SpigetApiUtil.getResourceLatestVersion("64871").chars().sum();
+                    int current = getDescription().getVersion().chars().sum();
                     if (current < expect) chat.messageConsole("&cENC is outdated! Please consider updating xD");
                 }
             }.runTaskLater(this, 60);

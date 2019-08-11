@@ -21,7 +21,7 @@ public class ColouredSheep extends Enchantment {
             @Override
             public void onAttack(ItemReport mainHand, EntityDamageByEntityEvent event, LivingEntity entity) {
                 if(!event.isCancelled() && entity instanceof Sheep){
-                    var s = (Sheep) entity;
+                    Sheep s = (Sheep) entity;
                     if(!s.isSheared()) s.setColor(
                             DyeColor.values()[RandomUtil.randomInt(0, DyeColor.values().length-1)]);
                 }

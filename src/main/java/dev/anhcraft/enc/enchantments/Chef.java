@@ -7,6 +7,7 @@ import dev.anhcraft.enc.api.listeners.SyncKillListener;
 import org.bukkit.Material;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class Chef extends Enchantment {
     private static final Material PORK = NMSVersion.getNMSVersion().isNewerOrSame(NMSVersion.v1_13_R1) ? Material.valueOf("COOKED_PORKCHOP") : Material.GRILLED_PORK;
@@ -20,8 +21,8 @@ public class Chef extends Enchantment {
         getEventListeners().add(new SyncKillListener() {
             @Override
             public void onKill(ItemReport mainHand, EntityDeathEvent event) {
-                for(var drop : event.getDrops()) {
-                    var mt = drop.getType().toString();
+                for(ItemStack drop : event.getDrops()) {
+                    String mt = drop.getType().toString();
                     switch(mt) {
                         case "PORKCHOP":
                         case "PORK":

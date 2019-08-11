@@ -17,6 +17,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,9 +28,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Collapse extends Enchantment implements Listener {
-    private static final List<Material> MATERIAL_LIST = new ArrayList<>();
-    private static final Map<Location, Long> DAMAGED_BLOCKS = new HashMap<>();
-    private static final List<Integer> FALLING_BLOCKS = new ArrayList<>();
+    private final List<Material> MATERIAL_LIST = new ArrayList<>();
+    private final Map<Location, Long> DAMAGED_BLOCKS = new HashMap<>();
+    private final List<Integer> FALLING_BLOCKS = new ArrayList<>();
 
     public Collapse() {
         super("Collapse", new String[]{
@@ -43,32 +44,32 @@ public class Collapse extends Enchantment implements Listener {
             public void onJump(ItemReport foot, PlayerJumpEvent event) {
                 if(!event.isOnSpot()) return;
                 List<Block> breakBlocks = new ArrayList<>();
-                var allowedMaterialList = getConfig().getBoolean("allowed_material_list");
-                var falling = getConfig().getBoolean("block_falling");
-                var physics = getConfig().getBoolean("block_physics");
-                var sound = getConfig().getBoolean("sound");
-                var r = RandomUtil.randomInt(
+                boolean allowedMaterialList = getConfig().getBoolean("allowed_material_list");
+                boolean falling = getConfig().getBoolean("block_falling");
+                boolean physics = getConfig().getBoolean("block_physics");
+                boolean sound = getConfig().getBoolean("sound");
+                int r = RandomUtil.randomInt(
                         (int) computeConfigValue("min_affected_radius", foot),
                         (int) computeConfigValue("max_affected_radius", foot));
-                var min_h = computeConfigValue("min_affected_depth", foot);
-                var max_h = computeConfigValue("max_affected_depth", foot);
-                var del_h = max_h-min_h;
-                var timeout = (long) UnitUtil.tick2ms(computeConfigValue("timeout", foot));
+                double min_h = computeConfigValue("min_affected_depth", foot);
+                double max_h = computeConfigValue("max_affected_depth", foot);
+                double del_h = max_h-min_h;
+                long timeout = (long) UnitUtil.tick2ms(computeConfigValue("timeout", foot));
 
-                var gen = new SimplexOctaveGenerator(foot.getPlayer().getWorld().getSeed(), 5);
-                var loc = foot.getPlayer().getLocation();
-                var locs = LocationUtil.getNearbyLocations(loc, r, 0, r);
+                SimplexOctaveGenerator gen = new SimplexOctaveGenerator(foot.getPlayer().getWorld().getSeed(), 5);
+                Location loc = foot.getPlayer().getLocation();
+                List<Location> locs = LocationUtil.getNearbyLocations(loc, r, 0, r);
                 for(Location xloc : locs){
                     // use noise to calculate the depth
-                    var y = (gen.noise(xloc.getX(), xloc.getZ(),
+                    double y = (gen.noise(xloc.getX(), xloc.getZ(),
                             0, 0, 0.01, 0.08, true)+1)/2d * del_h + min_h;
-                    for(var f = 0; f < y; f++) {
+                    for(int f = 0; f < y; f++) {
                         // the block being damaged or broken
-                        var cloc = xloc.clone().subtract(0, f, 0);
+                        Location cloc = xloc.clone().subtract(0, f, 0);
                         if(allowedMaterialList != MATERIAL_LIST.contains(cloc.getBlock().getType())) continue;
-                        var currentTime = System.currentTimeMillis();
+                        long currentTime = System.currentTimeMillis();
                         if(DAMAGED_BLOCKS.containsKey(cloc)){
-                            var lastTime = DAMAGED_BLOCKS.get(cloc);
+                            Long lastTime = DAMAGED_BLOCKS.get(cloc);
                             // if not time out yet, this block is going to be broken
                             if(currentTime-lastTime <= timeout) breakBlocks.add(cloc.getBlock());
                             // clean old data
@@ -93,7 +94,7 @@ public class Collapse extends Enchantment implements Listener {
                         .sync(() -> {
                             breakBlocks.forEach(block1 -> {
                                 if(falling) {
-                                    var fb = block1.getWorld().spawnFallingBlock(block1.getLocation(),
+                                    FallingBlock fb = block1.getWorld().spawnFallingBlock(block1.getLocation(),
                                             block1.getType(), block1.getData());
                                     fb.setDropItem(false);
                                     FALLING_BLOCKS.add(fb.getEntityId());

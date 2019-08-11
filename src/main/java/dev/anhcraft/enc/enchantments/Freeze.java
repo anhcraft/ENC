@@ -1,11 +1,11 @@
 package dev.anhcraft.enc.enchantments;
 
-import dev.anhcraft.craftkit.common.lang.annotation.RequiredCleaner;
 import dev.anhcraft.craftkit.utils.PlayerUtil;
 import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.ItemReport;
 import dev.anhcraft.enc.api.listeners.AsyncAttackListener;
+import dev.anhcraft.enc.utils.PlayerMap;
 import dev.anhcraft.enc.utils.UnitUtil;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
@@ -14,11 +14,11 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class Freeze extends Enchantment {
-    @RequiredCleaner
-    private static final Map<Player, Long> DATA = new HashMap<>();
+    private final PlayerMap<Long> DATA = new PlayerMap<>();
 
     public Freeze() {
         super("Freeze", new String[]{
@@ -28,9 +28,9 @@ public class Freeze extends Enchantment {
         new BukkitRunnable() {
             @Override
             public void run() {
-                var entries = DATA.entrySet().iterator();
+                Iterator<Map.Entry<Player, Long>> entries = DATA.entrySet().iterator();
                 while(entries.hasNext()){
-                    var entry = entries.next();
+                    Map.Entry<Player, Long> entry = entries.next();
                     if(System.currentTimeMillis() > entry.getValue()){
                         PlayerUtil.unfreeze(entry.getKey());
                         entries.remove();
@@ -43,12 +43,12 @@ public class Freeze extends Enchantment {
             @Override
             public void onAttack(ItemReport mainHand, EntityDamageByEntityEvent event, LivingEntity entity) {
                 if(event.isCancelled() || !(entity instanceof Player)) return;
-                var pent = (Player) entity;
+                Player pent = (Player) entity;
                 if(DATA.containsKey(pent)) return;
-                var chance = computeConfigValue("chance", mainHand)/100d;
+                double chance = computeConfigValue("chance", mainHand)/100d;
                 if(Math.random() > chance) return;
                 PlayerUtil.freeze(pent);
-                var duration = (long) UnitUtil.tick2ms(computeConfigValue("duration", mainHand));
+                long duration = (long) UnitUtil.tick2ms(computeConfigValue("duration", mainHand));
                 DATA.put(pent, System.currentTimeMillis()+duration);
             }
         });

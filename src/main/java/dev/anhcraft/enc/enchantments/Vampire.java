@@ -21,12 +21,12 @@ public class Vampire extends Enchantment {
             @Override
             public void onAttack(ItemReport mainHand, EntityDamageByEntityEvent event, LivingEntity entity) {
                 if(event.isCancelled()) return;
-                var currentHealth = mainHand.getPlayer().getHealth();
+                double currentHealth = mainHand.getPlayer().getHealth();
                 if(currentHealth > computeConfigValue("low_health", mainHand)) return;
                 if(Math.random() > computeConfigValue("chance", mainHand)/100d) return;
-                var amount = event.getDamage()*computeConfigValue("damage_percent", mainHand)/100;
-                var maxHealth = mainHand.getPlayer().getMaxHealth();
-                var newHealth = currentHealth+amount;
+                double amount = event.getDamage()*computeConfigValue("damage_percent", mainHand)/100;
+                double maxHealth = mainHand.getPlayer().getMaxHealth();
+                double newHealth = currentHealth+amount;
                 if(newHealth > maxHealth) {
                     amount = maxHealth-currentHealth;
                     newHealth = maxHealth;

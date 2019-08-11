@@ -1,25 +1,31 @@
 package dev.anhcraft.enc.listeners;
 
+import co.aikar.taskchain.TaskChain;
 import dev.anhcraft.craftkit.events.ArmorChangeEvent;
 import dev.anhcraft.enc.ENC;
+import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.EnchantmentAPI;
 import dev.anhcraft.enc.api.ItemReport;
 import dev.anhcraft.enc.api.listeners.AsyncChangeEquipListener;
 import dev.anhcraft.enc.api.listeners.SyncChangeEquipListener;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.Map;
 
 public class EquipChangeListener implements Listener {
     @EventHandler
     public void changeEquip(ArmorChangeEvent event){
-        var player = event.getPlayer();
-        var oldItem = event.getOldArmor();
-        var oldEnchants = EnchantmentAPI.listEnchantments(oldItem);
-        var newItem = event.getNewArmor();
-        var newEnchants = EnchantmentAPI.listEnchantments(newItem);
-        var listenerChain = ENC.getTaskChainFactory().newChain();
-        var oldReport = new ItemReport(player, oldItem, oldEnchants);
-        var newReport = new ItemReport(player, newItem, newEnchants);
+        Player player = event.getPlayer();
+        ItemStack oldItem = event.getOldArmor();
+        Map<Enchantment, Integer> oldEnchants = EnchantmentAPI.listEnchantments(oldItem);
+        ItemStack newItem = event.getNewArmor();
+        Map<Enchantment, Integer> newEnchants = EnchantmentAPI.listEnchantments(newItem);
+        TaskChain<Object> listenerChain = ENC.getTaskChainFactory().newChain();
+        ItemReport oldReport = new ItemReport(player, oldItem, oldEnchants);
+        ItemReport newReport = new ItemReport(player, newItem, newEnchants);
         oldEnchants.forEach((ench, e) -> {
             if(!ench.isEnabled() || !ench.isAllowedWorld(player.getWorld().getName())) return;
             ench.getEventListeners().stream()

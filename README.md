@@ -6,7 +6,7 @@ Brings more enchantments to your servers
 <repositories>
     <repository>
         <id>anhcraft-repo</id>
-        <url>https://anhcraft.dev:7554/repository/mvn/</url>
+        <url>https://repo.anhcraft.dev/repository/mvn/</url>
     </repository>
 </repositories>
 

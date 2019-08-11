@@ -1,36 +1,42 @@
 package dev.anhcraft.enc.listeners;
 
+import co.aikar.taskchain.TaskChain;
 import dev.anhcraft.craftkit.utils.ItemUtil;
 import dev.anhcraft.enc.ENC;
+import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.EnchantmentAPI;
 import dev.anhcraft.enc.api.ItemReport;
 import dev.anhcraft.enc.api.listeners.AsyncDeathDropListener;
 import dev.anhcraft.enc.api.listeners.SyncDeathDropListener;
 import dev.anhcraft.jvmkit.utils.CollectionUtil;
 import dev.anhcraft.keepmylife.api.events.KeepItemEvent;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DeathDropListener {
     public static class KeepMyLife implements Listener {
         @EventHandler
         public void keep(KeepItemEvent event){
-            var owner = event.getPlayer();
-            var i = 0;
-            for(var it = event.getDropItems().iterator(); it.hasNext();) {
-                var item = it.next();
-                var enchants = EnchantmentAPI.listEnchantments(item);
+            Player owner = event.getPlayer();
+            int i = 0;
+            for(Iterator<ItemStack> it = event.getDropItems().iterator(); it.hasNext();) {
+                ItemStack item = it.next();
+                Map<Enchantment, Integer> enchants = EnchantmentAPI.listEnchantments(item);
                 if(enchants.isEmpty()) continue;
-                var report = new ItemReport(owner, item, enchants);
-                var keep = new AtomicBoolean(false);
-                var listenerChain = ENC.getTaskChainFactory().newChain();
+                ItemReport report = new ItemReport(owner, item, enchants);
+                AtomicBoolean keep = new AtomicBoolean(false);
+                TaskChain<Object> listenerChain = ENC.getTaskChainFactory().newChain();
                 enchants.forEach((ench, value) -> {
                     if (!ench.isEnabled() || !ench.isAllowedWorld(owner.getWorld().getName())) return;
                     ench.getEventListeners().stream()
@@ -59,20 +65,20 @@ public class DeathDropListener {
         @EventHandler
         public void death(PlayerDeathEvent event){
             if(event.getKeepInventory()) return;
-            var owner = event.getEntity();
-            var location = owner.getLocation();
+            Player owner = event.getEntity();
+            Location location = owner.getLocation();
             // use linked list to keep the item order
             List<ItemStack> keptItems = new LinkedList<>();
-            for(var item : owner.getInventory().getContents()){
+            for(ItemStack item : owner.getInventory().getContents()){
                 if(ItemUtil.isNull(item)){
                     keptItems.add(new ItemStack(Material.AIR, 1));
                     continue;
                 }
-                var enchants = EnchantmentAPI.listEnchantments(item);
+                Map<Enchantment, Integer> enchants = EnchantmentAPI.listEnchantments(item);
                 if(!enchants.isEmpty()){
-                    var report = new ItemReport(owner, item, enchants);
-                    var keep = new AtomicBoolean(false);
-                    var listenerChain = ENC.getTaskChainFactory().newChain();
+                    ItemReport report = new ItemReport(owner, item, enchants);
+                    AtomicBoolean keep = new AtomicBoolean(false);
+                    TaskChain<Object> listenerChain = ENC.getTaskChainFactory().newChain();
                     enchants.forEach((ench, value) -> {
                         if (!ench.isEnabled() || !ench.isAllowedWorld(owner.getWorld().getName())) return;
                         ench.getEventListeners().stream()

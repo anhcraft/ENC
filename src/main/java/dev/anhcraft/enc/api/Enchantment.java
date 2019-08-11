@@ -82,7 +82,7 @@ public abstract class Enchantment {
     public <V> void initConfigEntries(@NotNull Map<String, V> map){
         Condition.argNotNull("map", map);
         int i = 0;
-        for(var entry : map.entrySet()) {
+        for(Map.Entry<String, V> entry : map.entrySet()) {
             if(!config.isSet(entry.getKey())) {
                 Condition.check(!entry.getValue().getClass().isArray(),
                         "Do not use array, switch to List instead");
@@ -152,13 +152,13 @@ public abstract class Enchantment {
                     return ent.getFirst();
             }
         }
-        var v = -1.0;
-        var value = config.get(key);
-        var ignored = false;
+        double v = -1.0;
+        Object value = config.get(key);
+        boolean ignored = false;
         if(value instanceof String){
-            var str = (String) value;
-            var levelCheck = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.level.full_regex"));
-            var levelGet = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.level.value_regex"));
+            String str = (String) value;
+            Pattern levelCheck = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.level.full_regex"));
+            Pattern levelGet = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.level.value_regex"));
             Matcher levelCheck_;
             // find all {level} placeholder
             while((levelCheck_ = levelCheck.matcher(str)).find()){
@@ -171,13 +171,13 @@ public abstract class Enchantment {
                 ignored = true;
             }
 
-            var maxLevelCheck = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.max_level.full_regex"));
-            var maxLevelGet = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.max_level.value_regex"));
+            Pattern maxLevelCheck = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.max_level.full_regex"));
+            Pattern maxLevelGet = Pattern.compile(ENC.getGeneralConfig().getString("enchantment.config_value_computing.placeholder_patterns.max_level.value_regex"));
             Matcher maxLevelCheck_;
             // find all {max_level} placeholder
             while((maxLevelCheck_ = maxLevelCheck.matcher(str)).find()){
                 // when get a {max_level} placeholder, check its is {max_level} or {max_level:<ENCHANTMENT_ID>}
-                var maxLevelGet_ = maxLevelGet.matcher(maxLevelCheck_.group());
+                Matcher maxLevelGet_ = maxLevelGet.matcher(maxLevelCheck_.group());
                 // if {max_level:<ENCHANTMENT_ID>}
                 if(maxLevelGet_.find()) str = maxLevelCheck_.replaceFirst(Integer.toString(EnchantmentAPI.getEnchantmentById(maxLevelGet_.group()).maxLevel));
                 else str = maxLevelCheck_.replaceFirst(Integer.toString(maxLevel)); // or {max_level}
@@ -330,7 +330,7 @@ public abstract class Enchantment {
 
     @Beta
     protected boolean handleCooldown(Map<Player, Cooldown> map, Player player, double cooldown){
-        var cooldownTimer = map.get(player);
+        Cooldown cooldownTimer = map.get(player);
         if(cooldownTimer == null) map.put(player, new Cooldown());
         else {
             if(cooldownTimer.isTimeout(cooldown)) cooldownTimer.reset();
