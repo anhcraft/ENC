@@ -51,6 +51,10 @@
                             <pattern>kotlin</pattern>
                             <shadedPattern>dev.anhcraft.enc.kotlin</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>net.objecthunter.exp4j</pattern>
+                            <shadedPattern>dev.anhcraft.enc.exp4j</shadedPattern>
+                        </relocation>
                     </relocations>
                     <finalName>${project.name}</finalName>
                 </configuration>
