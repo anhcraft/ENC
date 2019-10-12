@@ -192,6 +192,7 @@ public final class ENC extends JavaPlugin {
         registerEnchantment(new Morningstar());
         registerEnchantment(new Windstorm());
         registerEnchantment(new Hulk());
+        registerEnchantment(new Ultraviolet());
     }
 
     private void registerListeners() {
