@@ -12,9 +12,9 @@ import dev.anhcraft.craftkit.utils.ServerUtil;
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.gem.Gem;
 import dev.anhcraft.enc.api.gem.GemAPI;
-import dev.anhcraft.enc.commands.AdminCommand;
-import dev.anhcraft.enc.commands.PlayerCommand;
-import dev.anhcraft.enc.enchantments.*;
+import dev.anhcraft.enc.cmd.AdminCommand;
+import dev.anhcraft.enc.cmd.PlayerCommand;
+import dev.anhcraft.enc.enchant.*;
 import dev.anhcraft.enc.listeners.*;
 import dev.anhcraft.enc.listeners.gem.GemDropListener;
 import dev.anhcraft.enc.listeners.gem.GemMergeListener;
@@ -92,7 +92,12 @@ public final class ENC extends JavaPlugin {
                 getLogger().warning("Failed to upgrade the configuration!");
                 getLogger().warning("For security reasons, the plugin will be disabled!");
                 e.printStackTrace();
-                taskChainFactory.newChain().delay(60).sync(() -> getServer().getPluginManager().disablePlugin(this)).execute();
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        getServer().getPluginManager().disablePlugin(instance);
+                    }
+                }.runTaskLater(this, 60);
             }
         }
     }

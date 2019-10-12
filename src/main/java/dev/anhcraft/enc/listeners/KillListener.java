@@ -1,13 +1,10 @@
 package dev.anhcraft.enc.listeners;
 
-import co.aikar.taskchain.TaskChain;
 import dev.anhcraft.craftkit.utils.ItemUtil;
-import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.EnchantmentAPI;
 import dev.anhcraft.enc.api.ItemReport;
-import dev.anhcraft.enc.api.listeners.AsyncKillListener;
-import dev.anhcraft.enc.api.listeners.SyncKillListener;
+import dev.anhcraft.enc.api.handlers.KillHandler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,21 +23,13 @@ public class KillListener implements Listener {
         Map<Enchantment, Integer> enchants = EnchantmentAPI.listEnchantments(item);
         if(enchants.isEmpty()) return;
         ItemReport report = new ItemReport(killer, item, enchants);
-        TaskChain<Object> listenerChain = ENC.getTaskChainFactory().newChain();
         enchants.forEach((ench, value) -> {
             if(!ench.isEnabled() || !ench.isAllowedWorld(killer.getWorld().getName())) return;
-            ench.getEventListeners().stream()
-                    .filter(eventListener -> eventListener instanceof SyncKillListener)
-                    .forEach(eventListener -> {
-                        if(eventListener instanceof AsyncKillListener) {
-                            listenerChain.async(() -> ((AsyncKillListener) eventListener)
-                                    .onKill(report, event));
-                        } else{
-                            listenerChain.sync(() -> ((SyncKillListener) eventListener)
-                                    .onKill(report, event));
-                        }
+            ench.getEnchantHandlers().stream()
+                    .filter(handler -> handler instanceof KillHandler)
+                    .forEach(handler -> {
+                        ((KillHandler) handler).onKill(report, event);
                     });
         });
-        listenerChain.execute();
     }
 }

@@ -39,6 +39,18 @@
                             <pattern>co.aikar.commands</pattern>
                             <shadedPattern>dev.anhcraft.craftkit.acf</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>co.aikar.taskchain</pattern>
+                            <shadedPattern>dev.anhcraft.enc.taskchain</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>dev.anhcraft.confighelper</pattern>
+                            <shadedPattern>dev.anhcraft.craftkit.helpers.config</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>kotlin</pattern>
+                            <shadedPattern>dev.anhcraft.enc.kotlin</shadedPattern>
+                        </relocation>
                     </relocations>
                     <finalName>${project.name}</finalName>
                 </configuration>

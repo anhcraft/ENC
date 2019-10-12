@@ -2,7 +2,7 @@ package dev.anhcraft.enc.api;
 
 import dev.anhcraft.craftkit.chat.Chat;
 import dev.anhcraft.enc.ENC;
-import dev.anhcraft.enc.api.listeners.IListener;
+import dev.anhcraft.enc.api.handlers.EnchantHandler;
 import dev.anhcraft.enc.utils.*;
 import dev.anhcraft.jvmkit.lang.annotation.Beta;
 import dev.anhcraft.jvmkit.utils.ArrayUtil;
@@ -43,7 +43,7 @@ public abstract class Enchantment {
     private File configFile;
     private Chat chat;
     private YamlConfiguration config;
-    private final List<IListener> eventListeners = new ArrayList<>();
+    private final List<EnchantHandler> enchantHandlers = new ArrayList<>();
     private final List<String> worldList = new ArrayList<>();
     private final Map<String, Pair<Double, Long>> computation_caching = new HashMap<>();
 
@@ -299,8 +299,8 @@ public abstract class Enchantment {
      * The list is mutable which means can be modified.
      * @return list of event listeners
      */
-    public List<IListener> getEventListeners() {
-        return eventListeners;
+    public List<EnchantHandler> getEnchantHandlers() {
+        return enchantHandlers;
     }
 
     /**
@@ -356,7 +356,7 @@ public abstract class Enchantment {
                 Objects.equals(configFile, that.configFile) &&
                 Objects.equals(chat, that.chat) &&
                 config.equals(that.config) &&
-                eventListeners.equals(that.eventListeners) &&
+                enchantHandlers.equals(that.enchantHandlers) &&
                 worldList.equals(that.worldList) &&
                 computation_caching.equals(that.computation_caching);
     }

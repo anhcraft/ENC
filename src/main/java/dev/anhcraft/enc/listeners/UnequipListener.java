@@ -1,13 +1,10 @@
 package dev.anhcraft.enc.listeners;
 
-import co.aikar.taskchain.TaskChain;
 import dev.anhcraft.craftkit.events.ArmorUnequipEvent;
-import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.EnchantmentAPI;
 import dev.anhcraft.enc.api.ItemReport;
-import dev.anhcraft.enc.api.listeners.AsyncUnequipListener;
-import dev.anhcraft.enc.api.listeners.SyncUnequipListener;
+import dev.anhcraft.enc.api.handlers.UnequipHandler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,21 +20,13 @@ public class UnequipListener implements Listener {
         Map<Enchantment, Integer> enchants = EnchantmentAPI.listEnchantments(item);
         if(enchants.isEmpty()) return;
         ItemReport report = new ItemReport(player, item, enchants);
-        TaskChain<Object> listenerChain = ENC.getTaskChainFactory().newChain();
         enchants.forEach((ench, value) -> {
             if(!ench.isEnabled() || !ench.isAllowedWorld(player.getWorld().getName())) return;
-            ench.getEventListeners().stream()
-                    .filter(eventListener -> eventListener instanceof SyncUnequipListener)
-                    .forEach(eventListener -> {
-                        if(eventListener instanceof AsyncUnequipListener) {
-                            listenerChain.async(() -> ((AsyncUnequipListener) eventListener)
-                                    .onUnequip(report, event));
-                        } else{
-                            listenerChain.sync(() -> ((SyncUnequipListener) eventListener)
-                                    .onUnequip(report, event));
-                        }
+            ench.getEnchantHandlers().stream()
+                    .filter(handler -> handler instanceof UnequipHandler)
+                    .forEach(handler -> {
+                        ((UnequipHandler) handler).onUnequip(report, event);
                     });
         });
-        listenerChain.execute();
     }
 }

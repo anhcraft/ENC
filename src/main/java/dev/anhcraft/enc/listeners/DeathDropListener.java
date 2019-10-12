@@ -1,14 +1,11 @@
 package dev.anhcraft.enc.listeners;
 
-import co.aikar.taskchain.TaskChain;
 import dev.anhcraft.advancedkeep.api.events.PlayerKeepEvent;
 import dev.anhcraft.craftkit.utils.ItemUtil;
-import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.EnchantmentAPI;
 import dev.anhcraft.enc.api.ItemReport;
-import dev.anhcraft.enc.api.listeners.AsyncDeathDropListener;
-import dev.anhcraft.enc.api.listeners.SyncDeathDropListener;
+import dev.anhcraft.enc.api.handlers.DeathDropHandler;
 import dev.anhcraft.jvmkit.utils.CollectionUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -36,22 +33,14 @@ public class DeathDropListener {
                 if(enchants.isEmpty()) continue;
                 ItemReport report = new ItemReport(owner, item, enchants);
                 AtomicBoolean keep = new AtomicBoolean(false);
-                TaskChain<Object> listenerChain = ENC.getTaskChainFactory().newChain();
                 enchants.forEach((ench, value) -> {
                     if (!ench.isEnabled() || !ench.isAllowedWorld(owner.getWorld().getName())) return;
-                    ench.getEventListeners().stream()
-                            .filter(eventListener -> eventListener instanceof SyncDeathDropListener)
-                            .forEach(eventListener -> {
-                                if(eventListener instanceof AsyncDeathDropListener) {
-                                    listenerChain.async(() -> ((AsyncDeathDropListener) eventListener)
-                                            .onDrop(report, keep));
-                                } else {
-                                    listenerChain.sync(() -> ((SyncDeathDropListener) eventListener)
-                                            .onDrop(report, keep));
-                                }
+                    ench.getEnchantHandlers().stream()
+                            .filter(handler -> handler instanceof DeathDropHandler)
+                            .forEach(handler -> {
+                                ((DeathDropHandler) handler).onDrop(report, keep);
                             });
                 });
-                listenerChain.execute();
                 if(keep.get()){
                     event.getKeepItems().set(i, item);
                     it.remove();
@@ -78,22 +67,14 @@ public class DeathDropListener {
                 if(!enchants.isEmpty()){
                     ItemReport report = new ItemReport(owner, item, enchants);
                     AtomicBoolean keep = new AtomicBoolean(false);
-                    TaskChain<Object> listenerChain = ENC.getTaskChainFactory().newChain();
                     enchants.forEach((ench, value) -> {
                         if (!ench.isEnabled() || !ench.isAllowedWorld(owner.getWorld().getName())) return;
-                        ench.getEventListeners().stream()
-                                .filter(eventListener -> eventListener instanceof SyncDeathDropListener)
-                                .forEach(eventListener -> {
-                                    if(eventListener instanceof AsyncDeathDropListener) {
-                                        listenerChain.async(() -> ((AsyncDeathDropListener) eventListener)
-                                                .onDrop(report, keep));
-                                    } else {
-                                        listenerChain.sync(() -> ((SyncDeathDropListener) eventListener)
-                                                .onDrop(report, keep));
-                                    }
+                        ench.getEnchantHandlers().stream()
+                                .filter(handler -> handler instanceof DeathDropHandler)
+                                .forEach(handler -> {
+                                    ((DeathDropHandler) handler).onDrop(report, keep);
                                 });
                     });
-                    listenerChain.execute();
                     if(keep.get()){
                         keptItems.add(item);
                         continue;
