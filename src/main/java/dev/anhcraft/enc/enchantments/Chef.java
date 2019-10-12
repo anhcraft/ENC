@@ -1,6 +1,6 @@
 package dev.anhcraft.enc.enchantments;
 
-import dev.anhcraft.craftkit.cb_common.lang.enumeration.NMSVersion;
+import dev.anhcraft.craftkit.cb_common.NMSVersion;
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.ItemReport;
 import dev.anhcraft.enc.api.listeners.SyncKillListener;
@@ -10,8 +10,8 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class Chef extends Enchantment {
-    private static final Material PORK = NMSVersion.getNMSVersion().isNewerOrSame(NMSVersion.v1_13_R1) ? Material.valueOf("COOKED_PORKCHOP") : Material.GRILLED_PORK;
-    private static final Material COOKED_FISH = NMSVersion.getNMSVersion().isNewerOrSame(NMSVersion.v1_13_R1) ? null : Material.COOKED_FISH;
+    private static final Material PORK = NMSVersion.current().compare(NMSVersion.v1_13_R1) >= 0 ? Material.valueOf("COOKED_PORKCHOP") : Material.GRILLED_PORK;
+    private static final Material COOKED_FISH = NMSVersion.current().compare(NMSVersion.v1_13_R1) >= 0 ? null : Material.COOKED_FISH;
 
     public Chef() {
         super("Chef", new String[]{

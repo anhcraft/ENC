@@ -1,6 +1,6 @@
 package dev.anhcraft.enc.enchantments;
 
-import dev.anhcraft.craftkit.cb_common.lang.enumeration.NMSVersion;
+import dev.anhcraft.craftkit.cb_common.NMSVersion;
 import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.ItemReport;
@@ -25,7 +25,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public class Pull extends Enchantment {
-    private static final Sound SOUND = NMSVersion.getNMSVersion().isNewerOrSame(NMSVersion.v1_13_R1) ? Sound.valueOf("BLOCK_SLIME_BLOCK_HIT") : Sound.BLOCK_SLIME_HIT;
+    private static final Sound SOUND = NMSVersion.current().compare(NMSVersion.v1_13_R1) >= 0 ? Sound.valueOf("BLOCK_SLIME_BLOCK_HIT") : Sound.BLOCK_SLIME_HIT;
     private final PlayerMap<Cooldown> MAP = new PlayerMap<>();
 
     public Pull() {

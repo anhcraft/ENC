@@ -1,7 +1,7 @@
 package dev.anhcraft.enc.enchantments;
 
 import co.aikar.taskchain.TaskChain;
-import dev.anhcraft.craftkit.cb_common.lang.enumeration.NMSVersion;
+import dev.anhcraft.craftkit.cb_common.NMSVersion;
 import dev.anhcraft.craftkit.utils.VectorUtil;
 import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.Enchantment;
@@ -28,7 +28,7 @@ import org.bukkit.util.Vector;
 import java.util.*;
 
 public class Morningstar extends Enchantment {
-    private static final Material MATERIAL_PART = NMSVersion.getNMSVersion().isNewerOrSame(NMSVersion.v1_13_R1) ? Material.valueOf("OAK_BUTTON") : Material.WOOD_BUTTON;
+    private static final Material MATERIAL_PART = NMSVersion.current().compare(NMSVersion.v1_13_R1) >= 0 ? Material.valueOf("OAK_BUTTON") : Material.WOOD_BUTTON;
     private final PlayerMap<Cooldown> MAP = new PlayerMap<>();
 
     public Morningstar() {
