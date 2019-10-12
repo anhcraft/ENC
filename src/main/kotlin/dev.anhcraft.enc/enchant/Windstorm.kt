@@ -3,19 +3,17 @@ package dev.anhcraft.enc.enchant
 import dev.anhcraft.enc.ENC
 import dev.anhcraft.enc.api.Enchantment
 import dev.anhcraft.enc.api.ItemReport
-import dev.anhcraft.enc.api.handlers.AsyncInteractListener
+import dev.anhcraft.enc.api.handlers.InteractHandler
 import dev.anhcraft.enc.utils.Cooldown
 import dev.anhcraft.enc.utils.EntityFilter
 import dev.anhcraft.enc.utils.PlayerMap
 import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.enchantments.EnchantmentTarget
-import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
-import java.util.stream.Stream
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -39,7 +37,8 @@ class Windstorm : Enchantment(
     }
 
     init {
-        enchantHandlers.add(object : AsyncInteractListener() {
+        enchantHandlers.add(object : InteractHandler() {
+            @Override
             override fun onInteract(report: ItemReport, event: PlayerInteractEvent) {
                 val player = report.player
                 if (EquipmentSlot.OFF_HAND == event.hand || event.action != Action.RIGHT_CLICK_BLOCK && event.action != Action.RIGHT_CLICK_AIR)
@@ -61,7 +60,7 @@ class Windstorm : Enchantment(
                     var j = 0.0
                     while (j++ < height) {
                         val loc = pl.add(0.0, 1.0, 0.0).clone()
-                        task.asyncFirst<Stream<Entity>> {
+                        task.async {
                             var k = 0.0
                             while (k < 360) {
                                 val rad = Math.toRadians(k)
@@ -71,15 +70,13 @@ class Windstorm : Enchantment(
                                 player.world.spawnParticle(Particle.EXPLOSION_NORMAL, f, 15, 0.0, 0.0, 0.0, 0.0, null)
                                 k += 10
                             }
-                            return@asyncFirst player.world
+                        }.sync {
+                            player.world
                                     .getNearbyEntities(loc, ii, 0.5, ii)
                                     .stream()
                                     .filter{EntityFilter.check(it)}
                                     .filter{entity -> entity != player}
-                        }.syncLast {
-                            it.forEach { e ->
-                                (e as LivingEntity).damage(dam, player)
-                            }
+                                    .forEach { e -> (e as LivingEntity).damage(dam, player) }
                         }
                     }
                     task.delay(5)

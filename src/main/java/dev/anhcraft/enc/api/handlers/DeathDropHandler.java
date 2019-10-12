@@ -11,7 +11,7 @@ public abstract class DeathDropHandler implements EnchantHandler {
     /**
      * This method is called when an item stack which has the enchantment is going to be dropped due to the death of its owner.
      * @param report the report of the item stack
-     * @param keep the decision on keeping that item
+     * @param shouldKeep the decision on keeping that item
      */
-    public abstract void onDrop(ItemReport report, AtomicBoolean keep);
+    public abstract void onDrop(ItemReport report, AtomicBoolean shouldKeep);
 }

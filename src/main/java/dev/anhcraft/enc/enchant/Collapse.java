@@ -6,7 +6,7 @@ import dev.anhcraft.craftkit.utils.LocationUtil;
 import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.ItemReport;
-import dev.anhcraft.enc.api.handlers.AsyncJumpListener;
+import dev.anhcraft.enc.api.handlers.JumpHandler;
 import dev.anhcraft.enc.utils.ReplaceUtil;
 import dev.anhcraft.enc.utils.UnitUtil;
 import dev.anhcraft.jvmkit.utils.ArrayUtil;
@@ -39,7 +39,7 @@ public class Collapse extends Enchantment implements Listener {
 
         Bukkit.getPluginManager().registerEvents(this, ENC.getInstance());
 
-        getEnchantHandlers().add(new AsyncJumpListener() {
+        getEnchantHandlers().add(new JumpHandler() {
             @Override
             public void onJump(ItemReport foot, PlayerJumpEvent event) {
                 if(!event.isOnSpot()) return;

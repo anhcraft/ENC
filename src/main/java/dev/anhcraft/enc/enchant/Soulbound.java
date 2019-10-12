@@ -18,10 +18,10 @@ public class Soulbound extends Enchantment {
         // we will make modification so that we must use the sync event
         getEnchantHandlers().add(new DeathDropHandler() {
             @Override
-            public void onDrop(ItemReport report, AtomicBoolean keep) {
-                if(!keep.get()) return;
+            public void onDrop(ItemReport report, AtomicBoolean shouldKeep) {
+                if(shouldKeep.get()) return;
                 double chance = computeConfigValue("chance", report)/100d;
-                keep.set(Math.random() <= chance);
+                shouldKeep.set(Math.random() <= chance);
             }
         });
     }

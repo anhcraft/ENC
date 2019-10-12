@@ -4,7 +4,7 @@ import dev.anhcraft.craftkit.cb_common.NMSVersion;
 import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.ItemReport;
-import dev.anhcraft.enc.api.handlers.AsyncInteractListener;
+import dev.anhcraft.enc.api.handlers.InteractHandler;
 import dev.anhcraft.enc.utils.Cooldown;
 import dev.anhcraft.enc.utils.EntityFilter;
 import dev.anhcraft.enc.utils.PlayerMap;
@@ -33,7 +33,7 @@ public class Pull extends Enchantment {
             "Pulls entities toward you"
         }, "anhcraft", null, 3, EnchantmentTarget.ALL);
 
-        getEnchantHandlers().add(new AsyncInteractListener() {
+        getEnchantHandlers().add(new InteractHandler() {
             @Override
             public void onInteract(ItemReport report, PlayerInteractEvent event) {
                 Player player = report.getPlayer();

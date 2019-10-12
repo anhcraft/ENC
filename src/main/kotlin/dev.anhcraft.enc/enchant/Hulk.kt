@@ -30,6 +30,7 @@ class Hulk : Enchantment(
 
     init {
         enchantHandlers.add(object : EquipHandler() {
+            @Override
             override fun onEquip(equip: ItemReport, event: ArmorEquipEvent) {
                 equip.player.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 999999, computeConfigValue("slowness_level", equip).toInt()))
                 equip.player.addPotionEffect(PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, computeConfigValue("damage_resistance_level", equip).toInt()))
@@ -38,6 +39,7 @@ class Hulk : Enchantment(
         })
 
         enchantHandlers.add(object : UnequipHandler() {
+            @Override
             override fun onUnequip(equip: ItemReport, event: ArmorUnequipEvent) {
                 equip.player.removePotionEffect(PotionEffectType.SLOW)
                 equip.player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE)
@@ -46,6 +48,7 @@ class Hulk : Enchantment(
         })
 
         enchantHandlers.add(object : ChangeEquipHandler() {
+            @Override
             override fun onChangeEquip(oldEquip: ItemReport, newEquip: ItemReport, event: ArmorChangeEvent, onOldEquip: Boolean) {
                 if (onOldEquip){
                     event.player.removePotionEffect(PotionEffectType.SLOW)

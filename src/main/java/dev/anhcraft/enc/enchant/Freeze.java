@@ -4,7 +4,7 @@ import dev.anhcraft.craftkit.utils.PlayerUtil;
 import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.Enchantment;
 import dev.anhcraft.enc.api.ItemReport;
-import dev.anhcraft.enc.api.handlers.AsyncAttackListener;
+import dev.anhcraft.enc.api.handlers.AttackHandler;
 import dev.anhcraft.enc.utils.PlayerMap;
 import dev.anhcraft.enc.utils.UnitUtil;
 import org.bukkit.enchantments.EnchantmentTarget;
@@ -39,7 +39,7 @@ public class Freeze extends Enchantment {
             }
         }.runTaskTimerAsynchronously(ENC.getInstance(), 0, 20);
 
-        getEnchantHandlers().add(new AsyncAttackListener() {
+        getEnchantHandlers().add(new AttackHandler() {
             @Override
             public void onAttack(ItemReport mainHand, EntityDamageByEntityEvent event, LivingEntity entity) {
                 if(event.isCancelled() || !(entity instanceof Player)) return;
