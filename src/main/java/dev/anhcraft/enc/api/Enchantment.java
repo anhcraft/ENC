@@ -1,6 +1,6 @@
 package dev.anhcraft.enc.api;
 
-import dev.anhcraft.craftkit.kits.chat.Chat;
+import dev.anhcraft.craftkit.chat.Chat;
 import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.listeners.IListener;
 import dev.anhcraft.enc.utils.*;

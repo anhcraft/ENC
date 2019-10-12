@@ -1,6 +1,7 @@
 package dev.anhcraft.enc.listeners;
 
 import co.aikar.taskchain.TaskChain;
+import dev.anhcraft.advancedkeep.api.events.PlayerKeepEvent;
 import dev.anhcraft.craftkit.utils.ItemUtil;
 import dev.anhcraft.enc.ENC;
 import dev.anhcraft.enc.api.Enchantment;
@@ -9,7 +10,6 @@ import dev.anhcraft.enc.api.ItemReport;
 import dev.anhcraft.enc.api.listeners.AsyncDeathDropListener;
 import dev.anhcraft.enc.api.listeners.SyncDeathDropListener;
 import dev.anhcraft.jvmkit.utils.CollectionUtil;
-import dev.anhcraft.keepmylife.api.events.KeepItemEvent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class DeathDropListener {
     public static class KeepMyLife implements Listener {
         @EventHandler
-        public void keep(KeepItemEvent event){
+        public void keep(PlayerKeepEvent event){
             Player owner = event.getPlayer();
             int i = 0;
             for(Iterator<ItemStack> it = event.getDropItems().iterator(); it.hasNext();) {
